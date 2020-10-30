@@ -20,6 +20,6 @@ public class WorldBlockstateProvider extends BlockStateProvider {
 
 	@Override
 	protected void registerStatesAndModels() {
-		simpleBlock(WorldBlocks.RANDOMITE.get());
+		simpleBlock(WorldBlocks.RANDOMITE_ORE.get());
 	}
 }

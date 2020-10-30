@@ -21,7 +21,7 @@ public class WorldBlocks {
 	public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, AssortedWorld.MODID);
 	public static final DeferredRegister<Item> ITEMS = WorldItems.ITEMS;
 	
-	public static final RegistryObject<Block> RANDOMITE = register("randomite", () -> new Block(Properties.create(Material.ROCK).sound(SoundType.STONE).hardnessAndResistance(1.6f, 1.0f)));
+	public static final RegistryObject<Block> RANDOMITE_ORE = register("randomite_ore", () -> new Block(Properties.create(Material.ROCK).sound(SoundType.STONE).hardnessAndResistance(1.6f, 1.0f)));
 
 	private static <T extends Block> RegistryObject<T> register(String name, Supplier<? extends T> sup) {
 		return register(name, sup, block -> item(block));

@@ -18,7 +18,7 @@ public class WorldBlockTagProvider extends BlockTagsProvider {
 	@Override
 	protected void registerTags() {
 		this.getOrCreateBuilder(Tags.Blocks.ORES).addTag(WorldTags.Blocks.ORES_RANDOMITE);
-		this.getOrCreateBuilder(WorldTags.Blocks.ORES_RANDOMITE).add(WorldBlocks.RANDOMITE.get());
+		this.getOrCreateBuilder(WorldTags.Blocks.ORES_RANDOMITE).add(WorldBlocks.RANDOMITE_ORE.get());
 	}
 
 	@Override

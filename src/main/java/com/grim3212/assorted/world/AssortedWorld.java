@@ -9,6 +9,7 @@ import com.grim3212.assorted.world.common.block.WorldBlocks;
 import com.grim3212.assorted.world.common.data.WorldBlockTagProvider;
 import com.grim3212.assorted.world.common.data.WorldItemTagProvider;
 import com.grim3212.assorted.world.common.data.WorldLootProvider;
+import com.grim3212.assorted.world.common.gen.WorldGeneration;
 import com.grim3212.assorted.world.common.handler.WorldConfig;
 import com.grim3212.assorted.world.common.item.WorldItems;
 
@@ -17,6 +18,7 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -37,7 +39,7 @@ public class AssortedWorld {
 		@Override
 		@OnlyIn(Dist.CLIENT)
 		public ItemStack createIcon() {
-			return new ItemStack(WorldBlocks.RANDOMITE.get());
+			return new ItemStack(WorldBlocks.RANDOMITE_ORE.get());
 		}
 	});
 
@@ -54,6 +56,7 @@ public class AssortedWorld {
 		ModLoadingContext.get().registerConfig(Type.CLIENT, WorldConfig.CLIENT_SPEC);
 		ModLoadingContext.get().registerConfig(Type.COMMON, WorldConfig.COMMON_SPEC);
 
+		MinecraftForge.EVENT_BUS.register(new WorldGeneration());
 	}
 
 	private void setup(final FMLCommonSetupEvent event) {
