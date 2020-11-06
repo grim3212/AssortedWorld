@@ -1,5 +1,21 @@
 {
 	"itemGroup.assortedworld": "Assorted World",
 	
-	"block.assortedworld.randomite_ore": "Randomite Ore"
+	"block.assortedworld.randomite_ore": "Randomite Ore",
+	"block.assortedworld.ur_rune": "§3UR§r Rune",
+	"block.assortedworld.eoh_rune": "§dEOH§r Rune",
+	"block.assortedworld.hagel_rune": "§3HAGEL§r Rune",
+	"block.assortedworld.eolh_rune": "§3EOLH§r Rune",
+	"block.assortedworld.cen_rune": "§3CEN§r Rune",
+	"block.assortedworld.ger_rune": "§3GER§r Rune",
+	"block.assortedworld.rad_rune": "§3RAD§r Rune",
+	"block.assortedworld.is_rune": "§dIS§r Rune",
+	"block.assortedworld.daeg_rune": "§dDAEG§r Rune",
+	"block.assortedworld.tyr_rune": "§dTYR§r Rune",
+	"block.assortedworld.beorc_rune": "§3BEORC§r Rune",
+	"block.assortedworld.lagu_rune": "§3LAGU§r Rune",
+	"block.assortedworld.odal_rune": "§3ODAL§r Rune",
+	"block.assortedworld.nyd_rune": "§dNYD§r Rune",
+	"block.assortedworld.thorn_rune": "§dTHORN§r Rune",
+	"block.assortedworld.os_rune": "§dOS§r Rune"
 }

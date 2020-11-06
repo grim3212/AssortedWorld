@@ -10,6 +10,10 @@ import com.grim3212.assorted.world.common.data.WorldBlockTagProvider;
 import com.grim3212.assorted.world.common.data.WorldItemTagProvider;
 import com.grim3212.assorted.world.common.data.WorldLootProvider;
 import com.grim3212.assorted.world.common.gen.WorldGeneration;
+import com.grim3212.assorted.world.common.gen.feature.WorldConfiguredFeatures;
+import com.grim3212.assorted.world.common.gen.feature.WorldFeatures;
+import com.grim3212.assorted.world.common.gen.structure.WorldConfiguredStructures;
+import com.grim3212.assorted.world.common.gen.structure.WorldStructures;
 import com.grim3212.assorted.world.common.handler.WorldConfig;
 import com.grim3212.assorted.world.common.item.WorldItems;
 
@@ -52,6 +56,8 @@ public class AssortedWorld {
 
 		WorldBlocks.BLOCKS.register(modBus);
 		WorldItems.ITEMS.register(modBus);
+		WorldFeatures.FEATURES.register(modBus);
+		WorldStructures.STRUCTURES.register(modBus);
 
 		ModLoadingContext.get().registerConfig(Type.CLIENT, WorldConfig.CLIENT_SPEC);
 		ModLoadingContext.get().registerConfig(Type.COMMON, WorldConfig.COMMON_SPEC);
@@ -60,6 +66,11 @@ public class AssortedWorld {
 	}
 
 	private void setup(final FMLCommonSetupEvent event) {
+		event.enqueueWork(() -> {
+			WorldStructures.setupStructures();
+			WorldConfiguredStructures.registerConfiguredStructures();
+			WorldConfiguredFeatures.registerConfiguredFeatures();
+		});
 	}
 
 	private void gatherData(GatherDataEvent event) {
