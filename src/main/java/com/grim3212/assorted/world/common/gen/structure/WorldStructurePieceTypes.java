@@ -1,18 +1,13 @@
 package com.grim3212.assorted.world.common.gen.structure;
 
-import java.util.Locale;
-
-import com.grim3212.assorted.world.AssortedWorld;
-
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.gen.feature.structure.IStructurePieceType;
 
-public interface WorldStructurePieceTypes {
+public class WorldStructurePieceTypes {
 
-	IStructurePieceType PYRAMID = register(PyramidStructurePiece::new, "Pyramid");
+	public static IStructurePieceType PYRAMID = PyramidStructurePiece::new;
 
-	static IStructurePieceType register(IStructurePieceType type, String key) {
-		return Registry.register(Registry.STRUCTURE_PIECE, new ResourceLocation(AssortedWorld.MODID, key.toLowerCase(Locale.ROOT)), type);
+	public static void registerStructurePieces() {
+		Registry.register(Registry.STRUCTURE_PIECE, "pyramid_piece", PYRAMID);
 	}
 }

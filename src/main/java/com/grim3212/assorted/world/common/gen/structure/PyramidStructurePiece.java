@@ -20,6 +20,7 @@ import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.ChestTileEntity;
 import net.minecraft.tileentity.MobSpawnerTileEntity;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MutableBoundingBox;
@@ -29,6 +30,7 @@ import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.feature.structure.ScatteredStructurePiece;
 import net.minecraft.world.gen.feature.structure.StructureManager;
 import net.minecraft.world.gen.feature.template.TemplateManager;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class PyramidStructurePiece extends ScatteredStructurePiece {
 
@@ -40,7 +42,7 @@ public class PyramidStructurePiece extends ScatteredStructurePiece {
 	private int spawnerSkipCount;
 	private List<BlockPos> spawnerList;
 	private boolean initialLoad;
-	private Map<BlockPos, BlockState> pyramid;
+	private Map<BlockPos, ResourceLocation> pyramid;
 
 	public PyramidStructurePiece(Random random, BlockPos pos, int maxHeight, int type) {
 		super(WorldStructurePieceTypes.PYRAMID, random, pos.getX(), pos.getY(), pos.getZ(), maxHeight, maxHeight, maxHeight);
@@ -55,15 +57,16 @@ public class PyramidStructurePiece extends ScatteredStructurePiece {
 		super(WorldStructurePieceTypes.PYRAMID, tagCompound);
 		this.maxHeight = tagCompound.getInt("maxHeight");
 		this.type = tagCompound.getInt("type");
-		this.initialLoad = tagCompound.getBoolean("initialLoad");
+		this.initialLoad = false;
+		this.spawnerList = Lists.newArrayList();
 
 		this.pyramid = Maps.newHashMap();
 		ListNBT blocks = tagCompound.getList("pyramid", 10);
 		for (int i = 0; i < blocks.size(); i++) {
 			CompoundNBT blockCompound = (CompoundNBT) blocks.get(i);
 			BlockPos pos = NBTUtil.readBlockPos(blockCompound.getCompound("pos"));
-			BlockState state = NBTUtil.readBlockState(blockCompound.getCompound("state"));
-			this.pyramid.put(pos, state);
+			ResourceLocation block = new ResourceLocation(blockCompound.getString("block"));
+			this.pyramid.put(pos, block);
 		}
 	}
 
@@ -72,13 +75,12 @@ public class PyramidStructurePiece extends ScatteredStructurePiece {
 		super.readAdditional(tagCompound);
 		tagCompound.putInt("maxHeight", this.maxHeight);
 		tagCompound.putInt("type", this.type);
-		tagCompound.putBoolean("initialLoad", this.initialLoad);
 
 		ListNBT blocks = new ListNBT();
 		this.pyramid.forEach((p, s) -> {
 			CompoundNBT compound = new CompoundNBT();
 			compound.put("pos", NBTUtil.writeBlockPos(p));
-			compound.put("state", NBTUtil.writeBlockState(s));
+			compound.putString("block", s.toString());
 			blocks.add(compound);
 		});
 		tagCompound.put("pyramid", blocks);
@@ -86,36 +88,54 @@ public class PyramidStructurePiece extends ScatteredStructurePiece {
 
 	@Override
 	public boolean func_230383_a_(ISeedReader reader, StructureManager structureManager, ChunkGenerator generator, Random rand, MutableBoundingBox bb, ChunkPos chunkPos, BlockPos pos) {
-		if (pos.getY() == -1) {
+		if (!this.isInsideBounds(reader, bb, 0)) {
 			return false;
-		}
+		} else {
+			pos = pos.down(maxHeight / 2);
 
-		pos = pos.down(maxHeight / 2);
+			int halfWidth = halfWidth(maxHeight);
+			int colHeight = 0;
 
-		int halfWidth = halfWidth(maxHeight);
-		int colHeight = 0;
+			if (initialLoad) {
+				BlockPos newPos;
+				for (int x = -halfWidth; x <= halfWidth; x++) {
+					for (int z = -halfWidth; z <= halfWidth; z++) {
+						colHeight = getColumnHeight(x, z);
+						for (int y = -1; y <= colHeight; y++) {
+							newPos = new BlockPos(x, y, z);
 
-		if (initialLoad) {
-			BlockPos newPos;
-			for (int x = -halfWidth; x <= halfWidth; x++) {
-				for (int z = -halfWidth; z <= halfWidth; z++) {
-					colHeight = getColumnHeight(x, z);
-					for (int y = -1; y <= colHeight; y++) {
-						newPos = new BlockPos(x, y, z);
-
-						this.pyramid.put(pos.add(newPos), blockToPlace(rand, newPos, colHeight).getDefaultState());
+							this.pyramid.put(pos.add(newPos), blockToPlace(rand, newPos, colHeight).getRegistryName());
+						}
 					}
 				}
+
+				this.initialLoad = false;
 			}
-			this.initialLoad = false;
+
+			// Outside the triple for is actually saving a lot of time
+			// 38 size was generating in about ~16s
+			// Now it is generating in about ~2s
+			this.pyramid.forEach((p, s) -> setBlockState(reader, p, s, rand));
+
+			return true;
 		}
+	}
 
-		// Outside the triple for is actually saving a lot of time
-		// 38 size was generating in about ~16s
-		// Now it is generating in about ~2s
-		this.pyramid.forEach((p, s) -> setBlockState(reader, p, s, rand));
-
-		return true;
+	private void setBlockState(IServerWorld world, BlockPos p, ResourceLocation s, Random rand) {
+		if (s == Blocks.CHEST.getRegistryName()) {
+			setBlockState(world, p, Blocks.CHEST.getDefaultState(), rand);
+		} else if (s == Blocks.SPAWNER.getRegistryName()) {
+			setBlockState(world, p, Blocks.SPAWNER.getDefaultState(), rand);
+		} else if (s == Blocks.SANDSTONE.getRegistryName()) {
+			setBlockState(world, p, Blocks.SANDSTONE.getDefaultState(), rand);
+		} else if (s == Blocks.SAND.getRegistryName()) {
+			setBlockState(world, p, Blocks.SAND.getDefaultState(), rand);
+		} else if (s == Blocks.AIR.getRegistryName()) {
+			setBlockState(world, p, Blocks.AIR.getDefaultState(), rand);
+		} else {
+			// Hopefully ends up a bit more performant having this as a fallback
+			setBlockState(world, p, ForgeRegistries.BLOCKS.getValue(s).getDefaultState(), rand);
+		}
 	}
 
 	private void setBlockState(IServerWorld world, BlockPos p, BlockState s, Random rand) {

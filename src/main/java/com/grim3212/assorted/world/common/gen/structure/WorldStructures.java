@@ -24,11 +24,9 @@ public class WorldStructures {
 	}
 
 	public static void setupStructures() {
-		setupStructure(PYRAMID.get(), /* The instance of the structure */
-				new StructureSeparationSettings(3 /* maximum distance apart in chunks between spawn attempts */, 1 /* minimum distance apart in chunks between spawn attempts */, 323656344 /*
-																																																 * this modifies the seed of the structure so no two structures always spawn
-																																																 * over each-other. Make this large and unique.
-																																																 */), true);
+		setupStructure(PYRAMID.get(), new StructureSeparationSettings(4, 3, 323656344), true);
+
+		WorldStructurePieceTypes.registerStructurePieces();
 	}
 
 	public static <F extends Structure<?>> void setupStructure(F structure, StructureSeparationSettings structureSeparationSettings, boolean transformSurroundingLand) {

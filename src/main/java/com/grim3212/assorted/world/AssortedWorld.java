@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.grim3212.assorted.world.client.data.WorldBlockstateProvider;
 import com.grim3212.assorted.world.client.data.WorldItemModelProvider;
+import com.grim3212.assorted.world.client.proxy.ClientProxy;
 import com.grim3212.assorted.world.common.block.WorldBlocks;
 import com.grim3212.assorted.world.common.data.WorldBlockTagProvider;
 import com.grim3212.assorted.world.common.data.WorldItemTagProvider;
@@ -16,6 +17,7 @@ import com.grim3212.assorted.world.common.gen.structure.WorldConfiguredStructure
 import com.grim3212.assorted.world.common.gen.structure.WorldStructures;
 import com.grim3212.assorted.world.common.handler.WorldConfig;
 import com.grim3212.assorted.world.common.item.WorldItems;
+import com.grim3212.assorted.world.common.proxy.IProxy;
 
 import net.minecraft.data.DataGenerator;
 import net.minecraft.item.ItemGroup;
@@ -25,6 +27,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig.Type;
@@ -39,6 +42,9 @@ public class AssortedWorld {
 
 	public static final Logger LOGGER = LogManager.getLogger(MODID);
 
+	public static IProxy proxy = new IProxy() {
+	};
+
 	public static final ItemGroup ASSORTED_WORLD_ITEM_GROUP = (new ItemGroup(AssortedWorld.MODID) {
 		@Override
 		@OnlyIn(Dist.CLIENT)
@@ -48,6 +54,8 @@ public class AssortedWorld {
 	});
 
 	public AssortedWorld() {
+		DistExecutor.callWhenOn(Dist.CLIENT, () -> () -> proxy = new ClientProxy());
+		proxy.starting();
 
 		final IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
 
