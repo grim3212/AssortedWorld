@@ -28,7 +28,7 @@ public final class WorldConfig {
 		public final ForgeConfigSpec.IntValue ruinTries;
 		public final ForgeConfigSpec.DoubleValue runeChance;
 
-		public final ForgeConfigSpec.BooleanValue checkForStructures;
+		public final ForgeConfigSpec.BooleanValue generateRandomite;
 
 		public Common(ForgeConfigSpec.Builder builder) {
 			builder.push("Ruins");
@@ -45,7 +45,7 @@ public final class WorldConfig {
 			spireHeight = builder.comment("Set this to the height you would like for spires.").defineInRange("spireHeight", 40, 0, 100);
 			deathSpireChance = builder.comment("Set this to the chance for a death spire to generate.").defineInRange("deathSpireChance", 0.001D, 0, 1);
 
-			checkForStructures = builder.comment("Set to true if the large structures should try and not overlap eachother").define("checkForStructures", true);
+			generateRandomite = builder.comment("Set to true if you would like randomite to generate in your world.").define("generateRandomite", true);
 			builder.pop();
 		}
 	}

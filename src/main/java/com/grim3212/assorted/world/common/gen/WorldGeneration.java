@@ -31,7 +31,8 @@ public class WorldGeneration {
 		BiomeGenerationSettingsBuilder builder = evt.getGeneration();
 
 		if (category != Biome.Category.NETHER && category != Biome.Category.THEEND) {
-			builder.withFeature(Decoration.UNDERGROUND_ORES, WorldConfiguredFeatures.ORE_RANDOMITE);
+			if (WorldConfig.COMMON.generateRandomite.get())
+				builder.withFeature(Decoration.UNDERGROUND_ORES, WorldConfiguredFeatures.ORE_RANDOMITE);
 			if (category != Biome.Category.OCEAN && category != Biome.Category.RIVER && WorldConfig.COMMON.ruinChance.get() != 0)
 				builder.withFeature(Decoration.SURFACE_STRUCTURES, WorldConfiguredFeatures.RUIN);
 		}
