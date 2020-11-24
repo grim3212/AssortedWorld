@@ -67,7 +67,6 @@ public class AssortedWorld {
 		WorldFeatures.FEATURES.register(modBus);
 		WorldStructures.STRUCTURES.register(modBus);
 
-		ModLoadingContext.get().registerConfig(Type.CLIENT, WorldConfig.CLIENT_SPEC);
 		ModLoadingContext.get().registerConfig(Type.COMMON, WorldConfig.COMMON_SPEC);
 
 		MinecraftForge.EVENT_BUS.register(new WorldGeneration());

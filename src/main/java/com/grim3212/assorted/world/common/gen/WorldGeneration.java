@@ -6,6 +6,7 @@ import java.util.Map;
 import com.grim3212.assorted.world.common.gen.feature.WorldConfiguredFeatures;
 import com.grim3212.assorted.world.common.gen.structure.WorldConfiguredStructures;
 import com.grim3212.assorted.world.common.gen.structure.WorldStructures;
+import com.grim3212.assorted.world.common.handler.WorldConfig;
 
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -31,15 +32,12 @@ public class WorldGeneration {
 
 		if (category != Biome.Category.NETHER && category != Biome.Category.THEEND) {
 			builder.withFeature(Decoration.UNDERGROUND_ORES, WorldConfiguredFeatures.ORE_RANDOMITE);
-			builder.withFeature(Decoration.SURFACE_STRUCTURES, WorldConfiguredFeatures.RUIN);
-			// builder.withFeature(Decoration.SURFACE_STRUCTURES,
-			// WorldConfiguredFeatures.PYRAMID);
+			if (category != Biome.Category.OCEAN && category != Biome.Category.RIVER && WorldConfig.COMMON.ruinChance.get() != 0)
+				builder.withFeature(Decoration.SURFACE_STRUCTURES, WorldConfiguredFeatures.RUIN);
 		}
 
-		// builder.withFeature(Decoration.SURFACE_STRUCTURES,
-		// WorldConfiguredFeatures.RUIN_TEST);
-
-		builder.getStructures().add(() -> WorldConfiguredStructures.CONFIGURED_PYRAMID);
+		if (category == Biome.Category.DESERT && WorldConfig.COMMON.pyramidMaxChunkDistance.get() != 0)
+			builder.getStructures().add(() -> WorldConfiguredStructures.CONFIGURED_PYRAMID);
 	}
 
 	@SubscribeEvent(priority = EventPriority.NORMAL)

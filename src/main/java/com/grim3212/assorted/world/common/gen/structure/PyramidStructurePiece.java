@@ -108,14 +108,13 @@ public class PyramidStructurePiece extends ScatteredStructurePiece {
 						}
 					}
 				}
-
-				this.initialLoad = false;
 			}
 
 			// Outside the triple for is actually saving a lot of time
 			// 38 size was generating in about ~16s
 			// Now it is generating in about ~2s
 			this.pyramid.forEach((p, s) -> setBlockState(reader, p, s, rand));
+			this.initialLoad = false;
 
 			return true;
 		}
@@ -141,24 +140,25 @@ public class PyramidStructurePiece extends ScatteredStructurePiece {
 	private void setBlockState(IServerWorld world, BlockPos p, BlockState s, Random rand) {
 		world.setBlockState(p, s, 2);
 
-		if (s.getBlock() == Blocks.CHEST) {
-			TileEntity te = world.getTileEntity(p);
+		if (this.initialLoad)
+			if (s.getBlock() == Blocks.CHEST) {
+				TileEntity te = world.getTileEntity(p);
 
-			if (te instanceof ChestTileEntity) {
-				((ChestTileEntity) te).setLootTable(WorldLootTables.CHESTS_PYRAMID, rand.nextLong());
-			}
-
-		} else if (s.getBlock() == Blocks.SPAWNER) {
-			TileEntity te = world.getTileEntity(p);
-
-			if (te instanceof MobSpawnerTileEntity) {
-				EntityType<?> type = RuinUtil.getRandomRuneMob(rand);
-				if (type == null) {
-					type = EntityType.ZOMBIE;
+				if (te instanceof ChestTileEntity) {
+					((ChestTileEntity) te).setLootTable(WorldLootTables.CHESTS_PYRAMID, rand.nextLong());
 				}
-				((MobSpawnerTileEntity) te).getSpawnerBaseLogic().setEntityType(type);
+
+			} else if (s.getBlock() == Blocks.SPAWNER) {
+				TileEntity te = world.getTileEntity(p);
+
+				if (te instanceof MobSpawnerTileEntity) {
+					EntityType<?> type = RuinUtil.getRandomRuneMob(rand);
+					if (type == null) {
+						type = EntityType.ZOMBIE;
+					}
+					((MobSpawnerTileEntity) te).getSpawnerBaseLogic().setEntityType(type);
+				}
 			}
-		}
 	}
 
 	private Block blockToPlace(Random random, BlockPos pos, int colHeight) {

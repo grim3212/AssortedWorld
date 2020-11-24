@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.grim3212.assorted.world.AssortedWorld;
+import com.grim3212.assorted.world.common.handler.WorldConfig;
 
 import net.minecraft.world.gen.feature.NoFeatureConfig;
 import net.minecraft.world.gen.feature.structure.Structure;
@@ -24,8 +25,7 @@ public class WorldStructures {
 	}
 
 	public static void setupStructures() {
-		setupStructure(PYRAMID.get(), new StructureSeparationSettings(4, 3, 323656344), true);
-
+		setupStructure(PYRAMID.get(), new StructureSeparationSettings(WorldConfig.COMMON.pyramidMaxChunkDistance.get(), (int) (WorldConfig.COMMON.pyramidMaxChunkDistance.get() * 0.42f), 323656344), false);
 		WorldStructurePieceTypes.registerStructurePieces();
 	}
 
