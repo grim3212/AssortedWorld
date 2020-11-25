@@ -14,6 +14,7 @@ public class WorldConfiguredStructures {
 	public static StructureFeature<?, ?> CONFIGURED_PYRAMID = WorldStructures.PYRAMID.get().withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG);
 	public static StructureFeature<?, ?> CONFIGURED_FOUNTAIN = WorldStructures.FOUNTAIN.get().withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG);
 	public static StructureFeature<?, ?> CONFIGURED_WATERDOME = WorldStructures.WATERDOME.get().withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG);
+	public static StructureFeature<?, ?> CONFIGURED_SNOWBALL = WorldStructures.SNOWBALL.get().withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG);
 
 	/**
 	 * Registers the configured structure which is what gets added to the biomes.
@@ -34,6 +35,9 @@ public class WorldConfiguredStructures {
 
 		Registry.register(registry, new ResourceLocation(AssortedWorld.MODID, "configured_waterdome"), CONFIGURED_WATERDOME);
 		FlatGenerationSettings.STRUCTURES.put(WorldStructures.WATERDOME.get(), CONFIGURED_WATERDOME);
+
+		Registry.register(registry, new ResourceLocation(AssortedWorld.MODID, "configured_snowball"), CONFIGURED_SNOWBALL);
+		FlatGenerationSettings.STRUCTURES.put(WorldStructures.SNOWBALL.get(), CONFIGURED_SNOWBALL);
 	}
 
 }
