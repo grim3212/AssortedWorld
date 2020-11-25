@@ -26,27 +26,29 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 public class WorldGeneration {
 
 	@SubscribeEvent(priority = EventPriority.HIGH)
-	public void generateOverworldOres(final BiomeLoadingEvent evt) {
+	public void generateOverworld(final BiomeLoadingEvent evt) {
 		Category category = evt.getCategory();
 		BiomeGenerationSettingsBuilder builder = evt.getGeneration();
 
 		if (category != Biome.Category.NETHER && category != Biome.Category.THEEND) {
 			if (WorldConfig.COMMON.generateRandomite.get())
 				builder.withFeature(Decoration.UNDERGROUND_ORES, WorldConfiguredFeatures.ORE_RANDOMITE);
-			if (category != Biome.Category.OCEAN && category != Biome.Category.RIVER && WorldConfig.COMMON.ruinChance.get() != 0)
+			if (category != Biome.Category.OCEAN && category != Biome.Category.RIVER && WorldConfig.COMMON.ruinChance.get() > 0)
 				builder.withFeature(Decoration.SURFACE_STRUCTURES, WorldConfiguredFeatures.RUIN);
+			if (category == Biome.Category.EXTREME_HILLS && WorldConfig.COMMON.spireChance.get() > 0)
+				builder.withFeature(Decoration.SURFACE_STRUCTURES, WorldConfiguredFeatures.SPIRE);
 		}
 
-		if (category == Biome.Category.DESERT && WorldConfig.COMMON.pyramidMaxChunkDistance.get() != 0)
+		if (category == Biome.Category.DESERT && WorldConfig.COMMON.pyramidMaxChunkDistance.get() > 0)
 			builder.getStructures().add(() -> WorldConfiguredStructures.CONFIGURED_PYRAMID);
 
-		if (category == Biome.Category.SWAMP && WorldConfig.COMMON.fountainMaxChunkDistance.get() != 0)
+		if (category == Biome.Category.SWAMP && WorldConfig.COMMON.fountainMaxChunkDistance.get() > 0)
 			builder.getStructures().add(() -> WorldConfiguredStructures.CONFIGURED_FOUNTAIN);
 
-		if (category == Biome.Category.OCEAN && WorldConfig.COMMON.waterDomeMaxChunkDistance.get() != 0)
+		if (category == Biome.Category.OCEAN && WorldConfig.COMMON.waterDomeMaxChunkDistance.get() > 0)
 			builder.getStructures().add(() -> WorldConfiguredStructures.CONFIGURED_WATERDOME);
 
-		if (evt.getClimate().precipitation == Biome.RainType.SNOW && WorldConfig.COMMON.snowBallMaxChunkDistance.get() != 0)
+		if (evt.getClimate().precipitation == Biome.RainType.SNOW && WorldConfig.COMMON.snowBallMaxChunkDistance.get() > 0)
 			builder.getStructures().add(() -> WorldConfiguredStructures.CONFIGURED_SNOWBALL);
 	}
 

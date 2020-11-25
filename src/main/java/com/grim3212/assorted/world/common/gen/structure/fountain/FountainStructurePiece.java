@@ -4,7 +4,6 @@ import java.util.Map;
 import java.util.Random;
 
 import com.google.common.collect.Maps;
-import com.grim3212.assorted.world.common.block.WorldBlocks;
 import com.grim3212.assorted.world.common.gen.structure.WorldStructurePieceTypes;
 import com.grim3212.assorted.world.common.handler.WorldConfig;
 import com.grim3212.assorted.world.common.lib.WorldLootTables;
@@ -176,7 +175,7 @@ public class FountainStructurePiece extends ScatteredStructurePiece {
 	private Block blockToPlace(Random random, BlockPos pos, int colHeight) {
 		if (pos.getX() != 0 && pos.getY() == -1 && pos.getZ() != 0 && (double) random.nextFloat() <= WorldConfig.COMMON.runeChance.get() && !runePlaced) {
 			runePlaced = true;
-			return randomRune(random);
+			return RuinUtil.randomRune(random);
 		}
 		if (placeWater(pos, colHeight)) {
 			return Blocks.WATER;
@@ -200,10 +199,6 @@ public class FountainStructurePiece extends ScatteredStructurePiece {
 		} else {
 			return Blocks.AIR;
 		}
-	}
-
-	private Block randomRune(Random random) {
-		return WorldBlocks.runeBlocks()[random.nextInt(WorldBlocks.runeBlocks().length)];
 	}
 
 	private Block randomStoneBrick(Random random) {

@@ -2,7 +2,6 @@ package com.grim3212.assorted.world.common.gen.feature;
 
 import java.util.Random;
 
-import com.grim3212.assorted.world.common.block.WorldBlocks;
 import com.grim3212.assorted.world.common.handler.WorldConfig;
 import com.grim3212.assorted.world.common.lib.WorldLootTables;
 import com.grim3212.assorted.world.common.util.RuinUtil;
@@ -159,7 +158,7 @@ public class RuinFeature extends Feature<NoFeatureConfig> {
 		for (; topY < y; topY++) {
 			if (!runePlaced && (double) random.nextFloat() <= WorldConfig.COMMON.runeChance.get()) {
 				runePlaced = true;
-				world.setBlockState(pos, WorldBlocks.runeBlocks()[random.nextInt(WorldBlocks.runeBlocks().length)].getDefaultState(), 2);
+				world.setBlockState(pos, RuinUtil.randomRune(random).getDefaultState(), 2);
 				continue;
 			}
 			int blockType = random.nextInt(30);

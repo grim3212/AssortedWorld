@@ -6,8 +6,8 @@ import java.util.Map;
 import java.util.Random;
 
 import com.google.common.collect.Lists;
-import com.grim3212.assorted.world.common.block.WorldBlocks;
 import com.grim3212.assorted.world.common.gen.structure.WorldStructurePieceTypes;
+import com.grim3212.assorted.world.common.util.RuinUtil;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -112,7 +112,7 @@ public class SnowballStructurePiece extends ScatteredStructurePiece {
 
 		if (places > 0) {
 			if (point1.getX() == 0 && point1.getY() == 0 && point1.getZ() == 0) {
-				return randomRune(random);
+				return RuinUtil.randomRune(random);
 			}
 
 			if (point1.getX() == 0 && point1.getZ() == 0) {
@@ -136,9 +136,5 @@ public class SnowballStructurePiece extends ScatteredStructurePiece {
 		} else {
 			return null;
 		}
-	}
-
-	private Block randomRune(Random random) {
-		return WorldBlocks.runeBlocks()[random.nextInt(WorldBlocks.runeBlocks().length)];
 	}
 }

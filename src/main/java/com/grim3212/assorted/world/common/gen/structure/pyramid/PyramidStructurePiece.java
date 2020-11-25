@@ -6,7 +6,6 @@ import java.util.Random;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.grim3212.assorted.world.common.block.WorldBlocks;
 import com.grim3212.assorted.world.common.gen.structure.WorldStructurePieceTypes;
 import com.grim3212.assorted.world.common.lib.WorldLootTables;
 import com.grim3212.assorted.world.common.util.RuinUtil;
@@ -164,7 +163,7 @@ public class PyramidStructurePiece extends ScatteredStructurePiece {
 
 	private Block blockToPlace(Random random, BlockPos pos, int colHeight) {
 		if (pos.getX() == 0 && pos.getY() == 0 && pos.getZ() == 0) {
-			return randomRune(random);
+			return RuinUtil.randomRune(random);
 		}
 		if (placeStone(random, pos, colHeight)) {
 			if (type == 1) {
@@ -184,10 +183,6 @@ public class PyramidStructurePiece extends ScatteredStructurePiece {
 		} else {
 			return Blocks.AIR;
 		}
-	}
-
-	private Block randomRune(Random random) {
-		return WorldBlocks.runeBlocks()[random.nextInt(WorldBlocks.runeBlocks().length)];
 	}
 
 	private boolean placeStone(Random random, BlockPos pos, int colHeight) {

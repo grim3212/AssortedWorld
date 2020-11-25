@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;
 
+import com.grim3212.assorted.world.common.block.WorldBlocks;
+
+import net.minecraft.block.Block;
 import net.minecraft.entity.EntityType;
 import net.minecraft.util.WeightedRandom;
 import net.minecraftforge.common.DungeonHooks;
@@ -89,6 +92,10 @@ public class RuinUtil {
 
 	public static int distanceBetween(int x1, int z1, int x2, int z2) {
 		return (int) distanceBetweenD(x1, z1, x2, z2);
+	}
+
+	public static Block randomRune(Random random) {
+		return WorldBlocks.runeBlocks()[random.nextInt(WorldBlocks.runeBlocks().length)];
 	}
 
 	public static class RuneMob extends WeightedRandom.Item {

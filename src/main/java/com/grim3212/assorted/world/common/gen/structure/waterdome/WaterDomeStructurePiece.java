@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Random;
 
 import com.google.common.collect.Lists;
-import com.grim3212.assorted.world.common.block.WorldBlocks;
 import com.grim3212.assorted.world.common.gen.structure.WorldStructurePieceTypes;
 import com.grim3212.assorted.world.common.handler.WorldConfig;
+import com.grim3212.assorted.world.common.util.RuinUtil;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -131,7 +131,7 @@ public class WaterDomeStructurePiece extends ScatteredStructurePiece {
 				places++;
 				if (point1.equals(point) && !runePlaced) {
 					runePlaced = true;
-					return randomRune(random);
+					return RuinUtil.randomRune(random);
 				}
 				continue;
 			}
@@ -168,9 +168,5 @@ public class WaterDomeStructurePiece extends ScatteredStructurePiece {
 		} else {
 			return null;
 		}
-	}
-
-	private Block randomRune(Random random) {
-		return WorldBlocks.runeBlocks()[random.nextInt(WorldBlocks.runeBlocks().length)];
 	}
 }
