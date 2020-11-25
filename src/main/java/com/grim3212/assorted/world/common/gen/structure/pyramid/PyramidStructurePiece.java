@@ -1,4 +1,4 @@
-package com.grim3212.assorted.world.common.gen.structure;
+package com.grim3212.assorted.world.common.gen.structure.pyramid;
 
 import java.util.List;
 import java.util.Map;
@@ -7,6 +7,7 @@ import java.util.Random;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.grim3212.assorted.world.common.block.WorldBlocks;
+import com.grim3212.assorted.world.common.gen.structure.WorldStructurePieceTypes;
 import com.grim3212.assorted.world.common.lib.WorldLootTables;
 import com.grim3212.assorted.world.common.util.RuinUtil;
 

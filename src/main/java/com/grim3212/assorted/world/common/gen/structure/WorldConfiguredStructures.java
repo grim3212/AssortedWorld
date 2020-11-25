@@ -11,11 +11,9 @@ import net.minecraft.world.gen.feature.StructureFeature;
 
 public class WorldConfiguredStructures {
 
-	/**
-	 * Static instance of our structure so we can reference it and add it to biomes
-	 * easily.
-	 */
 	public static StructureFeature<?, ?> CONFIGURED_PYRAMID = WorldStructures.PYRAMID.get().withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG);
+	public static StructureFeature<?, ?> CONFIGURED_FOUNTAIN = WorldStructures.FOUNTAIN.get().withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG);
+	public static StructureFeature<?, ?> CONFIGURED_WATERDOME = WorldStructures.WATERDOME.get().withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG);
 
 	/**
 	 * Registers the configured structure which is what gets added to the biomes.
@@ -30,6 +28,12 @@ public class WorldConfiguredStructures {
 		Registry<StructureFeature<?, ?>> registry = WorldGenRegistries.CONFIGURED_STRUCTURE_FEATURE;
 		Registry.register(registry, new ResourceLocation(AssortedWorld.MODID, "configured_pyramid"), CONFIGURED_PYRAMID);
 		FlatGenerationSettings.STRUCTURES.put(WorldStructures.PYRAMID.get(), CONFIGURED_PYRAMID);
+
+		Registry.register(registry, new ResourceLocation(AssortedWorld.MODID, "configured_fountain"), CONFIGURED_FOUNTAIN);
+		FlatGenerationSettings.STRUCTURES.put(WorldStructures.FOUNTAIN.get(), CONFIGURED_FOUNTAIN);
+
+		Registry.register(registry, new ResourceLocation(AssortedWorld.MODID, "configured_waterdome"), CONFIGURED_WATERDOME);
+		FlatGenerationSettings.STRUCTURES.put(WorldStructures.WATERDOME.get(), CONFIGURED_WATERDOME);
 	}
 
 }

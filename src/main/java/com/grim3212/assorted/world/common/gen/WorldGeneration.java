@@ -39,6 +39,12 @@ public class WorldGeneration {
 
 		if (category == Biome.Category.DESERT && WorldConfig.COMMON.pyramidMaxChunkDistance.get() != 0)
 			builder.getStructures().add(() -> WorldConfiguredStructures.CONFIGURED_PYRAMID);
+
+		if (category == Biome.Category.SWAMP && WorldConfig.COMMON.fountainMaxChunkDistance.get() != 0)
+			builder.getStructures().add(() -> WorldConfiguredStructures.CONFIGURED_FOUNTAIN);
+		
+		if (category == Biome.Category.OCEAN && WorldConfig.COMMON.waterDomeMaxChunkDistance.get() != 0)
+			builder.getStructures().add(() -> WorldConfiguredStructures.CONFIGURED_WATERDOME);
 	}
 
 	@SubscribeEvent(priority = EventPriority.NORMAL)
@@ -56,6 +62,8 @@ public class WorldGeneration {
 
 			Map<Structure<?>, StructureSeparationSettings> tempMap = new HashMap<>(serverWorld.getChunkProvider().generator.func_235957_b_().func_236195_a_());
 			tempMap.put(WorldStructures.PYRAMID.get(), DimensionStructuresSettings.field_236191_b_.get(WorldStructures.PYRAMID.get()));
+			tempMap.put(WorldStructures.FOUNTAIN.get(), DimensionStructuresSettings.field_236191_b_.get(WorldStructures.FOUNTAIN.get()));
+			tempMap.put(WorldStructures.WATERDOME.get(), DimensionStructuresSettings.field_236191_b_.get(WorldStructures.WATERDOME.get()));
 			serverWorld.getChunkProvider().generator.func_235957_b_().field_236193_d_ = tempMap;
 		}
 	}

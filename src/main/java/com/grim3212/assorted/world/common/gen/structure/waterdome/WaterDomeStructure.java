@@ -1,4 +1,4 @@
-package com.grim3212.assorted.world.common.gen.structure;
+package com.grim3212.assorted.world.common.gen.structure.waterdome;
 
 import com.mojang.serialization.Codec;
 
@@ -11,16 +11,28 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.provider.BiomeProvider;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.GenerationStage;
-import net.minecraft.world.gen.Heightmap;
 import net.minecraft.world.gen.Heightmap.Type;
 import net.minecraft.world.gen.feature.NoFeatureConfig;
 import net.minecraft.world.gen.feature.structure.Structure;
 import net.minecraft.world.gen.feature.structure.StructureStart;
 import net.minecraft.world.gen.feature.template.TemplateManager;
 
-public class PyramidStructure extends Structure<NoFeatureConfig> {
-	public PyramidStructure(Codec<NoFeatureConfig> codec) {
+public class WaterDomeStructure extends Structure<NoFeatureConfig> {
+
+	public WaterDomeStructure(Codec<NoFeatureConfig> codec) {
 		super(codec);
+	}
+
+	@Override
+	protected boolean func_230363_a_(ChunkGenerator chunkGenerator, BiomeProvider biomeSource, long seed, SharedSeedRandom chunkRandom, int chunkX, int chunkZ, Biome biome, ChunkPos chunkPos, NoFeatureConfig featureConfig) {
+		int x = (chunkX << 4) + 7;
+		int z = (chunkZ << 4) + 7;
+		int y = chunkGenerator.getNoiseHeightMinusOne(x, z, Type.OCEAN_FLOOR_WG);
+
+		if (y == -1 || y > chunkGenerator.getSeaLevel() - 11) {
+			return false;
+		}
+		return true;
 	}
 
 	@Override
@@ -29,14 +41,8 @@ public class PyramidStructure extends Structure<NoFeatureConfig> {
 	}
 
 	@Override
-	protected boolean func_230363_a_(ChunkGenerator chunkGenerator, BiomeProvider biomeSource, long seed, SharedSeedRandom chunkRandom, int chunkX, int chunkZ, Biome biome, ChunkPos chunkPos, NoFeatureConfig featureConfig) {
-		int landHeight = chunkGenerator.getNoiseHeight(chunkX << 4, chunkZ << 4, Heightmap.Type.WORLD_SURFACE_WG);
-		return landHeight > 20;
-	}
-
-	@Override
 	public IStartFactory<NoFeatureConfig> getStartFactory() {
-		return PyramidStructure.Start::new;
+		return WaterDomeStructure.Start::new;
 	}
 
 	public static class Start extends StructureStart<NoFeatureConfig> {
@@ -49,13 +55,12 @@ public class PyramidStructure extends Structure<NoFeatureConfig> {
 		public void func_230364_a_(DynamicRegistries dynamicRegistries, ChunkGenerator chunkGenerator, TemplateManager templateManager, int chunkX, int chunkZ, Biome biome, NoFeatureConfig config) {
 			int x = (chunkX << 4) + 7;
 			int z = (chunkZ << 4) + 7;
-			int y = chunkGenerator.getNoiseHeightMinusOne(x, z, Type.WORLD_SURFACE_WG);
+			int y = chunkGenerator.getNoiseHeightMinusOne(x, z, Type.OCEAN_FLOOR_WG);
 
-			int maxHeight = 2 * (4 + rand.nextInt(16));
-			int type = rand.nextInt(2);
+			int radius = 3 + this.rand.nextInt(5);
 
-			PyramidStructurePiece desertpyramidpiece = new PyramidStructurePiece(this.rand, new BlockPos(x, y, z), maxHeight, type);
-			this.components.add(desertpyramidpiece);
+			WaterDomeStructurePiece waterdomepiece = new WaterDomeStructurePiece(this.rand, new BlockPos(x, y, z), radius);
+			this.components.add(waterdomepiece);
 			this.recalculateStructureSize();
 		}
 

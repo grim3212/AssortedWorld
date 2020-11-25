@@ -16,10 +16,11 @@ public final class WorldConfig {
 
 	public static class Common {
 
-		public final ForgeConfigSpec.IntValue fountainChance;
+		public final ForgeConfigSpec.IntValue fountainMaxChunkDistance;
 		public final ForgeConfigSpec.IntValue pyramidMaxChunkDistance;
 		public final ForgeConfigSpec.IntValue snowBallChance;
-		public final ForgeConfigSpec.IntValue waterDomeChance;
+		public final ForgeConfigSpec.IntValue waterDomeMaxChunkDistance;
+		public final ForgeConfigSpec.IntValue waterDomeTries;
 		public final ForgeConfigSpec.IntValue ruinChance;
 		public final ForgeConfigSpec.IntValue spireChance;
 		public final ForgeConfigSpec.IntValue spireRadius;
@@ -32,10 +33,11 @@ public final class WorldConfig {
 
 		public Common(ForgeConfigSpec.Builder builder) {
 			builder.push("Ruins");
-			fountainChance = builder.comment("Set this to the chance for a fountain structure to generate.").defineInRange("fountainChance", 52, 0, 1000);
+			fountainMaxChunkDistance = builder.comment("How rare are fountains to generate. 0 to disable generating fountains.").defineInRange("fountainMaxChunkDistance", 50, 0, 1000);
 			pyramidMaxChunkDistance = builder.comment("How rare are Pyramids to spawn in Desert Biomes. 0 to disable generating pyramids.").defineInRange("pyramidMaxChunkDistance", 54, 0, 1000);
 			snowBallChance = builder.comment("Set this to the chance for a snowball structure to generate.").defineInRange("snowBallChance", 50, 0, 1000);
-			waterDomeChance = builder.comment("Set this to the chance for a water dome structure to generate.").defineInRange("waterDomeChance", 42, 0, 1000);
+			waterDomeMaxChunkDistance = builder.comment("How rare are Water Domes to spawn in the ocean. 0 to disable generating water domes.").defineInRange("waterDomeMaxChunkDistance", 32, 0, 1000);
+			waterDomeTries = builder.comment("Set this to how many tries should happen for a water dome to generate.").defineInRange("waterDomeTries", 16, 0, 36);
 			ruinChance = builder.comment("Set this to the chance for a ruin to generate.").defineInRange("ruinChance", 400, 0, 2000);
 			ruinTries = builder.comment("Set this to how many tries should happen for a ruin to generate.").defineInRange("ruinTries", 4, 0, 36);
 			runeChance = builder.comment("Set this to the chance that a rune will genarate inside a structure.").defineInRange("runeChance", 0.15D, 0, 1);
