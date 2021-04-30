@@ -15,9 +15,9 @@ import net.minecraft.world.gen.feature.OreFeatureConfig;
 
 public class WorldConfiguredFeatures {
 
-	public static ConfiguredFeature<?, ?> RUIN = WorldFeatures.RUIN.get().withConfiguration(NoFeatureConfig.field_236559_b_).withPlacement(Features.Placements.HEIGHTMAP_PLACEMENT).chance(WorldConfig.COMMON.ruinChance.get()).func_242731_b(WorldConfig.COMMON.ruinTries.get());
-	public static ConfiguredFeature<?, ?> SPIRE = WorldFeatures.SPIRE.get().withConfiguration(NoFeatureConfig.field_236559_b_).withPlacement(Features.Placements.HEIGHTMAP_PLACEMENT).chance(WorldConfig.COMMON.spireChance.get()).func_242731_b(WorldConfig.COMMON.spireTries.get());
-	public static ConfiguredFeature<?, ?> ORE_RANDOMITE = Feature.ORE.withConfiguration(new OreFeatureConfig(OreFeatureConfig.FillerBlockType.BASE_STONE_OVERWORLD, WorldBlocks.RANDOMITE_ORE.get().getDefaultState(), 8)).range(164).square().func_242731_b(12);
+	public static ConfiguredFeature<?, ?> RUIN = WorldFeatures.RUIN.get().withConfiguration(NoFeatureConfig.NO_FEATURE_CONFIG).withPlacement(Features.Placements.HEIGHTMAP_PLACEMENT).chance(WorldConfig.COMMON.ruinChance.get()).count(WorldConfig.COMMON.ruinTries.get());
+	public static ConfiguredFeature<?, ?> SPIRE = WorldFeatures.SPIRE.get().withConfiguration(NoFeatureConfig.NO_FEATURE_CONFIG).withPlacement(Features.Placements.HEIGHTMAP_PLACEMENT).chance(WorldConfig.COMMON.spireChance.get()).count(WorldConfig.COMMON.spireTries.get());
+	public static ConfiguredFeature<?, ?> ORE_RANDOMITE = Feature.ORE.withConfiguration(new OreFeatureConfig(OreFeatureConfig.FillerBlockType.BASE_STONE_OVERWORLD, WorldBlocks.RANDOMITE_ORE.get().getDefaultState(), 8)).range(164).square().count(12);
 
 	public static void registerConfiguredFeatures() {
 		Registry<ConfiguredFeature<?, ?>> registry = WorldGenRegistries.CONFIGURED_FEATURE;

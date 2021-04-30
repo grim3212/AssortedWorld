@@ -22,10 +22,10 @@ import net.minecraftforge.registries.ForgeRegistries;
 public class WorldStructures {
 	public static final DeferredRegister<Structure<?>> STRUCTURES = DeferredRegister.create(ForgeRegistries.STRUCTURE_FEATURES, AssortedWorld.MODID);
 
-	public static final RegistryObject<Structure<NoFeatureConfig>> PYRAMID = setupStructure("pyramid", () -> (new PyramidStructure(NoFeatureConfig.field_236558_a_)));
-	public static final RegistryObject<Structure<NoFeatureConfig>> FOUNTAIN = setupStructure("fountain", () -> (new FountainStructure(NoFeatureConfig.field_236558_a_)));
-	public static final RegistryObject<Structure<NoFeatureConfig>> WATERDOME = setupStructure("waterdome", () -> (new WaterDomeStructure(NoFeatureConfig.field_236558_a_)));
-	public static final RegistryObject<Structure<NoFeatureConfig>> SNOWBALL = setupStructure("snowball", () -> (new SnowballStructure(NoFeatureConfig.field_236558_a_)));
+	public static final RegistryObject<Structure<NoFeatureConfig>> PYRAMID = setupStructure("pyramid", () -> (new PyramidStructure(NoFeatureConfig.CODEC)));
+	public static final RegistryObject<Structure<NoFeatureConfig>> FOUNTAIN = setupStructure("fountain", () -> (new FountainStructure(NoFeatureConfig.CODEC)));
+	public static final RegistryObject<Structure<NoFeatureConfig>> WATERDOME = setupStructure("waterdome", () -> (new WaterDomeStructure(NoFeatureConfig.CODEC)));
+	public static final RegistryObject<Structure<NoFeatureConfig>> SNOWBALL = setupStructure("snowball", () -> (new SnowballStructure(NoFeatureConfig.CODEC)));
 
 	private static <T extends Structure<?>> RegistryObject<T> setupStructure(String name, Supplier<T> structure) {
 		return STRUCTURES.register(name, structure);

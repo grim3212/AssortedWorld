@@ -14,8 +14,8 @@ public class WorldFeatures {
 
 	public static final DeferredRegister<Feature<?>> FEATURES = DeferredRegister.create(ForgeRegistries.FEATURES, AssortedWorld.MODID);
 
-	public static final RegistryObject<Feature<NoFeatureConfig>> RUIN = createFeature("ruin", () -> new RuinFeature(NoFeatureConfig.field_236558_a_));
-	public static final RegistryObject<Feature<NoFeatureConfig>> SPIRE = createFeature("spire", () -> new SpireFeature(NoFeatureConfig.field_236558_a_));
+	public static final RegistryObject<Feature<NoFeatureConfig>> RUIN = createFeature("ruin", () -> new RuinFeature(NoFeatureConfig.CODEC));
+	public static final RegistryObject<Feature<NoFeatureConfig>> SPIRE = createFeature("spire", () -> new SpireFeature(NoFeatureConfig.CODEC));
 
 	private static <F extends Feature<?>> RegistryObject<F> createFeature(String name, Supplier<F> feature) {
 		return FEATURES.register(name, feature);
