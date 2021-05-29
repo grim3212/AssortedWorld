@@ -41,7 +41,7 @@ public final class WorldConfig {
 			snowBallMaxChunkDistance = builder.comment("How rare are Snowballs to spawn in Snow Biomes. 0 to disable generating snowballs.").defineInRange("snowBallMaxChunkDistance", 50, 0, 1000);
 			waterDomeMaxChunkDistance = builder.comment("How rare are Water Domes to spawn in the ocean. 0 to disable generating water domes.").defineInRange("waterDomeMaxChunkDistance", 32, 0, 1000);
 			waterDomeTries = builder.comment("Set this to how many tries should happen for a water dome to generate.").defineInRange("waterDomeTries", 16, 0, 36);
-			ruinChance = builder.comment("Set this to the chance for a ruin to generate.").defineInRange("ruinChance", 400, 0, 2000);
+			ruinChance = builder.comment("Set this to the chance for a ruin to generate.").defineInRange("ruinChance", 900, 0, 2000);
 			ruinTries = builder.comment("Set this to how many tries should happen for a ruin to generate.").defineInRange("ruinTries", 4, 0, 36);
 			runeChance = builder.comment("Set this to the chance that a rune will genarate inside a structure.").defineInRange("runeChance", 0.15D, 0, 1);
 
