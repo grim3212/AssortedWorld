@@ -18,8 +18,6 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
-import net.minecraft.block.AbstractBlock.Properties;
-
 public class RuneBlock extends Block {
 
 	private final RuneType runeType;
