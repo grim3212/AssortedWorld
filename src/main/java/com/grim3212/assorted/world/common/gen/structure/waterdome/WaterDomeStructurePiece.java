@@ -45,14 +45,14 @@ public class WaterDomeStructurePiece extends ScatteredStructurePiece {
 	}
 
 	@Override
-	protected void readAdditional(CompoundNBT tagCompound) {
-		super.readAdditional(tagCompound);
+	protected void addAdditionalSaveData(CompoundNBT tagCompound) {
+		super.addAdditionalSaveData(tagCompound);
 		tagCompound.putInt("radius", this.radius);
 		tagCompound.putBoolean("runePlaced", runePlaced);
 	}
 
 	@Override
-	public boolean func_230383_a_(ISeedReader reader, StructureManager structureManager, ChunkGenerator generator, Random rand, MutableBoundingBox bb, ChunkPos chunkPos, BlockPos pos) {
+	public boolean postProcess(ISeedReader reader, StructureManager structureManager, ChunkGenerator generator, Random rand, MutableBoundingBox bb, ChunkPos chunkPos, BlockPos pos) {
 		this.centrePoints = Lists.newArrayList();
 		this.radii = Lists.newArrayList();
 
@@ -82,10 +82,10 @@ public class WaterDomeStructurePiece extends ScatteredStructurePiece {
 			// Set type
 			int type = rand.nextInt(20);
 
-			BlockPos depth = pos.add(point.getX(), 0, point.getZ());
+			BlockPos depth = pos.offset(point.getX(), 0, point.getZ());
 
 			// Get start position
-			for (Block b = reader.getBlockState(depth.down()).getBlock(); (b == Blocks.GLASS || b == Blocks.AIR || b == Blocks.IRON_BLOCK || b == Blocks.COBBLESTONE || b == Blocks.GLOWSTONE) && depth.getY() > 0; depth = depth.down(), b = reader.getBlockState(depth).getBlock())
+			for (Block b = reader.getBlockState(depth.below()).getBlock(); (b == Blocks.GLASS || b == Blocks.AIR || b == Blocks.IRON_BLOCK || b == Blocks.COBBLESTONE || b == Blocks.GLOWSTONE) && depth.getY() > 0; depth = depth.below(), b = reader.getBlockState(depth).getBlock())
 				;
 
 			// Get correct position
@@ -101,13 +101,13 @@ public class WaterDomeStructurePiece extends ScatteredStructurePiece {
 							continue;
 						}
 
-						Block curBlock = reader.getBlockState(pos.add(newPoint)).getBlock();
+						Block curBlock = reader.getBlockState(pos.offset(newPoint)).getBlock();
 						if (curBlock == Blocks.WATER) {
-							reader.setBlockState(pos.add(newPoint), b.getDefaultState(), 2);
+							reader.setBlock(pos.offset(newPoint), b.defaultBlockState(), 2);
 						} else {
-							FluidState state = reader.getFluidState(pos.add(newPoint));
-							if (!state.isEmpty() && (state.getFluid() == Fluids.FLOWING_WATER || state.getFluid() == Fluids.WATER)) {
-								reader.setBlockState(pos.add(newPoint), b.getDefaultState(), 2);
+							FluidState state = reader.getFluidState(pos.offset(newPoint));
+							if (!state.isEmpty() && (state.getType() == Fluids.FLOWING_WATER || state.getType() == Fluids.WATER)) {
+								reader.setBlock(pos.offset(newPoint), b.defaultBlockState(), 2);
 							}
 						}
 					}
@@ -126,7 +126,7 @@ public class WaterDomeStructurePiece extends ScatteredStructurePiece {
 			BlockPos point = centrePoints.get(pIdx);
 			int radi = radii.get(pIdx);
 
-			int distance = (int) Math.round(MathHelper.sqrt(point.distanceSq(point1)));
+			int distance = (int) Math.round(MathHelper.sqrt(point.distSqr(point1)));
 			if (distance < radi) {
 				places++;
 				if (point1.equals(point) && !runePlaced) {

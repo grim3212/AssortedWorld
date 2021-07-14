@@ -21,7 +21,7 @@ public class WorldTags {
 		}
 
 		private static ITag.INamedTag<Block> tag(String name) {
-			return BlockTags.makeWrapperTag(prefix(name).toString());
+			return BlockTags.bind(prefix(name).toString());
 		}
 	}
 
@@ -34,7 +34,7 @@ public class WorldTags {
 		}
 
 		private static ITag.INamedTag<Item> tag(String name) {
-			return ItemTags.makeWrapperTag(prefix(name).toString());
+			return ItemTags.bind(prefix(name).toString());
 		}
 	}
 

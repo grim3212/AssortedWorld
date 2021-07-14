@@ -31,7 +31,7 @@ public class SpireFeature extends Feature<NoFeatureConfig> {
 	}
 
 	@Override
-	public boolean generate(ISeedReader reader, ChunkGenerator generator, Random rand, BlockPos pos, NoFeatureConfig config) {
+	public boolean place(ISeedReader reader, ChunkGenerator generator, Random rand, BlockPos pos, NoFeatureConfig config) {
 		radius = 2;
 		if (WorldConfig.COMMON.spireRadius.get() > 2) {
 			radius = rand.nextInt(WorldConfig.COMMON.spireRadius.get() - 2);
@@ -87,14 +87,14 @@ public class SpireFeature extends Feature<NoFeatureConfig> {
 				if (RuinUtil.distanceBetween(pos.getX(), pos.getZ(), xOff + x, zOff + z) > radius) {
 					continue;
 				}
-				BlockPos newPos = world.getHeight(Type.WORLD_SURFACE_WG, new BlockPos(xOff + x, pos.getY(), zOff + z));
+				BlockPos newPos = world.getHeightmapPos(Type.WORLD_SURFACE_WG, new BlockPos(xOff + x, pos.getY(), zOff + z));
 				if (newPos.getY() == 0) {
 					return false;
 				}
 				if (Math.abs(pos.getY() - newPos.getY()) > 7) {
 					return false;
 				}
-				if (world.getLight(newPos) < 12) {
+				if (world.getMaxLocalRawBrightness(newPos) < 12) {
 					return false;
 				}
 			}
@@ -105,7 +105,7 @@ public class SpireFeature extends Feature<NoFeatureConfig> {
 	}
 
 	private void fillWater(ISeedReader world, BlockPos pos) {
-		pos = world.getHeight(Type.WORLD_SURFACE_WG, pos);
+		pos = world.getHeightmapPos(Type.WORLD_SURFACE_WG, pos);
 		if (pos.getY() == 0) {
 			return;
 		}
@@ -114,16 +114,16 @@ public class SpireFeature extends Feature<NoFeatureConfig> {
 			BlockPos newPos = new BlockPos(pos.getX(), newY, pos.getZ());
 			BlockState state = world.getBlockState(newPos);
 
-			if (state.getBlock() == Blocks.WATER || world.getBlockState(newPos.down()).getBlock() == Blocks.ICE) {
+			if (state.getBlock() == Blocks.WATER || world.getBlockState(newPos.below()).getBlock() == Blocks.ICE) {
 				if (deathSpire) {
-					world.setBlockState(newPos, Blocks.NETHERRACK.getDefaultState(), 2);
+					world.setBlock(newPos, Blocks.NETHERRACK.defaultBlockState(), 2);
 				} else {
-					world.setBlockState(newPos, Blocks.STONE.getDefaultState(), 2);
+					world.setBlock(newPos, Blocks.STONE.defaultBlockState(), 2);
 				}
 
 				continue;
 			}
-			if (state.isSolid()) {
+			if (state.canOcclude()) {
 				flag = true;
 			}
 		}
@@ -132,34 +132,34 @@ public class SpireFeature extends Feature<NoFeatureConfig> {
 	private void generateColumn(ISeedReader world, Random random, BlockPos pos, int heightMod) {
 		int startY = pos.getY();
 
-		for (pos = world.getHeight(Type.WORLD_SURFACE_WG, pos); pos.getY() < startY; pos = pos.up()) {
+		for (pos = world.getHeightmapPos(Type.WORLD_SURFACE_WG, pos); pos.getY() < startY; pos = pos.above()) {
 			if (!runePlaced && (double) random.nextFloat() <= WorldConfig.COMMON.runeChance.get()) {
 				runePlaced = true;
-				world.setBlockState(pos, RuinUtil.randomRune(random).getDefaultState(), 2);
+				world.setBlock(pos, RuinUtil.randomRune(random).defaultBlockState(), 2);
 				continue;
 			}
 
 			if (deathSpire) {
 				float blockType = random.nextFloat();
 				if (blockType < 0.01F) {
-					world.setBlockState(pos, Blocks.LAVA.getDefaultState(), 2);
+					world.setBlock(pos, Blocks.LAVA.defaultBlockState(), 2);
 					FluidState fluidstate = world.getFluidState(pos);
 					if (!fluidstate.isEmpty()) {
-						world.getPendingFluidTicks().scheduleTick(pos, fluidstate.getFluid(), 0);
+						world.getLiquidTicks().scheduleTick(pos, fluidstate.getType(), 0);
 					}
 				} else {
-					world.setBlockState(pos, Blocks.NETHERRACK.getDefaultState(), 2);
+					world.setBlock(pos, Blocks.NETHERRACK.defaultBlockState(), 2);
 				}
 				continue;
 			}
 
 			int blockType = random.nextInt(2);
 			if (blockType == 1) {
-				world.setBlockState(pos, Blocks.STONE.getDefaultState(), 2);
+				world.setBlock(pos, Blocks.STONE.defaultBlockState(), 2);
 				continue;
 			}
 			if (blockType == 0) {
-				world.setBlockState(pos, Blocks.DIRT.getDefaultState(), 2);
+				world.setBlock(pos, Blocks.DIRT.defaultBlockState(), 2);
 			}
 		}
 
@@ -175,7 +175,7 @@ public class SpireFeature extends Feature<NoFeatureConfig> {
 		}
 		startHeight /= mod;
 		for (int heightOff = 0; heightOff < startHeight; heightOff++) {
-			if (!world.isAirBlock(pos.up(heightOff)) && !(world.getBlockState(pos.up(heightOff)).getBlock() instanceof LeavesBlock) && !(BlockTags.LOGS.contains(world.getBlockState(pos.up(heightOff)).getBlock()))) {
+			if (!world.isEmptyBlock(pos.above(heightOff)) && !(world.getBlockState(pos.above(heightOff)).getBlock() instanceof LeavesBlock) && !(BlockTags.LOGS.contains(world.getBlockState(pos.above(heightOff)).getBlock()))) {
 				continue;
 			}
 			if (deathSpire) {
@@ -185,13 +185,13 @@ public class SpireFeature extends Feature<NoFeatureConfig> {
 				}
 				float blockType = random.nextFloat();
 				if (blockType < 0.01F) {
-					world.setBlockState(pos, Blocks.LAVA.getDefaultState(), 2);
+					world.setBlock(pos, Blocks.LAVA.defaultBlockState(), 2);
 					FluidState fluidstate = world.getFluidState(pos);
 					if (!fluidstate.isEmpty()) {
-						world.getPendingFluidTicks().scheduleTick(pos, fluidstate.getFluid(), 0);
+						world.getLiquidTicks().scheduleTick(pos, fluidstate.getType(), 0);
 					}
 				} else {
-					world.setBlockState(pos.up(heightOff), Blocks.NETHERRACK.getDefaultState(), 2);
+					world.setBlock(pos.above(heightOff), Blocks.NETHERRACK.defaultBlockState(), 2);
 				}
 				continue;
 			}
@@ -199,35 +199,35 @@ public class SpireFeature extends Feature<NoFeatureConfig> {
 			if (check > startHeight / (heightOff + 1)) {
 				break;
 			}
-			world.setBlockState(pos.up(heightOff), Blocks.STONE.getDefaultState(), 2);
+			world.setBlock(pos.above(heightOff), Blocks.STONE.defaultBlockState(), 2);
 		}
 	}
 
 	private void clearArea(ISeedReader world, Random random, BlockPos pos) {
 		int startY = pos.getY();
 
-		for (pos = world.getHeight(Type.WORLD_SURFACE_WG, pos); pos.getY() < startY; pos = pos.up()) {
+		for (pos = world.getHeightmapPos(Type.WORLD_SURFACE_WG, pos); pos.getY() < startY; pos = pos.above()) {
 			if (deathSpire) {
 				float blockType = random.nextFloat();
 				if (blockType < 0.01F) {
-					world.setBlockState(pos, Blocks.LAVA.getDefaultState(), 2);
+					world.setBlock(pos, Blocks.LAVA.defaultBlockState(), 2);
 					FluidState fluidstate = world.getFluidState(pos);
 					if (!fluidstate.isEmpty()) {
-						world.getPendingFluidTicks().scheduleTick(pos, fluidstate.getFluid(), 0);
+						world.getLiquidTicks().scheduleTick(pos, fluidstate.getType(), 0);
 					}
 				} else {
-					world.setBlockState(pos, Blocks.NETHERRACK.getDefaultState(), 2);
+					world.setBlock(pos, Blocks.NETHERRACK.defaultBlockState(), 2);
 				}
 				continue;
 			}
 
 			int blockType = random.nextInt(2);
 			if (blockType == 1) {
-				world.setBlockState(pos, Blocks.STONE.getDefaultState(), 2);
+				world.setBlock(pos, Blocks.STONE.defaultBlockState(), 2);
 				continue;
 			}
 			if (blockType == 0) {
-				world.setBlockState(pos, Blocks.DIRT.getDefaultState(), 2);
+				world.setBlock(pos, Blocks.DIRT.defaultBlockState(), 2);
 			}
 		}
 		if (pos.getY() > startY + 7) {
@@ -235,8 +235,8 @@ public class SpireFeature extends Feature<NoFeatureConfig> {
 		}
 
 		for (int off = 0; off < height; off++) {
-			if (!world.isAirBlock(pos.up(off))) {
-				world.setBlockState(pos, Blocks.AIR.getDefaultState(), 2);
+			if (!world.isEmptyBlock(pos.above(off))) {
+				world.setBlock(pos, Blocks.AIR.defaultBlockState(), 2);
 			}
 		}
 	}

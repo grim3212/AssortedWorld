@@ -39,13 +39,13 @@ public class SnowballStructurePiece extends ScatteredStructurePiece {
 	}
 
 	@Override
-	protected void readAdditional(CompoundNBT tagCompound) {
-		super.readAdditional(tagCompound);
+	protected void addAdditionalSaveData(CompoundNBT tagCompound) {
+		super.addAdditionalSaveData(tagCompound);
 		tagCompound.putInt("radius", this.radius);
 	}
 
 	@Override
-	public boolean func_230383_a_(ISeedReader reader, StructureManager structureManager, ChunkGenerator generator, Random rand, MutableBoundingBox bb, ChunkPos chunkPos, BlockPos pos) {
+	public boolean postProcess(ISeedReader reader, StructureManager structureManager, ChunkGenerator generator, Random rand, MutableBoundingBox bb, ChunkPos chunkPos, BlockPos pos) {
 		this.centrePoints = Lists.newArrayList(BlockPos.ZERO);
 		this.radii = Lists.newArrayList(radius);
 
@@ -87,7 +87,7 @@ public class SnowballStructurePiece extends ScatteredStructurePiece {
 			}
 		}
 
-		blockCache.forEach((p, b) -> reader.setBlockState(p, b.getDefaultState(), 2));
+		blockCache.forEach((p, b) -> reader.setBlock(p, b.defaultBlockState(), 2));
 
 		return true;
 	}
@@ -99,7 +99,7 @@ public class SnowballStructurePiece extends ScatteredStructurePiece {
 			BlockPos centerPoint = centrePoints.get(point);
 			int radi = radii.get(point);
 
-			int distance = (int) Math.round(Math.sqrt(centerPoint.distanceSq(point1)));
+			int distance = (int) Math.round(Math.sqrt(centerPoint.distSqr(point1)));
 			if (distance < radi) {
 				places++;
 				continue;

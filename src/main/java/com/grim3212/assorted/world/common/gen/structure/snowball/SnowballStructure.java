@@ -18,6 +18,8 @@ import net.minecraft.world.gen.feature.structure.Structure;
 import net.minecraft.world.gen.feature.structure.StructureStart;
 import net.minecraft.world.gen.feature.template.TemplateManager;
 
+import net.minecraft.world.gen.feature.structure.Structure.IStartFactory;
+
 public class SnowballStructure extends Structure<NoFeatureConfig> {
 
 	public SnowballStructure(Codec<NoFeatureConfig> codec) {
@@ -25,13 +27,13 @@ public class SnowballStructure extends Structure<NoFeatureConfig> {
 	}
 
 	@Override
-	protected boolean func_230363_a_(ChunkGenerator chunkGenerator, BiomeProvider biomeSource, long seed, SharedSeedRandom chunkRandom, int chunkX, int chunkZ, Biome biome, ChunkPos chunkPos, NoFeatureConfig featureConfig) {
-		int landHeight = chunkGenerator.getNoiseHeight(chunkX << 4, chunkZ << 4, Heightmap.Type.WORLD_SURFACE_WG);
+	protected boolean isFeatureChunk(ChunkGenerator chunkGenerator, BiomeProvider biomeSource, long seed, SharedSeedRandom chunkRandom, int chunkX, int chunkZ, Biome biome, ChunkPos chunkPos, NoFeatureConfig featureConfig) {
+		int landHeight = chunkGenerator.getFirstFreeHeight(chunkX << 4, chunkZ << 4, Heightmap.Type.WORLD_SURFACE_WG);
 		return landHeight > 20;
 	}
 
 	@Override
-	public GenerationStage.Decoration getDecorationStage() {
+	public GenerationStage.Decoration step() {
 		return GenerationStage.Decoration.SURFACE_STRUCTURES;
 	}
 
@@ -47,16 +49,16 @@ public class SnowballStructure extends Structure<NoFeatureConfig> {
 		}
 
 		@Override
-		public void func_230364_a_(DynamicRegistries dynamicRegistries, ChunkGenerator chunkGenerator, TemplateManager templateManager, int chunkX, int chunkZ, Biome biome, NoFeatureConfig config) {
+		public void generatePieces(DynamicRegistries dynamicRegistries, ChunkGenerator chunkGenerator, TemplateManager templateManager, int chunkX, int chunkZ, Biome biome, NoFeatureConfig config) {
 			int x = (chunkX << 4) + 7;
 			int z = (chunkZ << 4) + 7;
-			int y = chunkGenerator.getNoiseHeightMinusOne(x, z, Type.WORLD_SURFACE_WG);
+			int y = chunkGenerator.getFirstOccupiedHeight(x, z, Type.WORLD_SURFACE_WG);
 
-			int radius = 3 * (3 + this.rand.nextInt(5));
+			int radius = 3 * (3 + this.random.nextInt(5));
 
-			SnowballStructurePiece snowballpiece = new SnowballStructurePiece(this.rand, new BlockPos(x, y, z), radius);
-			this.components.add(snowballpiece);
-			this.recalculateStructureSize();
+			SnowballStructurePiece snowballpiece = new SnowballStructurePiece(this.random, new BlockPos(x, y, z), radius);
+			this.pieces.add(snowballpiece);
+			this.calculateBoundingBox();
 		}
 
 	}

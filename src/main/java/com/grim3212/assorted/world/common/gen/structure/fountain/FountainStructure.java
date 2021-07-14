@@ -18,6 +18,8 @@ import net.minecraft.world.gen.feature.structure.Structure;
 import net.minecraft.world.gen.feature.structure.StructureStart;
 import net.minecraft.world.gen.feature.template.TemplateManager;
 
+import net.minecraft.world.gen.feature.structure.Structure.IStartFactory;
+
 public class FountainStructure extends Structure<NoFeatureConfig> {
 
 	public FountainStructure(Codec<NoFeatureConfig> codec) {
@@ -25,13 +27,13 @@ public class FountainStructure extends Structure<NoFeatureConfig> {
 	}
 
 	@Override
-	public GenerationStage.Decoration getDecorationStage() {
+	public GenerationStage.Decoration step() {
 		return GenerationStage.Decoration.SURFACE_STRUCTURES;
 	}
 
 	@Override
-	protected boolean func_230363_a_(ChunkGenerator chunkGenerator, BiomeProvider biomeSource, long seed, SharedSeedRandom chunkRandom, int chunkX, int chunkZ, Biome biome, ChunkPos chunkPos, NoFeatureConfig featureConfig) {
-		int landHeight = chunkGenerator.getNoiseHeight(chunkX << 4, chunkZ << 4, Heightmap.Type.WORLD_SURFACE_WG);
+	protected boolean isFeatureChunk(ChunkGenerator chunkGenerator, BiomeProvider biomeSource, long seed, SharedSeedRandom chunkRandom, int chunkX, int chunkZ, Biome biome, ChunkPos chunkPos, NoFeatureConfig featureConfig) {
+		int landHeight = chunkGenerator.getFirstFreeHeight(chunkX << 4, chunkZ << 4, Heightmap.Type.WORLD_SURFACE_WG);
 		return landHeight > 20;
 	}
 
@@ -47,17 +49,17 @@ public class FountainStructure extends Structure<NoFeatureConfig> {
 		}
 
 		@Override
-		public void func_230364_a_(DynamicRegistries dynamicRegistries, ChunkGenerator chunkGenerator, TemplateManager templateManager, int chunkX, int chunkZ, Biome biome, NoFeatureConfig config) {
+		public void generatePieces(DynamicRegistries dynamicRegistries, ChunkGenerator chunkGenerator, TemplateManager templateManager, int chunkX, int chunkZ, Biome biome, NoFeatureConfig config) {
 			int x = (chunkX << 4) + 7;
 			int z = (chunkZ << 4) + 7;
-			int y = chunkGenerator.getNoiseHeightMinusOne(x, z, Type.WORLD_SURFACE_WG);
+			int y = chunkGenerator.getFirstOccupiedHeight(x, z, Type.WORLD_SURFACE_WG);
 
-			int height = 4 * (3 + rand.nextInt(3));
-			int type = rand.nextInt(2);
+			int height = 4 * (3 + random.nextInt(3));
+			int type = random.nextInt(2);
 
-			FountainStructurePiece fountainpiece = new FountainStructurePiece(this.rand, new BlockPos(x, y, z), height, type);
-			this.components.add(fountainpiece);
-			this.recalculateStructureSize();
+			FountainStructurePiece fountainpiece = new FountainStructurePiece(this.random, new BlockPos(x, y, z), height, type);
+			this.pieces.add(fountainpiece);
+			this.calculateBoundingBox();
 		}
 
 	}

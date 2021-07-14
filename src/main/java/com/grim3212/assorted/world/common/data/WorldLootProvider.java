@@ -47,7 +47,7 @@ public class WorldLootProvider implements IDataProvider {
 	}
 
 	@Override
-	public void act(DirectoryCache cache) throws IOException {
+	public void run(DirectoryCache cache) throws IOException {
 		Map<ResourceLocation, LootTable.Builder> tables = new HashMap<>();
 
 		for (Block b : blocks) {
@@ -56,7 +56,7 @@ public class WorldLootProvider implements IDataProvider {
 
 		for (Map.Entry<ResourceLocation, LootTable.Builder> e : tables.entrySet()) {
 			Path path = getPath(generator.getOutputFolder(), e.getKey());
-			IDataProvider.save(GSON, cache, LootTableManager.toJson(e.getValue().setParameterSet(LootParameterSets.BLOCK).build()), path);
+			IDataProvider.save(GSON, cache, LootTableManager.serialize(e.getValue().setParamSet(LootParameterSets.BLOCK).build()), path);
 		}
 
 		genRandomite(cache);
@@ -67,28 +67,28 @@ public class WorldLootProvider implements IDataProvider {
 	}
 
 	private static LootTable.Builder genRegular(Block b) {
-		LootEntry.Builder<?> entry = ItemLootEntry.builder(b);
-		LootPool.Builder pool = LootPool.builder().name("main").rolls(ConstantRange.of(1)).addEntry(entry).acceptCondition(SurvivesExplosion.builder());
-		return LootTable.builder().addLootPool(pool);
+		LootEntry.Builder<?> entry = ItemLootEntry.lootTableItem(b);
+		LootPool.Builder pool = LootPool.lootPool().name("main").setRolls(ConstantRange.exactly(1)).add(entry).when(SurvivesExplosion.survivesExplosion());
+		return LootTable.lootTable().withPool(pool);
 	}
 
 	private void genRandomite(DirectoryCache cache) throws IOException {
 		Block randomite = WorldBlocks.RANDOMITE_ORE.get();
 		Path randomitePath = getPath(generator.getOutputFolder(), randomite.getRegistryName());
-		LootEntry.Builder<?> eggOption = ItemLootEntry.builder(Items.EGG).weight(40);
-		LootEntry.Builder<?> coalOption = ItemLootEntry.builder(Items.COAL).weight(30).acceptFunction(ApplyBonus.oreDrops(Enchantments.FORTUNE)).acceptFunction(ExplosionDecay.builder());
-		LootEntry.Builder<?> slimeOption = ItemLootEntry.builder(Items.SLIME_BALL).weight(30).acceptFunction(SetCount.builder(RandomValueRange.of(2.0F, 3.0F))).acceptFunction(ApplyBonus.oreDrops(Enchantments.FORTUNE)).acceptFunction(ExplosionDecay.builder());
-		LootEntry.Builder<?> quartzOption = ItemLootEntry.builder(Items.QUARTZ).weight(20).acceptFunction(ApplyBonus.oreDrops(Enchantments.FORTUNE)).acceptFunction(ExplosionDecay.builder());
-		LootEntry.Builder<?> ironOption = ItemLootEntry.builder(Blocks.IRON_ORE).weight(20);
-		LootEntry.Builder<?> goldOption = ItemLootEntry.builder(Blocks.GOLD_ORE).weight(18);
-		LootEntry.Builder<?> emeraldOption = ItemLootEntry.builder(Items.EMERALD).weight(18).acceptFunction(ApplyBonus.oreDrops(Enchantments.FORTUNE)).acceptFunction(ExplosionDecay.builder());
-		LootEntry.Builder<?> redstoneOption = ItemLootEntry.builder(Items.REDSTONE).weight(16).acceptFunction(SetCount.builder(RandomValueRange.of(4.0F, 5.0F))).acceptFunction(ApplyBonus.uniformBonusCount(Enchantments.FORTUNE)).acceptFunction(ExplosionDecay.builder());
-		LootEntry.Builder<?> lapisOption = ItemLootEntry.builder(Items.LAPIS_LAZULI).weight(15).acceptFunction(SetCount.builder(RandomValueRange.of(4.0F, 9.0F))).acceptFunction(ApplyBonus.oreDrops(Enchantments.FORTUNE)).acceptFunction(ExplosionDecay.builder());
-		LootEntry.Builder<?> diamondOption = ItemLootEntry.builder(Items.DIAMOND).weight(10).acceptFunction(ApplyBonus.oreDrops(Enchantments.FORTUNE));
-		LootEntry.Builder<?> netherDebrisOption = ItemLootEntry.builder(Blocks.ANCIENT_DEBRIS).weight(1);
-		LootPool.Builder pool = LootPool.builder().name("main").rolls(ConstantRange.of(1)).addEntry(coalOption).addEntry(ironOption).addEntry(goldOption).addEntry(diamondOption).addEntry(redstoneOption).addEntry(lapisOption).addEntry(slimeOption).addEntry(emeraldOption).addEntry(quartzOption).addEntry(netherDebrisOption).addEntry(eggOption).acceptCondition(SurvivesExplosion.builder());
+		LootEntry.Builder<?> eggOption = ItemLootEntry.lootTableItem(Items.EGG).setWeight(40);
+		LootEntry.Builder<?> coalOption = ItemLootEntry.lootTableItem(Items.COAL).setWeight(30).apply(ApplyBonus.addOreBonusCount(Enchantments.BLOCK_FORTUNE)).apply(ExplosionDecay.explosionDecay());
+		LootEntry.Builder<?> slimeOption = ItemLootEntry.lootTableItem(Items.SLIME_BALL).setWeight(30).apply(SetCount.setCount(RandomValueRange.between(2.0F, 3.0F))).apply(ApplyBonus.addOreBonusCount(Enchantments.BLOCK_FORTUNE)).apply(ExplosionDecay.explosionDecay());
+		LootEntry.Builder<?> quartzOption = ItemLootEntry.lootTableItem(Items.QUARTZ).setWeight(20).apply(ApplyBonus.addOreBonusCount(Enchantments.BLOCK_FORTUNE)).apply(ExplosionDecay.explosionDecay());
+		LootEntry.Builder<?> ironOption = ItemLootEntry.lootTableItem(Blocks.IRON_ORE).setWeight(20);
+		LootEntry.Builder<?> goldOption = ItemLootEntry.lootTableItem(Blocks.GOLD_ORE).setWeight(18);
+		LootEntry.Builder<?> emeraldOption = ItemLootEntry.lootTableItem(Items.EMERALD).setWeight(18).apply(ApplyBonus.addOreBonusCount(Enchantments.BLOCK_FORTUNE)).apply(ExplosionDecay.explosionDecay());
+		LootEntry.Builder<?> redstoneOption = ItemLootEntry.lootTableItem(Items.REDSTONE).setWeight(16).apply(SetCount.setCount(RandomValueRange.between(4.0F, 5.0F))).apply(ApplyBonus.addUniformBonusCount(Enchantments.BLOCK_FORTUNE)).apply(ExplosionDecay.explosionDecay());
+		LootEntry.Builder<?> lapisOption = ItemLootEntry.lootTableItem(Items.LAPIS_LAZULI).setWeight(15).apply(SetCount.setCount(RandomValueRange.between(4.0F, 9.0F))).apply(ApplyBonus.addOreBonusCount(Enchantments.BLOCK_FORTUNE)).apply(ExplosionDecay.explosionDecay());
+		LootEntry.Builder<?> diamondOption = ItemLootEntry.lootTableItem(Items.DIAMOND).setWeight(10).apply(ApplyBonus.addOreBonusCount(Enchantments.BLOCK_FORTUNE));
+		LootEntry.Builder<?> netherDebrisOption = ItemLootEntry.lootTableItem(Blocks.ANCIENT_DEBRIS).setWeight(1);
+		LootPool.Builder pool = LootPool.lootPool().name("main").setRolls(ConstantRange.exactly(1)).add(coalOption).add(ironOption).add(goldOption).add(diamondOption).add(redstoneOption).add(lapisOption).add(slimeOption).add(emeraldOption).add(quartzOption).add(netherDebrisOption).add(eggOption).when(SurvivesExplosion.survivesExplosion());
 
-		IDataProvider.save(GSON, cache, LootTableManager.toJson(LootTable.builder().addLootPool(pool).setParameterSet(LootParameterSets.BLOCK).build()), randomitePath);
+		IDataProvider.save(GSON, cache, LootTableManager.serialize(LootTable.lootTable().withPool(pool).setParamSet(LootParameterSets.BLOCK).build()), randomitePath);
 	}
 
 	@Override

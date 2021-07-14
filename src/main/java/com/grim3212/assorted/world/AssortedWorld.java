@@ -48,7 +48,7 @@ public class AssortedWorld {
 	public static final ItemGroup ASSORTED_WORLD_ITEM_GROUP = (new ItemGroup(AssortedWorld.MODID) {
 		@Override
 		@OnlyIn(Dist.CLIENT)
-		public ItemStack createIcon() {
+		public ItemStack makeIcon() {
 			return new ItemStack(WorldBlocks.RANDOMITE_ORE.get());
 		}
 	});

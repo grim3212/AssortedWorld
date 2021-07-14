@@ -18,30 +18,32 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
+import net.minecraft.block.AbstractBlock.Properties;
+
 public class RuneBlock extends Block {
 
 	private final RuneType runeType;
 
 	public RuneBlock(RuneType runeType) {
-		super(Properties.create(Material.ROCK).sound(SoundType.STONE).hardnessAndResistance(50f));
+		super(Properties.of(Material.STONE).sound(SoundType.STONE).strength(50f));
 		this.runeType = runeType;
 	}
 
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-		player.addPotionEffect(getPotionEffect(player.experienceLevel, 1.0F, 0.06F));
+	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+		player.addEffect(getPotionEffect(player.experienceLevel, 1.0F, 0.06F));
 		return ActionResultType.SUCCESS;
 	}
 
 	@Override
-	public void onEntityWalk(World worldIn, BlockPos pos, Entity entityIn) {
+	public void stepOn(World worldIn, BlockPos pos, Entity entityIn) {
 		if (entityIn instanceof LivingEntity) {
 			LivingEntity living = (LivingEntity) entityIn;
 			int xpLevel = 1;
 			if (living instanceof PlayerEntity) {
 				xpLevel = ((PlayerEntity) living).experienceLevel;
 			}
-			living.addPotionEffect(getPotionEffect(xpLevel, 1.0F, 0.06F));
+			living.addEffect(getPotionEffect(xpLevel, 1.0F, 0.06F));
 		}
 	}
 
@@ -87,7 +89,7 @@ public class RuneBlock extends Block {
 			String[] names = new String[states.length];
 
 			for (int i = 0; i < states.length; i++) {
-				names[i] = states[i].getString();
+				names[i] = states[i].getSerializedName();
 			}
 
 			return names;
@@ -103,11 +105,11 @@ public class RuneBlock extends Block {
 		}
 
 		public static Effect get(String loc) {
-			return Registry.EFFECTS.getOrDefault(new ResourceLocation(loc));
+			return Registry.MOB_EFFECT.get(new ResourceLocation(loc));
 		}
 
 		@Override
-		public String getString() {
+		public String getSerializedName() {
 			return this.runeName;
 		}
 	}

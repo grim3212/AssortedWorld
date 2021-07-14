@@ -15,9 +15,9 @@ import net.minecraft.world.gen.feature.OreFeatureConfig;
 
 public class WorldConfiguredFeatures {
 
-	public static ConfiguredFeature<?, ?> RUIN = WorldFeatures.RUIN.get().withConfiguration(NoFeatureConfig.NO_FEATURE_CONFIG).withPlacement(Features.Placements.HEIGHTMAP_PLACEMENT).chance(WorldConfig.COMMON.ruinChance.get()).count(WorldConfig.COMMON.ruinTries.get());
-	public static ConfiguredFeature<?, ?> SPIRE = WorldFeatures.SPIRE.get().withConfiguration(NoFeatureConfig.NO_FEATURE_CONFIG).withPlacement(Features.Placements.HEIGHTMAP_PLACEMENT).chance(WorldConfig.COMMON.spireChance.get()).count(WorldConfig.COMMON.spireTries.get());
-	public static ConfiguredFeature<?, ?> ORE_RANDOMITE = Feature.ORE.withConfiguration(new OreFeatureConfig(OreFeatureConfig.FillerBlockType.BASE_STONE_OVERWORLD, WorldBlocks.RANDOMITE_ORE.get().getDefaultState(), 8)).range(164).square().count(12);
+	public static ConfiguredFeature<?, ?> RUIN = WorldFeatures.RUIN.get().configured(NoFeatureConfig.NONE).decorated(Features.Placements.HEIGHTMAP_SQUARE).chance(WorldConfig.COMMON.ruinChance.get()).count(WorldConfig.COMMON.ruinTries.get());
+	public static ConfiguredFeature<?, ?> SPIRE = WorldFeatures.SPIRE.get().configured(NoFeatureConfig.NONE).decorated(Features.Placements.HEIGHTMAP_SQUARE).chance(WorldConfig.COMMON.spireChance.get()).count(WorldConfig.COMMON.spireTries.get());
+	public static ConfiguredFeature<?, ?> ORE_RANDOMITE = Feature.ORE.configured(new OreFeatureConfig(OreFeatureConfig.FillerBlockType.NATURAL_STONE, WorldBlocks.RANDOMITE_ORE.get().defaultBlockState(), 8)).range(164).squared().count(12);
 
 	public static void registerConfiguredFeatures() {
 		Registry<ConfiguredFeature<?, ?>> registry = WorldGenRegistries.CONFIGURED_FEATURE;

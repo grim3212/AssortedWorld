@@ -22,7 +22,7 @@ public class WorldBlocks {
 	public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, AssortedWorld.MODID);
 	public static final DeferredRegister<Item> ITEMS = WorldItems.ITEMS;
 
-	public static final RegistryObject<Block> RANDOMITE_ORE = register("randomite_ore", () -> new Block(Properties.create(Material.ROCK).sound(SoundType.STONE).hardnessAndResistance(1.6f, 1.0f)));
+	public static final RegistryObject<Block> RANDOMITE_ORE = register("randomite_ore", () -> new Block(Properties.of(Material.STONE).sound(SoundType.STONE).strength(1.6f, 1.0f)));
 	public static final RegistryObject<RuneBlock> UR_RUNE = register("ur_rune", () -> new RuneBlock(RuneType.UR));
 	public static final RegistryObject<RuneBlock> EOH_RUNE = register("eoh_rune", () -> new RuneBlock(RuneType.EOH));
 	public static final RegistryObject<RuneBlock> HAGEL_RUNE = register("hagel_rune", () -> new RuneBlock(RuneType.HAGEL));
@@ -55,7 +55,7 @@ public class WorldBlocks {
 	}
 
 	private static Supplier<BlockItem> item(final RegistryObject<? extends Block> block) {
-		return () -> new BlockItem(block.get(), new Item.Properties().group(AssortedWorld.ASSORTED_WORLD_ITEM_GROUP));
+		return () -> new BlockItem(block.get(), new Item.Properties().tab(AssortedWorld.ASSORTED_WORLD_ITEM_GROUP));
 	}
 
 	public static Block[] runeBlocks() {

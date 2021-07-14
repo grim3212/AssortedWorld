@@ -32,11 +32,11 @@ public class WorldGeneration {
 
 		if (category != Biome.Category.NETHER && category != Biome.Category.THEEND) {
 			if (WorldConfig.COMMON.generateRandomite.get())
-				builder.withFeature(Decoration.UNDERGROUND_ORES, WorldConfiguredFeatures.ORE_RANDOMITE);
+				builder.addFeature(Decoration.UNDERGROUND_ORES, WorldConfiguredFeatures.ORE_RANDOMITE);
 			if (category != Biome.Category.OCEAN && category != Biome.Category.RIVER && WorldConfig.COMMON.ruinChance.get() > 0)
-				builder.withFeature(Decoration.SURFACE_STRUCTURES, WorldConfiguredFeatures.RUIN);
+				builder.addFeature(Decoration.SURFACE_STRUCTURES, WorldConfiguredFeatures.RUIN);
 			if (category == Biome.Category.EXTREME_HILLS && WorldConfig.COMMON.spireChance.get() > 0)
-				builder.withFeature(Decoration.SURFACE_STRUCTURES, WorldConfiguredFeatures.SPIRE);
+				builder.addFeature(Decoration.SURFACE_STRUCTURES, WorldConfiguredFeatures.SPIRE);
 		}
 
 		if (category == Biome.Category.DESERT && WorldConfig.COMMON.pyramidMaxChunkDistance.get() > 0)
@@ -61,16 +61,16 @@ public class WorldGeneration {
 			// people seem to want their superflat worlds free of modded structures.
 			// Also that vanilla superflat is really tricky and buggy to work with in my
 			// experience.
-			if (serverWorld.getChunkProvider().getChunkGenerator() instanceof FlatChunkGenerator && serverWorld.getDimensionKey().equals(World.OVERWORLD)) {
+			if (serverWorld.getChunkSource().getGenerator() instanceof FlatChunkGenerator && serverWorld.dimension().equals(World.OVERWORLD)) {
 				return;
 			}
 
-			Map<Structure<?>, StructureSeparationSettings> tempMap = new HashMap<>(serverWorld.getChunkProvider().generator.func_235957_b_().func_236195_a_());
-			tempMap.put(WorldStructures.PYRAMID.get(), DimensionStructuresSettings.field_236191_b_.get(WorldStructures.PYRAMID.get()));
-			tempMap.put(WorldStructures.FOUNTAIN.get(), DimensionStructuresSettings.field_236191_b_.get(WorldStructures.FOUNTAIN.get()));
-			tempMap.put(WorldStructures.WATERDOME.get(), DimensionStructuresSettings.field_236191_b_.get(WorldStructures.WATERDOME.get()));
-			tempMap.put(WorldStructures.SNOWBALL.get(), DimensionStructuresSettings.field_236191_b_.get(WorldStructures.SNOWBALL.get()));
-			serverWorld.getChunkProvider().generator.func_235957_b_().field_236193_d_ = tempMap;
+			Map<Structure<?>, StructureSeparationSettings> tempMap = new HashMap<>(serverWorld.getChunkSource().generator.getSettings().structureConfig());
+			tempMap.put(WorldStructures.PYRAMID.get(), DimensionStructuresSettings.DEFAULTS.get(WorldStructures.PYRAMID.get()));
+			tempMap.put(WorldStructures.FOUNTAIN.get(), DimensionStructuresSettings.DEFAULTS.get(WorldStructures.FOUNTAIN.get()));
+			tempMap.put(WorldStructures.WATERDOME.get(), DimensionStructuresSettings.DEFAULTS.get(WorldStructures.WATERDOME.get()));
+			tempMap.put(WorldStructures.SNOWBALL.get(), DimensionStructuresSettings.DEFAULTS.get(WorldStructures.SNOWBALL.get()));
+			serverWorld.getChunkSource().generator.getSettings().structureConfig = tempMap;
 		}
 	}
 }

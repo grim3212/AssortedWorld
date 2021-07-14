@@ -71,8 +71,8 @@ public class PyramidStructurePiece extends ScatteredStructurePiece {
 	}
 
 	@Override
-	protected void readAdditional(CompoundNBT tagCompound) {
-		super.readAdditional(tagCompound);
+	protected void addAdditionalSaveData(CompoundNBT tagCompound) {
+		super.addAdditionalSaveData(tagCompound);
 		tagCompound.putInt("maxHeight", this.maxHeight);
 		tagCompound.putInt("type", this.type);
 
@@ -87,11 +87,11 @@ public class PyramidStructurePiece extends ScatteredStructurePiece {
 	}
 
 	@Override
-	public boolean func_230383_a_(ISeedReader reader, StructureManager structureManager, ChunkGenerator generator, Random rand, MutableBoundingBox bb, ChunkPos chunkPos, BlockPos pos) {
-		if (!this.isInsideBounds(reader, bb, 0)) {
+	public boolean postProcess(ISeedReader reader, StructureManager structureManager, ChunkGenerator generator, Random rand, MutableBoundingBox bb, ChunkPos chunkPos, BlockPos pos) {
+		if (!this.updateAverageGroundHeight(reader, bb, 0)) {
 			return false;
 		} else {
-			pos = pos.down(maxHeight / 2);
+			pos = pos.below(maxHeight / 2);
 
 			int halfWidth = halfWidth(maxHeight);
 			int colHeight = 0;
@@ -104,7 +104,7 @@ public class PyramidStructurePiece extends ScatteredStructurePiece {
 						for (int y = -1; y <= colHeight; y++) {
 							newPos = new BlockPos(x, y, z);
 
-							this.pyramid.put(pos.add(newPos), blockToPlace(rand, newPos, colHeight).getRegistryName());
+							this.pyramid.put(pos.offset(newPos), blockToPlace(rand, newPos, colHeight).getRegistryName());
 						}
 					}
 				}
@@ -122,41 +122,41 @@ public class PyramidStructurePiece extends ScatteredStructurePiece {
 
 	private void setBlockState(IServerWorld world, BlockPos p, ResourceLocation s, Random rand) {
 		if (s == Blocks.CHEST.getRegistryName()) {
-			setBlockState(world, p, Blocks.CHEST.getDefaultState(), rand);
+			setBlockState(world, p, Blocks.CHEST.defaultBlockState(), rand);
 		} else if (s == Blocks.SPAWNER.getRegistryName()) {
-			setBlockState(world, p, Blocks.SPAWNER.getDefaultState(), rand);
+			setBlockState(world, p, Blocks.SPAWNER.defaultBlockState(), rand);
 		} else if (s == Blocks.SANDSTONE.getRegistryName()) {
-			setBlockState(world, p, Blocks.SANDSTONE.getDefaultState(), rand);
+			setBlockState(world, p, Blocks.SANDSTONE.defaultBlockState(), rand);
 		} else if (s == Blocks.SAND.getRegistryName()) {
-			setBlockState(world, p, Blocks.SAND.getDefaultState(), rand);
+			setBlockState(world, p, Blocks.SAND.defaultBlockState(), rand);
 		} else if (s == Blocks.AIR.getRegistryName()) {
-			setBlockState(world, p, Blocks.AIR.getDefaultState(), rand);
+			setBlockState(world, p, Blocks.AIR.defaultBlockState(), rand);
 		} else {
 			// Hopefully ends up a bit more performant having this as a fallback
-			setBlockState(world, p, ForgeRegistries.BLOCKS.getValue(s).getDefaultState(), rand);
+			setBlockState(world, p, ForgeRegistries.BLOCKS.getValue(s).defaultBlockState(), rand);
 		}
 	}
 
 	private void setBlockState(IServerWorld world, BlockPos p, BlockState s, Random rand) {
-		world.setBlockState(p, s, 2);
+		world.setBlock(p, s, 2);
 
 		if (this.initialLoad)
 			if (s.getBlock() == Blocks.CHEST) {
-				TileEntity te = world.getTileEntity(p);
+				TileEntity te = world.getBlockEntity(p);
 
 				if (te instanceof ChestTileEntity) {
 					((ChestTileEntity) te).setLootTable(WorldLootTables.CHESTS_PYRAMID, rand.nextLong());
 				}
 
 			} else if (s.getBlock() == Blocks.SPAWNER) {
-				TileEntity te = world.getTileEntity(p);
+				TileEntity te = world.getBlockEntity(p);
 
 				if (te instanceof MobSpawnerTileEntity) {
 					EntityType<?> type = RuinUtil.getRandomRuneMob(rand);
 					if (type == null) {
 						type = EntityType.ZOMBIE;
 					}
-					((MobSpawnerTileEntity) te).getSpawnerBaseLogic().setEntityType(type);
+					((MobSpawnerTileEntity) te).getSpawner().setEntityId(type);
 				}
 			}
 	}
@@ -225,7 +225,7 @@ public class PyramidStructurePiece extends ScatteredStructurePiece {
 				if (random.nextInt(98) < 2) {
 					boolean flag = false;
 					for (int idx = 0; idx < spawnerList.size(); idx++) {
-						double d = spawnerList.get(idx).distanceSq(pos.up(pos.getY()));
+						double d = spawnerList.get(idx).distSqr(pos.above(pos.getY()));
 						if (d < 6D) {
 							flag = true;
 						}
@@ -233,7 +233,7 @@ public class PyramidStructurePiece extends ScatteredStructurePiece {
 
 					if (!flag) {
 						placedSpawners++;
-						spawnerList.add(pos.up(pos.getY()));
+						spawnerList.add(pos.above(pos.getY()));
 						return true;
 					}
 				}

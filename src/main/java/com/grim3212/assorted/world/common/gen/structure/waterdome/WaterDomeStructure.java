@@ -17,6 +17,8 @@ import net.minecraft.world.gen.feature.structure.Structure;
 import net.minecraft.world.gen.feature.structure.StructureStart;
 import net.minecraft.world.gen.feature.template.TemplateManager;
 
+import net.minecraft.world.gen.feature.structure.Structure.IStartFactory;
+
 public class WaterDomeStructure extends Structure<NoFeatureConfig> {
 
 	public WaterDomeStructure(Codec<NoFeatureConfig> codec) {
@@ -24,10 +26,10 @@ public class WaterDomeStructure extends Structure<NoFeatureConfig> {
 	}
 
 	@Override
-	protected boolean func_230363_a_(ChunkGenerator chunkGenerator, BiomeProvider biomeSource, long seed, SharedSeedRandom chunkRandom, int chunkX, int chunkZ, Biome biome, ChunkPos chunkPos, NoFeatureConfig featureConfig) {
+	protected boolean isFeatureChunk(ChunkGenerator chunkGenerator, BiomeProvider biomeSource, long seed, SharedSeedRandom chunkRandom, int chunkX, int chunkZ, Biome biome, ChunkPos chunkPos, NoFeatureConfig featureConfig) {
 		int x = (chunkX << 4) + 7;
 		int z = (chunkZ << 4) + 7;
-		int y = chunkGenerator.getNoiseHeightMinusOne(x, z, Type.OCEAN_FLOOR_WG);
+		int y = chunkGenerator.getFirstOccupiedHeight(x, z, Type.OCEAN_FLOOR_WG);
 
 		if (y == -1 || y > chunkGenerator.getSeaLevel() - 11) {
 			return false;
@@ -36,7 +38,7 @@ public class WaterDomeStructure extends Structure<NoFeatureConfig> {
 	}
 
 	@Override
-	public GenerationStage.Decoration getDecorationStage() {
+	public GenerationStage.Decoration step() {
 		return GenerationStage.Decoration.SURFACE_STRUCTURES;
 	}
 
@@ -52,16 +54,16 @@ public class WaterDomeStructure extends Structure<NoFeatureConfig> {
 		}
 
 		@Override
-		public void func_230364_a_(DynamicRegistries dynamicRegistries, ChunkGenerator chunkGenerator, TemplateManager templateManager, int chunkX, int chunkZ, Biome biome, NoFeatureConfig config) {
+		public void generatePieces(DynamicRegistries dynamicRegistries, ChunkGenerator chunkGenerator, TemplateManager templateManager, int chunkX, int chunkZ, Biome biome, NoFeatureConfig config) {
 			int x = (chunkX << 4) + 7;
 			int z = (chunkZ << 4) + 7;
-			int y = chunkGenerator.getNoiseHeightMinusOne(x, z, Type.OCEAN_FLOOR_WG);
+			int y = chunkGenerator.getFirstOccupiedHeight(x, z, Type.OCEAN_FLOOR_WG);
 
-			int radius = 3 + this.rand.nextInt(5);
+			int radius = 3 + this.random.nextInt(5);
 
-			WaterDomeStructurePiece waterdomepiece = new WaterDomeStructurePiece(this.rand, new BlockPos(x, y, z), radius);
-			this.components.add(waterdomepiece);
-			this.recalculateStructureSize();
+			WaterDomeStructurePiece waterdomepiece = new WaterDomeStructurePiece(this.random, new BlockPos(x, y, z), radius);
+			this.pieces.add(waterdomepiece);
+			this.calculateBoundingBox();
 		}
 
 	}

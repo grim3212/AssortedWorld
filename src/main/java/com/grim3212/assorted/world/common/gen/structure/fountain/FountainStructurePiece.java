@@ -71,8 +71,8 @@ public class FountainStructurePiece extends ScatteredStructurePiece {
 	}
 
 	@Override
-	protected void readAdditional(CompoundNBT tagCompound) {
-		super.readAdditional(tagCompound);
+	protected void addAdditionalSaveData(CompoundNBT tagCompound) {
+		super.addAdditionalSaveData(tagCompound);
 		tagCompound.putInt("height", this.height);
 		tagCompound.putInt("type", this.type);
 
@@ -87,7 +87,7 @@ public class FountainStructurePiece extends ScatteredStructurePiece {
 	}
 
 	@Override
-	public boolean func_230383_a_(ISeedReader reader, StructureManager structureManager, ChunkGenerator generator, Random rand, MutableBoundingBox bb, ChunkPos chunkPos, BlockPos pos) {
+	public boolean postProcess(ISeedReader reader, StructureManager structureManager, ChunkGenerator generator, Random rand, MutableBoundingBox bb, ChunkPos chunkPos, BlockPos pos) {
 
 		int halfWidth = halfWidth(height);
 		int colHeight = 0;
@@ -100,7 +100,7 @@ public class FountainStructurePiece extends ScatteredStructurePiece {
 					for (int y = -1; y <= colHeight; y++) {
 						newPos = new BlockPos(x, y, z);
 
-						this.fountain.put(pos.add(newPos), blockToPlace(rand, newPos, colHeight).getRegistryName());
+						this.fountain.put(pos.offset(newPos), blockToPlace(rand, newPos, colHeight).getRegistryName());
 					}
 				}
 			}
@@ -117,49 +117,49 @@ public class FountainStructurePiece extends ScatteredStructurePiece {
 
 	private void setBlockState(IServerWorld world, BlockPos p, ResourceLocation s, Random rand) {
 		if (s == Blocks.CHEST.getRegistryName()) {
-			setBlockState(world, p, Blocks.CHEST.getDefaultState(), rand);
+			setBlockState(world, p, Blocks.CHEST.defaultBlockState(), rand);
 		} else if (s == Blocks.SPAWNER.getRegistryName()) {
-			setBlockState(world, p, Blocks.SPAWNER.getDefaultState(), rand);
+			setBlockState(world, p, Blocks.SPAWNER.defaultBlockState(), rand);
 		} else if (s == Blocks.COBBLESTONE.getRegistryName()) {
-			setBlockState(world, p, Blocks.COBBLESTONE.getDefaultState(), rand);
+			setBlockState(world, p, Blocks.COBBLESTONE.defaultBlockState(), rand);
 		} else if (s == Blocks.MOSSY_COBBLESTONE.getRegistryName()) {
-			setBlockState(world, p, Blocks.MOSSY_COBBLESTONE.getDefaultState(), rand);
+			setBlockState(world, p, Blocks.MOSSY_COBBLESTONE.defaultBlockState(), rand);
 		} else if (s == Blocks.CRACKED_STONE_BRICKS.getRegistryName()) {
-			setBlockState(world, p, Blocks.CRACKED_STONE_BRICKS.getDefaultState(), rand);
+			setBlockState(world, p, Blocks.CRACKED_STONE_BRICKS.defaultBlockState(), rand);
 		} else if (s == Blocks.MOSSY_STONE_BRICKS.getRegistryName()) {
-			setBlockState(world, p, Blocks.MOSSY_STONE_BRICKS.getDefaultState(), rand);
+			setBlockState(world, p, Blocks.MOSSY_STONE_BRICKS.defaultBlockState(), rand);
 		} else if (s == Blocks.STONE_BRICKS.getRegistryName()) {
-			setBlockState(world, p, Blocks.STONE_BRICKS.getDefaultState(), rand);
+			setBlockState(world, p, Blocks.STONE_BRICKS.defaultBlockState(), rand);
 		} else if (s == Blocks.WATER.getRegistryName()) {
-			setBlockState(world, p, Blocks.WATER.getDefaultState(), rand);
+			setBlockState(world, p, Blocks.WATER.defaultBlockState(), rand);
 		} else if (s == Blocks.AIR.getRegistryName()) {
-			setBlockState(world, p, Blocks.AIR.getDefaultState(), rand);
+			setBlockState(world, p, Blocks.AIR.defaultBlockState(), rand);
 		} else {
 			// Hopefully ends up a bit more performant having this as a fallback
-			setBlockState(world, p, ForgeRegistries.BLOCKS.getValue(s).getDefaultState(), rand);
+			setBlockState(world, p, ForgeRegistries.BLOCKS.getValue(s).defaultBlockState(), rand);
 		}
 	}
 
 	private void setBlockState(IServerWorld world, BlockPos p, BlockState s, Random rand) {
-		world.setBlockState(p, s, 2);
+		world.setBlock(p, s, 2);
 
 		if (this.initialLoad) {
 			if (s.getBlock() == Blocks.CHEST) {
-				TileEntity te = world.getTileEntity(p);
+				TileEntity te = world.getBlockEntity(p);
 
 				if (te instanceof ChestTileEntity) {
 					((ChestTileEntity) te).setLootTable(WorldLootTables.CHESTS_FOUNTAIN, rand.nextLong());
 				}
 
 			} else if (s.getBlock() == Blocks.SPAWNER) {
-				TileEntity te = world.getTileEntity(p);
+				TileEntity te = world.getBlockEntity(p);
 
 				if (te instanceof MobSpawnerTileEntity) {
 					EntityType<?> type = RuinUtil.getRandomRuneMob(rand);
 					if (type == null) {
 						type = EntityType.ZOMBIE;
 					}
-					((MobSpawnerTileEntity) te).getSpawnerBaseLogic().setEntityType(type);
+					((MobSpawnerTileEntity) te).getSpawner().setEntityId(type);
 				}
 			}
 		}
@@ -167,7 +167,7 @@ public class FountainStructurePiece extends ScatteredStructurePiece {
 		if (s.getBlock() == Blocks.WATER) {
 			FluidState fluidstate = world.getFluidState(p);
 			if (!fluidstate.isEmpty()) {
-				world.getPendingFluidTicks().scheduleTick(p, fluidstate.getFluid(), 0);
+				world.getLiquidTicks().scheduleTick(p, fluidstate.getType(), 0);
 			}
 		}
 	}

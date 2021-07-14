@@ -11,10 +11,10 @@ import net.minecraft.world.gen.feature.StructureFeature;
 
 public class WorldConfiguredStructures {
 
-	public static StructureFeature<?, ?> CONFIGURED_PYRAMID = WorldStructures.PYRAMID.get().withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG);
-	public static StructureFeature<?, ?> CONFIGURED_FOUNTAIN = WorldStructures.FOUNTAIN.get().withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG);
-	public static StructureFeature<?, ?> CONFIGURED_WATERDOME = WorldStructures.WATERDOME.get().withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG);
-	public static StructureFeature<?, ?> CONFIGURED_SNOWBALL = WorldStructures.SNOWBALL.get().withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG);
+	public static StructureFeature<?, ?> CONFIGURED_PYRAMID = WorldStructures.PYRAMID.get().configured(IFeatureConfig.NONE);
+	public static StructureFeature<?, ?> CONFIGURED_FOUNTAIN = WorldStructures.FOUNTAIN.get().configured(IFeatureConfig.NONE);
+	public static StructureFeature<?, ?> CONFIGURED_WATERDOME = WorldStructures.WATERDOME.get().configured(IFeatureConfig.NONE);
+	public static StructureFeature<?, ?> CONFIGURED_SNOWBALL = WorldStructures.SNOWBALL.get().configured(IFeatureConfig.NONE);
 
 	/**
 	 * Registers the configured structure which is what gets added to the biomes.
@@ -28,16 +28,16 @@ public class WorldConfiguredStructures {
 	public static void registerConfiguredStructures() {
 		Registry<StructureFeature<?, ?>> registry = WorldGenRegistries.CONFIGURED_STRUCTURE_FEATURE;
 		Registry.register(registry, new ResourceLocation(AssortedWorld.MODID, "configured_pyramid"), CONFIGURED_PYRAMID);
-		FlatGenerationSettings.STRUCTURES.put(WorldStructures.PYRAMID.get(), CONFIGURED_PYRAMID);
+		FlatGenerationSettings.STRUCTURE_FEATURES.put(WorldStructures.PYRAMID.get(), CONFIGURED_PYRAMID);
 
 		Registry.register(registry, new ResourceLocation(AssortedWorld.MODID, "configured_fountain"), CONFIGURED_FOUNTAIN);
-		FlatGenerationSettings.STRUCTURES.put(WorldStructures.FOUNTAIN.get(), CONFIGURED_FOUNTAIN);
+		FlatGenerationSettings.STRUCTURE_FEATURES.put(WorldStructures.FOUNTAIN.get(), CONFIGURED_FOUNTAIN);
 
 		Registry.register(registry, new ResourceLocation(AssortedWorld.MODID, "configured_waterdome"), CONFIGURED_WATERDOME);
-		FlatGenerationSettings.STRUCTURES.put(WorldStructures.WATERDOME.get(), CONFIGURED_WATERDOME);
+		FlatGenerationSettings.STRUCTURE_FEATURES.put(WorldStructures.WATERDOME.get(), CONFIGURED_WATERDOME);
 
 		Registry.register(registry, new ResourceLocation(AssortedWorld.MODID, "configured_snowball"), CONFIGURED_SNOWBALL);
-		FlatGenerationSettings.STRUCTURES.put(WorldStructures.SNOWBALL.get(), CONFIGURED_SNOWBALL);
+		FlatGenerationSettings.STRUCTURE_FEATURES.put(WorldStructures.SNOWBALL.get(), CONFIGURED_SNOWBALL);
 	}
 
 }
