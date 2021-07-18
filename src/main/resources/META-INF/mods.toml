@@ -14,7 +14,7 @@ displayURL="https://assortedmods.com/world"
 logoFile="logo.png"
 authors="Grim3212"
 description='''
-An assortment of various additions based around world generation that are Minecraft world.
+An assortment of various additions based around world generation that are added to the Minecraft world.
 '''
 
 [[dependencies.assortedworld]]
