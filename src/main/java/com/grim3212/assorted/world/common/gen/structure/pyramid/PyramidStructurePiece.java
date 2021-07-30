@@ -10,29 +10,29 @@ import com.grim3212.assorted.world.common.gen.structure.WorldStructurePieceTypes
 import com.grim3212.assorted.world.common.lib.WorldLootTables;
 import com.grim3212.assorted.world.common.util.RuinUtil;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.EntityType;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.nbt.NBTUtil;
-import net.minecraft.tileentity.ChestTileEntity;
-import net.minecraft.tileentity.MobSpawnerTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.MutableBoundingBox;
-import net.minecraft.world.ISeedReader;
-import net.minecraft.world.IServerWorld;
-import net.minecraft.world.gen.ChunkGenerator;
-import net.minecraft.world.gen.feature.structure.ScatteredStructurePiece;
-import net.minecraft.world.gen.feature.structure.StructureManager;
-import net.minecraft.world.gen.feature.template.TemplateManager;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.StructureFeatureManager;
+import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
+import net.minecraft.world.level.block.entity.SpawnerBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.level.levelgen.structure.ScatteredFeaturePiece;
 import net.minecraftforge.registries.ForgeRegistries;
 
-public class PyramidStructurePiece extends ScatteredStructurePiece {
+public class PyramidStructurePiece extends ScatteredFeaturePiece {
 
 	private final int maxHeight;
 	private final int type;
@@ -45,7 +45,7 @@ public class PyramidStructurePiece extends ScatteredStructurePiece {
 	private Map<BlockPos, ResourceLocation> pyramid;
 
 	public PyramidStructurePiece(Random random, BlockPos pos, int maxHeight, int type) {
-		super(WorldStructurePieceTypes.PYRAMID, random, pos.getX(), pos.getY(), pos.getZ(), maxHeight, maxHeight, maxHeight);
+		super(WorldStructurePieceTypes.PYRAMID, pos.getX(), pos.getY(), pos.getZ(), maxHeight, maxHeight, maxHeight, getRandomHorizontalDirection(random));
 		this.maxHeight = maxHeight;
 		this.type = type;
 		this.spawnerList = Lists.newArrayList();
@@ -53,7 +53,7 @@ public class PyramidStructurePiece extends ScatteredStructurePiece {
 		this.pyramid = Maps.newHashMap();
 	}
 
-	public PyramidStructurePiece(TemplateManager template, CompoundNBT tagCompound) {
+	public PyramidStructurePiece(ServerLevel level, CompoundTag tagCompound) {
 		super(WorldStructurePieceTypes.PYRAMID, tagCompound);
 		this.maxHeight = tagCompound.getInt("maxHeight");
 		this.type = tagCompound.getInt("type");
@@ -61,25 +61,25 @@ public class PyramidStructurePiece extends ScatteredStructurePiece {
 		this.spawnerList = Lists.newArrayList();
 
 		this.pyramid = Maps.newHashMap();
-		ListNBT blocks = tagCompound.getList("pyramid", 10);
+		ListTag blocks = tagCompound.getList("pyramid", 10);
 		for (int i = 0; i < blocks.size(); i++) {
-			CompoundNBT blockCompound = (CompoundNBT) blocks.get(i);
-			BlockPos pos = NBTUtil.readBlockPos(blockCompound.getCompound("pos"));
+			CompoundTag blockCompound = (CompoundTag) blocks.get(i);
+			BlockPos pos = NbtUtils.readBlockPos(blockCompound.getCompound("pos"));
 			ResourceLocation block = new ResourceLocation(blockCompound.getString("block"));
 			this.pyramid.put(pos, block);
 		}
 	}
 
 	@Override
-	protected void addAdditionalSaveData(CompoundNBT tagCompound) {
-		super.addAdditionalSaveData(tagCompound);
+	protected void addAdditionalSaveData(ServerLevel level, CompoundTag tagCompound) {
+		super.addAdditionalSaveData(level, tagCompound);
 		tagCompound.putInt("maxHeight", this.maxHeight);
 		tagCompound.putInt("type", this.type);
 
-		ListNBT blocks = new ListNBT();
+		ListTag blocks = new ListTag();
 		this.pyramid.forEach((p, s) -> {
-			CompoundNBT compound = new CompoundNBT();
-			compound.put("pos", NBTUtil.writeBlockPos(p));
+			CompoundTag compound = new CompoundTag();
+			compound.put("pos", NbtUtils.writeBlockPos(p));
 			compound.putString("block", s.toString());
 			blocks.add(compound);
 		});
@@ -87,7 +87,7 @@ public class PyramidStructurePiece extends ScatteredStructurePiece {
 	}
 
 	@Override
-	public boolean postProcess(ISeedReader reader, StructureManager structureManager, ChunkGenerator generator, Random rand, MutableBoundingBox bb, ChunkPos chunkPos, BlockPos pos) {
+	public boolean postProcess(WorldGenLevel reader, StructureFeatureManager structureManager, ChunkGenerator generator, Random rand, BoundingBox bb, ChunkPos chunkPos, BlockPos pos) {
 		if (!this.updateAverageGroundHeight(reader, bb, 0)) {
 			return false;
 		} else {
@@ -120,7 +120,7 @@ public class PyramidStructurePiece extends ScatteredStructurePiece {
 		}
 	}
 
-	private void setBlockState(IServerWorld world, BlockPos p, ResourceLocation s, Random rand) {
+	private void setBlockState(ServerLevelAccessor world, BlockPos p, ResourceLocation s, Random rand) {
 		if (s == Blocks.CHEST.getRegistryName()) {
 			setBlockState(world, p, Blocks.CHEST.defaultBlockState(), rand);
 		} else if (s == Blocks.SPAWNER.getRegistryName()) {
@@ -137,26 +137,26 @@ public class PyramidStructurePiece extends ScatteredStructurePiece {
 		}
 	}
 
-	private void setBlockState(IServerWorld world, BlockPos p, BlockState s, Random rand) {
+	private void setBlockState(ServerLevelAccessor world, BlockPos p, BlockState s, Random rand) {
 		world.setBlock(p, s, 2);
 
 		if (this.initialLoad)
 			if (s.getBlock() == Blocks.CHEST) {
-				TileEntity te = world.getBlockEntity(p);
+				BlockEntity te = world.getBlockEntity(p);
 
-				if (te instanceof ChestTileEntity) {
-					((ChestTileEntity) te).setLootTable(WorldLootTables.CHESTS_PYRAMID, rand.nextLong());
+				if (te instanceof ChestBlockEntity) {
+					((ChestBlockEntity) te).setLootTable(WorldLootTables.CHESTS_PYRAMID, rand.nextLong());
 				}
 
 			} else if (s.getBlock() == Blocks.SPAWNER) {
-				TileEntity te = world.getBlockEntity(p);
+				BlockEntity te = world.getBlockEntity(p);
 
-				if (te instanceof MobSpawnerTileEntity) {
+				if (te instanceof SpawnerBlockEntity) {
 					EntityType<?> type = RuinUtil.getRandomRuneMob(rand);
 					if (type == null) {
 						type = EntityType.ZOMBIE;
 					}
-					((MobSpawnerTileEntity) te).getSpawner().setEntityId(type);
+					((SpawnerBlockEntity) te).getSpawner().setEntityId(type);
 				}
 			}
 	}

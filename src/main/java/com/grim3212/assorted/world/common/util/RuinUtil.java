@@ -6,9 +6,9 @@ import java.util.Random;
 
 import com.grim3212.assorted.world.common.block.WorldBlocks;
 
-import net.minecraft.block.Block;
-import net.minecraft.entity.EntityType;
-import net.minecraft.util.WeightedRandom;
+import net.minecraft.util.WeighedRandom;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.DungeonHooks;
 
 /**
@@ -76,7 +76,7 @@ public class RuinUtil {
 	 */
 	public static EntityType<?> getRandomRuneMob(Random rand) {
 		if (rand.nextInt(3) > 0) {
-			RuneMob mob = WeightedRandom.getRandomItem(rand, runeMobs);
+			RuneMob mob = WeighedRandom.getRandomItem(rand, runeMobs).orElseThrow();
 			return mob.type;
 		} else {
 
@@ -98,7 +98,7 @@ public class RuinUtil {
 		return WorldBlocks.runeBlocks()[random.nextInt(WorldBlocks.runeBlocks().length)];
 	}
 
-	public static class RuneMob extends WeightedRandom.Item {
+	public static class RuneMob extends WeighedRandom.WeighedRandomItem {
 		public final EntityType<?> type;
 
 		public RuneMob(int weight, EntityType<?> type) {

@@ -3,7 +3,7 @@ package com.grim3212.assorted.world.client.data;
 import com.grim3212.assorted.world.AssortedWorld;
 import com.grim3212.assorted.world.common.block.WorldBlocks;
 
-import net.minecraft.block.Block;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.data.DataGenerator;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;

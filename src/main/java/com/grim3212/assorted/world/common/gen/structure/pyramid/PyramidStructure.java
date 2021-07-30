@@ -2,61 +2,60 @@ package com.grim3212.assorted.world.common.gen.structure.pyramid;
 
 import com.mojang.serialization.Codec;
 
-import net.minecraft.util.SharedSeedRandom;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.MutableBoundingBox;
-import net.minecraft.util.registry.DynamicRegistries;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.provider.BiomeProvider;
-import net.minecraft.world.gen.ChunkGenerator;
-import net.minecraft.world.gen.GenerationStage;
-import net.minecraft.world.gen.Heightmap;
-import net.minecraft.world.gen.Heightmap.Type;
-import net.minecraft.world.gen.feature.NoFeatureConfig;
-import net.minecraft.world.gen.feature.structure.Structure;
-import net.minecraft.world.gen.feature.structure.StructureStart;
-import net.minecraft.world.gen.feature.template.TemplateManager;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.LevelHeightAccessor;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.BiomeSource;
+import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.levelgen.GenerationStep;
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.levelgen.Heightmap.Types;
+import net.minecraft.world.level.levelgen.WorldgenRandom;
+import net.minecraft.world.level.levelgen.feature.StructureFeature;
+import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
+import net.minecraft.world.level.levelgen.structure.StructureStart;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureManager;
 
-public class PyramidStructure extends Structure<NoFeatureConfig> {
-	public PyramidStructure(Codec<NoFeatureConfig> codec) {
+public class PyramidStructure extends StructureFeature<NoneFeatureConfiguration> {
+	public PyramidStructure(Codec<NoneFeatureConfiguration> codec) {
 		super(codec);
 	}
 
 	@Override
-	public GenerationStage.Decoration step() {
-		return GenerationStage.Decoration.SURFACE_STRUCTURES;
+	public GenerationStep.Decoration step() {
+		return GenerationStep.Decoration.SURFACE_STRUCTURES;
 	}
 
 	@Override
-	protected boolean isFeatureChunk(ChunkGenerator chunkGenerator, BiomeProvider biomeSource, long seed, SharedSeedRandom chunkRandom, int chunkX, int chunkZ, Biome biome, ChunkPos chunkPos, NoFeatureConfig featureConfig) {
-		int landHeight = chunkGenerator.getFirstFreeHeight(chunkX << 4, chunkZ << 4, Heightmap.Type.WORLD_SURFACE_WG);
+	protected boolean isFeatureChunk(ChunkGenerator chunkGenerator, BiomeSource biomeSource, long seed, WorldgenRandom chunkRandom, ChunkPos chunkPos, Biome biome, ChunkPos chunkPos2, NoneFeatureConfiguration featureConfig, LevelHeightAccessor heightAccessor) {
+		int landHeight = chunkGenerator.getFirstFreeHeight(chunkPos.x << 4, chunkPos.z << 4, Heightmap.Types.WORLD_SURFACE_WG, heightAccessor);
 		return landHeight > 20;
 	}
 
 	@Override
-	public IStartFactory<NoFeatureConfig> getStartFactory() {
+	public StructureStartFactory<NoneFeatureConfiguration> getStartFactory() {
 		return PyramidStructure.Start::new;
 	}
 
-	public static class Start extends StructureStart<NoFeatureConfig> {
+	public static class Start extends StructureStart<NoneFeatureConfiguration> {
 
-		public Start(Structure<NoFeatureConfig> structureIn, int chunkX, int chunkZ, MutableBoundingBox mutableBoundingBox, int referenceIn, long seedIn) {
-			super(structureIn, chunkX, chunkZ, mutableBoundingBox, referenceIn, seedIn);
+		public Start(StructureFeature<NoneFeatureConfiguration> structureIn, ChunkPos chunkPos, int referenceIn, long seedIn) {
+			super(structureIn, chunkPos, referenceIn, seedIn);
 		}
 
 		@Override
-		public void generatePieces(DynamicRegistries dynamicRegistries, ChunkGenerator chunkGenerator, TemplateManager templateManager, int chunkX, int chunkZ, Biome biome, NoFeatureConfig config) {
-			int x = (chunkX << 4) + 7;
-			int z = (chunkZ << 4) + 7;
-			int y = chunkGenerator.getFirstOccupiedHeight(x, z, Type.WORLD_SURFACE_WG);
+		public void generatePieces(RegistryAccess dynamicRegistries, ChunkGenerator chunkGenerator, StructureManager templateManager, ChunkPos chunkPos, Biome biome, NoneFeatureConfiguration config, LevelHeightAccessor heightAccessor) {
+			int x = (chunkPos.x << 4) + 7;
+			int z = (chunkPos.z << 4) + 7;
+			int y = chunkGenerator.getFirstOccupiedHeight(x, z, Types.WORLD_SURFACE_WG, heightAccessor);
 
 			int maxHeight = 2 * (4 + random.nextInt(16));
 			int type = random.nextInt(2);
 
 			PyramidStructurePiece desertpyramidpiece = new PyramidStructurePiece(this.random, new BlockPos(x, y, z), maxHeight, type);
-			this.pieces.add(desertpyramidpiece);
-			this.calculateBoundingBox();
+			this.addPiece(desertpyramidpiece);
 		}
 
 	}

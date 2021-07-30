@@ -1,22 +1,22 @@
 package com.grim3212.assorted.world.common.block;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.potion.Effect;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.BlockHitResult;
 
 public class RuneBlock extends Block {
 
@@ -28,33 +28,33 @@ public class RuneBlock extends Block {
 	}
 
 	@Override
-	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
 		player.addEffect(getPotionEffect(player.experienceLevel, 1.0F, 0.06F));
-		return ActionResultType.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 
 	@Override
-	public void stepOn(World worldIn, BlockPos pos, Entity entityIn) {
-		if (entityIn instanceof LivingEntity) {
-			LivingEntity living = (LivingEntity) entityIn;
+	public void stepOn(Level level, BlockPos pos, BlockState state, Entity entity) {
+		if (entity instanceof LivingEntity) {
+			LivingEntity living = (LivingEntity) entity;
 			int xpLevel = 1;
-			if (living instanceof PlayerEntity) {
-				xpLevel = ((PlayerEntity) living).experienceLevel;
+			if (living instanceof Player) {
+				xpLevel = ((Player) living).experienceLevel;
 			}
 			living.addEffect(getPotionEffect(xpLevel, 1.0F, 0.06F));
 		}
 	}
 
-	private EffectInstance getPotionEffect(int xpLevel, float durationMod, float amplifierMod) {
+	private MobEffectInstance getPotionEffect(int xpLevel, float durationMod, float amplifierMod) {
 		// TODO: Add in config options for modifiers
 		// XPLVLMOD, DURATIONMOD, AMPLIFIERMOD
 		int duration = (int) (1000F + (float) (500F + (xpLevel * 100)) * durationMod);
 		int amplifier = (int) (0.0D + Math.floor(amplifierMod * (float) xpLevel));
 
-		return new EffectInstance(this.runeType.getEffect(), duration, amplifier);
+		return new MobEffectInstance(this.runeType.getEffect(), duration, amplifier);
 	}
 
-	public static enum RuneType implements IStringSerializable {
+	public static enum RuneType implements StringRepresentable {
 		UR("ur", "strength"),
 		EOH("eoh", "poison"),
 		HAGEL("hagel", "jump_boost"),
@@ -74,7 +74,7 @@ public class RuneBlock extends Block {
 
 		private final String runeName;
 		private final String effectName;
-		private Effect effectType;
+		private MobEffect effectType;
 		public static final RuneType values[] = values();
 
 		private RuneType(String runeName, String effectName) {
@@ -93,7 +93,7 @@ public class RuneBlock extends Block {
 			return names;
 		}
 
-		public Effect getEffect() {
+		public MobEffect getEffect() {
 			if (effectType != null) {
 				return effectType;
 			} else {
@@ -102,7 +102,7 @@ public class RuneBlock extends Block {
 			}
 		}
 
-		public static Effect get(String loc) {
+		public static MobEffect get(String loc) {
 			return Registry.MOB_EFFECT.get(new ResourceLocation(loc));
 		}
 

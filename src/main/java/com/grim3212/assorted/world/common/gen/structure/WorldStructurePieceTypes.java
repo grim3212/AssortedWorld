@@ -5,15 +5,15 @@ import com.grim3212.assorted.world.common.gen.structure.pyramid.PyramidStructure
 import com.grim3212.assorted.world.common.gen.structure.snowball.SnowballStructurePiece;
 import com.grim3212.assorted.world.common.gen.structure.waterdome.WaterDomeStructurePiece;
 
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.gen.feature.structure.IStructurePieceType;
+import net.minecraft.core.Registry;
+import net.minecraft.world.level.levelgen.feature.StructurePieceType;
 
 public class WorldStructurePieceTypes {
 
-	public static IStructurePieceType PYRAMID = PyramidStructurePiece::new;
-	public static IStructurePieceType FOUNTAIN = FountainStructurePiece::new;
-	public static IStructurePieceType WATERDOME = WaterDomeStructurePiece::new;
-	public static IStructurePieceType SNOWBALL = SnowballStructurePiece::new;
+	public static StructurePieceType PYRAMID = PyramidStructurePiece::new;
+	public static StructurePieceType FOUNTAIN = FountainStructurePiece::new;
+	public static StructurePieceType WATERDOME = WaterDomeStructurePiece::new;
+	public static StructurePieceType SNOWBALL = SnowballStructurePiece::new;
 
 	public static void registerStructurePieces() {
 		Registry.register(Registry.STRUCTURE_PIECE, "pyramid_piece", PYRAMID);

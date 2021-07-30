@@ -9,19 +9,19 @@ import com.google.common.collect.Lists;
 import com.grim3212.assorted.world.common.gen.structure.WorldStructurePieceTypes;
 import com.grim3212.assorted.world.common.util.RuinUtil;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.MutableBoundingBox;
-import net.minecraft.world.ISeedReader;
-import net.minecraft.world.gen.ChunkGenerator;
-import net.minecraft.world.gen.feature.structure.ScatteredStructurePiece;
-import net.minecraft.world.gen.feature.structure.StructureManager;
-import net.minecraft.world.gen.feature.template.TemplateManager;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.StructureFeatureManager;
+import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.level.levelgen.structure.ScatteredFeaturePiece;
 
-public class SnowballStructurePiece extends ScatteredStructurePiece {
+public class SnowballStructurePiece extends ScatteredFeaturePiece {
 
 	private final int radius;
 
@@ -29,23 +29,23 @@ public class SnowballStructurePiece extends ScatteredStructurePiece {
 	private List<Integer> radii;
 
 	public SnowballStructurePiece(Random random, BlockPos pos, int radius) {
-		super(WorldStructurePieceTypes.WATERDOME, random, pos.getX(), pos.getY(), pos.getZ(), radius * 2, radius, radius * 2);
+		super(WorldStructurePieceTypes.WATERDOME, pos.getX(), pos.getY(), pos.getZ(), radius * 2, radius, radius * 2, getRandomHorizontalDirection(random));
 		this.radius = radius;
 	}
 
-	public SnowballStructurePiece(TemplateManager template, CompoundNBT tagCompound) {
+	public SnowballStructurePiece(ServerLevel level, CompoundTag tagCompound) {
 		super(WorldStructurePieceTypes.WATERDOME, tagCompound);
 		this.radius = tagCompound.getInt("radius");
 	}
 
 	@Override
-	protected void addAdditionalSaveData(CompoundNBT tagCompound) {
-		super.addAdditionalSaveData(tagCompound);
+	protected void addAdditionalSaveData(ServerLevel level, CompoundTag tagCompound) {
+		super.addAdditionalSaveData(level, tagCompound);
 		tagCompound.putInt("radius", this.radius);
 	}
 
 	@Override
-	public boolean postProcess(ISeedReader reader, StructureManager structureManager, ChunkGenerator generator, Random rand, MutableBoundingBox bb, ChunkPos chunkPos, BlockPos pos) {
+	public boolean postProcess(WorldGenLevel reader, StructureFeatureManager structureManager, ChunkGenerator generator, Random rand, BoundingBox bb, ChunkPos chunkPos, BlockPos pos) {
 		this.centrePoints = Lists.newArrayList(BlockPos.ZERO);
 		this.radii = Lists.newArrayList(radius);
 

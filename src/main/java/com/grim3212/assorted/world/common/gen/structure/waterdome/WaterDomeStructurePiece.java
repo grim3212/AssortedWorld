@@ -8,22 +8,22 @@ import com.grim3212.assorted.world.common.gen.structure.WorldStructurePieceTypes
 import com.grim3212.assorted.world.common.handler.WorldConfig;
 import com.grim3212.assorted.world.common.util.RuinUtil;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.MutableBoundingBox;
-import net.minecraft.world.ISeedReader;
-import net.minecraft.world.gen.ChunkGenerator;
-import net.minecraft.world.gen.feature.structure.ScatteredStructurePiece;
-import net.minecraft.world.gen.feature.structure.StructureManager;
-import net.minecraft.world.gen.feature.template.TemplateManager;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.StructureFeatureManager;
+import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.level.levelgen.structure.ScatteredFeaturePiece;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
 
-public class WaterDomeStructurePiece extends ScatteredStructurePiece {
+public class WaterDomeStructurePiece extends ScatteredFeaturePiece {
 
 	private final int radius;
 
@@ -33,26 +33,26 @@ public class WaterDomeStructurePiece extends ScatteredStructurePiece {
 	private List<Integer> radii;
 
 	public WaterDomeStructurePiece(Random random, BlockPos pos, int radius) {
-		super(WorldStructurePieceTypes.WATERDOME, random, pos.getX(), pos.getY(), pos.getZ(), radius * 2, radius, radius * 2);
+		super(WorldStructurePieceTypes.WATERDOME, pos.getX(), pos.getY(), pos.getZ(), radius * 2, radius, radius * 2, getRandomHorizontalDirection(random));
 		this.radius = radius;
 		this.runePlaced = false;
 	}
 
-	public WaterDomeStructurePiece(TemplateManager template, CompoundNBT tagCompound) {
+	public WaterDomeStructurePiece(ServerLevel level, CompoundTag tagCompound) {
 		super(WorldStructurePieceTypes.WATERDOME, tagCompound);
 		this.radius = tagCompound.getInt("radius");
 		this.runePlaced = tagCompound.getBoolean("runePlaced");
 	}
 
 	@Override
-	protected void addAdditionalSaveData(CompoundNBT tagCompound) {
-		super.addAdditionalSaveData(tagCompound);
+	protected void addAdditionalSaveData(ServerLevel level, CompoundTag tagCompound) {
+		super.addAdditionalSaveData(level, tagCompound);
 		tagCompound.putInt("radius", this.radius);
 		tagCompound.putBoolean("runePlaced", runePlaced);
 	}
 
 	@Override
-	public boolean postProcess(ISeedReader reader, StructureManager structureManager, ChunkGenerator generator, Random rand, MutableBoundingBox bb, ChunkPos chunkPos, BlockPos pos) {
+	public boolean postProcess(WorldGenLevel reader, StructureFeatureManager structureManager, ChunkGenerator generator, Random rand, BoundingBox bb, ChunkPos chunkPos, BlockPos pos) {
 		this.centrePoints = Lists.newArrayList();
 		this.radii = Lists.newArrayList();
 
@@ -126,7 +126,7 @@ public class WaterDomeStructurePiece extends ScatteredStructurePiece {
 			BlockPos point = centrePoints.get(pIdx);
 			int radi = radii.get(pIdx);
 
-			int distance = (int) Math.round(MathHelper.sqrt(point.distSqr(point1)));
+			int distance = (int) Math.round(Mth.sqrt((float) point.distSqr(point1)));
 			if (distance < radi) {
 				places++;
 				if (point1.equals(point) && !runePlaced) {
