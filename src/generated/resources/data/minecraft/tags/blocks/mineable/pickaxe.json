@@ -1,0 +1,22 @@
+{
+  "replace": false,
+  "values": [
+    "assortedworld:ur_rune",
+    "assortedworld:eoh_rune",
+    "assortedworld:hagel_rune",
+    "assortedworld:eolh_rune",
+    "assortedworld:cen_rune",
+    "assortedworld:ger_rune",
+    "assortedworld:rad_rune",
+    "assortedworld:is_rune",
+    "assortedworld:daeg_rune",
+    "assortedworld:tyr_rune",
+    "assortedworld:beorc_rune",
+    "assortedworld:lagu_rune",
+    "assortedworld:odal_rune",
+    "assortedworld:nyd_rune",
+    "assortedworld:thorn_rune",
+    "assortedworld:os_rune",
+    "assortedworld:randomite_ore"
+  ]
+}
