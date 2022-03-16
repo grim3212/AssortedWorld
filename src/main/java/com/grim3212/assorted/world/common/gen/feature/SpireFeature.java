@@ -149,7 +149,7 @@ public class SpireFeature extends Feature<NoneFeatureConfiguration> {
 					level.setBlock(pos, Blocks.LAVA.defaultBlockState(), 2);
 					FluidState fluidstate = level.getFluidState(pos);
 					if (!fluidstate.isEmpty()) {
-						level.getLiquidTicks().scheduleTick(pos, fluidstate.getType(), 0);
+						level.scheduleTick(pos, fluidstate.getType(), 0);
 					}
 				} else {
 					level.setBlock(pos, Blocks.NETHERRACK.defaultBlockState(), 2);
@@ -179,7 +179,7 @@ public class SpireFeature extends Feature<NoneFeatureConfiguration> {
 		}
 		startHeight /= mod;
 		for (int heightOff = 0; heightOff < startHeight; heightOff++) {
-			if (!level.isEmptyBlock(pos.above(heightOff)) && !(level.getBlockState(pos.above(heightOff)).getBlock() instanceof LeavesBlock) && !(BlockTags.LOGS.contains(level.getBlockState(pos.above(heightOff)).getBlock()))) {
+			if (!level.isEmptyBlock(pos.above(heightOff)) && !(level.getBlockState(pos.above(heightOff)).getBlock() instanceof LeavesBlock) && !(level.getBlockState(pos.above(heightOff)).is(BlockTags.LOGS))) {
 				continue;
 			}
 			if (deathSpire) {
@@ -192,7 +192,7 @@ public class SpireFeature extends Feature<NoneFeatureConfiguration> {
 					level.setBlock(pos, Blocks.LAVA.defaultBlockState(), 2);
 					FluidState fluidstate = level.getFluidState(pos);
 					if (!fluidstate.isEmpty()) {
-						level.getLiquidTicks().scheduleTick(pos, fluidstate.getType(), 0);
+						level.scheduleTick(pos, fluidstate.getType(), 0);
 					}
 				} else {
 					level.setBlock(pos.above(heightOff), Blocks.NETHERRACK.defaultBlockState(), 2);
@@ -217,7 +217,7 @@ public class SpireFeature extends Feature<NoneFeatureConfiguration> {
 					level.setBlock(pos, Blocks.LAVA.defaultBlockState(), 2);
 					FluidState fluidstate = level.getFluidState(pos);
 					if (!fluidstate.isEmpty()) {
-						level.getLiquidTicks().scheduleTick(pos, fluidstate.getType(), 0);
+						level.scheduleTick(pos, fluidstate.getType(), 0);
 					}
 				} else {
 					level.setBlock(pos, Blocks.NETHERRACK.defaultBlockState(), 2);

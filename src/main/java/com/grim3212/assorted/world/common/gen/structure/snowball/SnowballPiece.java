@@ -11,7 +11,6 @@ import com.grim3212.assorted.world.common.util.RuinUtil;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.StructureFeatureManager;
 import net.minecraft.world.level.WorldGenLevel;
@@ -20,76 +19,81 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.ScatteredFeaturePiece;
+import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceSerializationContext;
 
-public class SnowballStructurePiece extends ScatteredFeaturePiece {
+public class SnowballPiece extends ScatteredFeaturePiece {
 
 	private final int radius;
+	private final int numCenterPoints;
 
 	private List<BlockPos> centrePoints;
 	private List<Integer> radii;
 
-	public SnowballStructurePiece(Random random, BlockPos pos, int radius) {
-		super(WorldStructurePieceTypes.WATERDOME, pos.getX(), pos.getY(), pos.getZ(), radius * 2, radius, radius * 2, getRandomHorizontalDirection(random));
+	public SnowballPiece(Random random, BlockPos pos, int radius, int numCenterPoints) {
+		super(WorldStructurePieceTypes.SNOWBALL, pos.getX(), pos.getY(), pos.getZ(), radius * 2, radius * (numCenterPoints + 1), radius * 2, getRandomHorizontalDirection(random));
 		this.radius = radius;
+		this.numCenterPoints = numCenterPoints;
 	}
 
-	public SnowballStructurePiece(ServerLevel level, CompoundTag tagCompound) {
-		super(WorldStructurePieceTypes.WATERDOME, tagCompound);
+	public SnowballPiece(StructurePieceSerializationContext context, CompoundTag tagCompound) {
+		super(WorldStructurePieceTypes.SNOWBALL, tagCompound);
 		this.radius = tagCompound.getInt("radius");
+		this.numCenterPoints = tagCompound.getInt("numCenterPoints");
 	}
 
 	@Override
-	protected void addAdditionalSaveData(ServerLevel level, CompoundTag tagCompound) {
-		super.addAdditionalSaveData(level, tagCompound);
+	protected void addAdditionalSaveData(StructurePieceSerializationContext context, CompoundTag tagCompound) {
+		super.addAdditionalSaveData(context, tagCompound);
 		tagCompound.putInt("radius", this.radius);
+		tagCompound.putInt("numCenterPoints", this.numCenterPoints);
 	}
 
 	@Override
-	public boolean postProcess(WorldGenLevel reader, StructureFeatureManager structureManager, ChunkGenerator generator, Random rand, BoundingBox bb, ChunkPos chunkPos, BlockPos pos) {
-		this.centrePoints = Lists.newArrayList(BlockPos.ZERO);
-		this.radii = Lists.newArrayList(radius);
+	public void postProcess(WorldGenLevel reader, StructureFeatureManager structureManager, ChunkGenerator generator, Random rand, BoundingBox bb, ChunkPos chunkPos, BlockPos pos) {
+		if (this.updateAverageGroundHeight(reader, bb, 0)) {
+			this.centrePoints = Lists.newArrayList(BlockPos.ZERO);
+			this.radii = Lists.newArrayList(radius);
 
-		int rad = radius;
-		int newY = 0;
+			int rad = radius;
+			int newY = 0;
 
-		for (int i = 0; i < 2 + rand.nextInt(6); i++) {
-			int off = newY + rad;
-			rad -= 3;
-			newY = off;
-			if (rad < 3 || pos.getY() + newY + rad >= 128) {
-				break;
+			for (int i = 0; i < this.numCenterPoints; i++) {
+				int off = newY + rad;
+				rad -= 3;
+				newY = off;
+				if (rad < 3 || pos.getY() + newY + rad >= reader.getMaxBuildHeight()) {
+					break;
+				}
+
+				centrePoints.add(new BlockPos(0, off, 0));
+				radii.add(rad);
 			}
 
-			centrePoints.add(new BlockPos(0, off, 0));
-			radii.add(rad);
-		}
+			Map<BlockPos, Block> blockCache = new HashMap<>();
 
-		Map<BlockPos, Block> blockCache = new HashMap<>();
+			for (int idx = 0; idx < centrePoints.size(); idx++) {
+				BlockPos point = centrePoints.get(idx);
+				int radi = radii.get(idx);
 
-		for (int idx = 0; idx < centrePoints.size(); idx++) {
-			BlockPos point = centrePoints.get(idx);
-			int radi = radii.get(idx);
+				for (int x = -radi; x <= radi; x++) {
+					for (int z = -radi; z <= radi; z++) {
+						for (int y = -radi; y <= radi; y++) {
+							BlockPos newPoint = new BlockPos(x, y + point.getY(), z);
 
-			for (int x = -radi; x <= radi; x++) {
-				for (int z = -radi; z <= radi; z++) {
-					for (int y = -radi; y <= radi; y++) {
-						BlockPos newPoint = new BlockPos(x, y + point.getY(), z);
-
-						if (pos.getY() + (int) newPoint.getY() >= 128) {
-							break;
-						}
-						Block block = blockToPlace(rand, pos, newPoint, point);
-						if (block != null) {
-							blockCache.put(new BlockPos(pos.getX() + x, pos.getY() + newPoint.getY(), pos.getZ() + z), block);
+							if (pos.getY() + (int) newPoint.getY() >= reader.getMaxBuildHeight()) {
+								break;
+							}
+							Block block = blockToPlace(rand, pos, newPoint, point);
+							if (block != null) {
+								blockCache.put(new BlockPos(pos.getX() + x, pos.getY() + newPoint.getY(), pos.getZ() + z), block);
+							}
 						}
 					}
 				}
 			}
+
+			blockCache.forEach((p, b) -> reader.setBlock(p, b.defaultBlockState(), 2));
 		}
-
-		blockCache.forEach((p, b) -> reader.setBlock(p, b.defaultBlockState(), 2));
-
-		return true;
 	}
 
 	private Block blockToPlace(Random random, BlockPos pos, BlockPos point1, BlockPos point2) {

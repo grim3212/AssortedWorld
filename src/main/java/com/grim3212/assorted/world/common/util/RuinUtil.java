@@ -6,7 +6,8 @@ import java.util.Random;
 
 import com.grim3212.assorted.world.common.block.WorldBlocks;
 
-import net.minecraft.util.WeighedRandom;
+import net.minecraft.util.random.WeightedEntry;
+import net.minecraft.util.random.WeightedRandom;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.DungeonHooks;
@@ -43,7 +44,7 @@ public class RuinUtil {
 			RuneMob mob = itr.next();
 			if (type == mob.type) {
 				itr.remove();
-				rarity = mob.weight + rarity;
+				rarity = mob.getWeight().asInt() + rarity;
 				break;
 			}
 		}
@@ -62,7 +63,7 @@ public class RuinUtil {
 		for (RuneMob mob : runeMobs) {
 			if (name.equals(mob.type)) {
 				runeMobs.remove(mob);
-				return mob.weight;
+				return mob.getWeight().asInt();
 			}
 		}
 		return 0;
@@ -76,7 +77,7 @@ public class RuinUtil {
 	 */
 	public static EntityType<?> getRandomRuneMob(Random rand) {
 		if (rand.nextInt(3) > 0) {
-			RuneMob mob = WeighedRandom.getRandomItem(rand, runeMobs).orElseThrow();
+			RuneMob mob = WeightedRandom.getRandomItem(rand, runeMobs).orElseThrow();
 			return mob.type;
 		} else {
 
@@ -98,7 +99,7 @@ public class RuinUtil {
 		return WorldBlocks.runeBlocks()[random.nextInt(WorldBlocks.runeBlocks().length)];
 	}
 
-	public static class RuneMob extends WeighedRandom.WeighedRandomItem {
+	public static class RuneMob extends WeightedEntry.IntrusiveBase {
 		public final EntityType<?> type;
 
 		public RuneMob(int weight, EntityType<?> type) {
