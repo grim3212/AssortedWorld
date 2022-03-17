@@ -18,7 +18,6 @@ public class WorldItemTagProvider extends ItemTagsProvider {
 	protected void addTags() {
 		this.copy(WorldTags.Blocks.ORES_RANDOMITE, WorldTags.Items.ORES_RANDOMITE);
 		this.copy(WorldTags.Blocks.RUNES, WorldTags.Items.RUNES);
-
 	}
 
 	@Override

@@ -40,6 +40,12 @@ public final class WorldConfig {
 
 		public final ForgeConfigSpec.BooleanValue generateRandomite;
 		public final ForgeConfigSpec.IntValue randomiteCount;
+		public final ForgeConfigSpec.IntValue randomiteSize;
+
+		public final ForgeConfigSpec.BooleanValue generateGunpowderReeds;
+		public final ForgeConfigSpec.IntValue gunpowderReedsRarity;
+		public final ForgeConfigSpec.IntValue gunpowderReedsTries;
+		public final ForgeConfigSpec.IntValue gunpowderReedsXZSpread;
 
 		public Common(ForgeConfigSpec.Builder builder) {
 			builder.push("Common");
@@ -75,7 +81,15 @@ public final class WorldConfig {
 
 			builder.push("Randomite");
 			generateRandomite = builder.comment("Set to true if you would like randomite to generate in your world.").define("generateRandomite", true);
-			randomiteCount = builder.comment("Set this to the maximum cluster count of randomite that can generate.").defineInRange("randomiteCount", 12, 0, 100);
+			randomiteCount = builder.comment("Set this to the average count of randomite clusters per chunk.").defineInRange("randomiteCount", 12, 0, 256);
+			randomiteSize = builder.comment("Set this to the average number of blocks that randomite clusters will generate with.").defineInRange("randomiteSize", 8, 0, 64);
+			builder.pop();
+
+			builder.push("Gunpowder Reeds");
+			generateGunpowderReeds = builder.comment("Set to true if you would like gunpowder reeds to generate in your world. This will disable the recipes associated with Gunpowder Reeds as well.").define("generateGunpowderReeds", true);
+			gunpowderReedsTries = builder.comment("The number of tries that will be used to try and generate gunpowder reeds.").defineInRange("gunpowderReedsTries", 20, 0, 1000);
+			gunpowderReedsXZSpread = builder.comment("The x and z spread that will be used when trying to generate gunpowder reeds.").defineInRange("gunpowderReedsXZSpread", 4, 0, 1000);
+			gunpowderReedsRarity = builder.comment("Set this to the chance for a gunpowder reeds to try and generate.").defineInRange("gunpowderReedsRarity", 8, 0, 10000);
 			builder.pop();
 		}
 	}

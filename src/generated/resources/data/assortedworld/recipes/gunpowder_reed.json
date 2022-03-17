@@ -1,0 +1,32 @@
+{
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "part": "gunpowder_reeds",
+          "type": "assortedworld:part_enabled"
+        }
+      ],
+      "recipe": {
+        "type": "minecraft:crafting_shaped",
+        "pattern": [
+          "XXX",
+          "XRX",
+          "XXX"
+        ],
+        "key": {
+          "X": {
+            "tag": "forge:gunpowder"
+          },
+          "R": {
+            "item": "minecraft:sugar_cane"
+          }
+        },
+        "result": {
+          "item": "assortedworld:gunpowder_reed"
+        }
+      }
+    }
+  ]
+}

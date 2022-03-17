@@ -21,8 +21,13 @@ public class WorldGeneration {
 		if (category != Biome.BiomeCategory.NETHER && category != Biome.BiomeCategory.THEEND) {
 			if (WorldConfig.COMMON.generateRandomite.get())
 				builder.addFeature(Decoration.UNDERGROUND_ORES, WorldFeaturePlacements.ORE_RANDOMITE);
+
+			if (WorldConfig.COMMON.generateGunpowderReeds.get())
+				builder.addFeature(Decoration.VEGETAL_DECORATION, WorldFeaturePlacements.PATCH_GUNPOWDER_REED);
+
 			if (category != Biome.BiomeCategory.OCEAN && category != Biome.BiomeCategory.RIVER && WorldConfig.COMMON.ruinRarity.get() > 0)
 				builder.addFeature(Decoration.SURFACE_STRUCTURES, WorldFeaturePlacements.RUIN);
+
 			if ((category == Biome.BiomeCategory.EXTREME_HILLS || category == Biome.BiomeCategory.MOUNTAIN) && WorldConfig.COMMON.spireRarity.get() > 0)
 				builder.addFeature(Decoration.SURFACE_STRUCTURES, WorldFeaturePlacements.SPIRE);
 		}

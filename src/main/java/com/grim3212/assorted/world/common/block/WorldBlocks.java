@@ -40,6 +40,8 @@ public class WorldBlocks {
 	public static final RegistryObject<RuneBlock> THORN_RUNE = register("thorn_rune", () -> new RuneBlock(RuneType.THORN));
 	public static final RegistryObject<RuneBlock> OS_RUNE = register("os_rune", () -> new RuneBlock(RuneType.OS));
 
+	public static final RegistryObject<GunpowderReedBlock> GUNPOWDER_REED = register("gunpowder_reed", () -> new GunpowderReedBlock(Properties.of(Material.PLANT).noCollission().randomTicks().instabreak().lightLevel((l) -> 5).explosionResistance(200F).sound(SoundType.GRASS)));
+
 	private static <T extends Block> RegistryObject<T> register(String name, Supplier<? extends T> sup) {
 		return register(name, sup, block -> item(block));
 	}

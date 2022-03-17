@@ -21,6 +21,7 @@ public class WorldFeaturePlacements {
 	public static final Holder<PlacedFeature> ORE_RANDOMITE = PlacementUtils.register(prefix("ore_randomite"), WorldConfiguredFeatures.ORE_RANDOMITE, commonOrePlacement(WorldConfig.COMMON.randomiteCount.get(), HeightRangePlacement.triangle(VerticalAnchor.BOTTOM, VerticalAnchor.TOP)));
 	public static final Holder<PlacedFeature> RUIN = PlacementUtils.register(prefix("ruin"), WorldConfiguredFeatures.RUIN, heightmapPlacement(WorldConfig.COMMON.ruinRarity.get()));
 	public static final Holder<PlacedFeature> SPIRE = PlacementUtils.register(prefix("spire"), WorldConfiguredFeatures.SPIRE, heightmapPlacement(WorldConfig.COMMON.spireRarity.get()));
+	public static final Holder<PlacedFeature> PATCH_GUNPOWDER_REED = PlacementUtils.register(prefix("patch_gunpowder_reed"), WorldConfiguredFeatures.PATCH_GUNPOWDER_REED, heightmapPlacement(WorldConfig.COMMON.gunpowderReedsRarity.get()));
 
 	private static List<PlacementModifier> orePlacement(PlacementModifier placement, PlacementModifier modifier) {
 		return List.of(placement, InSquarePlacement.spread(), modifier, BiomeFilter.biome());

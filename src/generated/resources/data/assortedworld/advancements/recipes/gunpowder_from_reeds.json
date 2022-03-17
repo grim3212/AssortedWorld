@@ -1,0 +1,46 @@
+{
+  "advancements": [
+    {
+      "conditions": [
+        {
+          "part": "gunpowder_reeds",
+          "type": "assortedworld:part_enabled"
+        }
+      ],
+      "advancement": {
+        "parent": "minecraft:recipes/root",
+        "rewards": {
+          "recipes": [
+            "minecraft:gunpowder"
+          ]
+        },
+        "criteria": {
+          "has_gunpowder_reeds": {
+            "trigger": "minecraft:inventory_changed",
+            "conditions": {
+              "items": [
+                {
+                  "items": [
+                    "assortedworld:gunpowder_reed"
+                  ]
+                }
+              ]
+            }
+          },
+          "has_the_recipe": {
+            "trigger": "minecraft:recipe_unlocked",
+            "conditions": {
+              "recipe": "minecraft:gunpowder"
+            }
+          }
+        },
+        "requirements": [
+          [
+            "has_gunpowder_reeds",
+            "has_the_recipe"
+          ]
+        ]
+      }
+    }
+  ]
+}

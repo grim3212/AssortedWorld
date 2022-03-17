@@ -54,6 +54,8 @@ public class WorldLootProvider implements DataProvider {
 			tables.put(b.getRegistryName(), genRegular(b));
 		}
 
+		tables.put(WorldBlocks.GUNPOWDER_REED.getId(), genRegular(WorldBlocks.GUNPOWDER_REED.get()));
+
 		for (Map.Entry<ResourceLocation, LootTable.Builder> e : tables.entrySet()) {
 			Path path = getPath(generator.getOutputFolder(), e.getKey());
 			DataProvider.save(GSON, cache, LootTables.serialize(e.getValue().setParamSet(LootContextParamSets.BLOCK).build()), path);

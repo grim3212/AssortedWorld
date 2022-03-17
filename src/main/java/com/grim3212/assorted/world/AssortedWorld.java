@@ -10,11 +10,13 @@ import com.grim3212.assorted.world.common.block.WorldBlocks;
 import com.grim3212.assorted.world.common.data.WorldBlockTagProvider;
 import com.grim3212.assorted.world.common.data.WorldItemTagProvider;
 import com.grim3212.assorted.world.common.data.WorldLootProvider;
+import com.grim3212.assorted.world.common.data.WorldRecipes;
 import com.grim3212.assorted.world.common.gen.WorldGeneration;
 import com.grim3212.assorted.world.common.gen.feature.WorldFeatures;
 import com.grim3212.assorted.world.common.gen.structure.WorldBuiltinStructures;
 import com.grim3212.assorted.world.common.gen.structure.WorldStructureFeatures;
 import com.grim3212.assorted.world.common.gen.structure.WorldStructurePieceTypes;
+import com.grim3212.assorted.world.common.handler.EnabledCondition;
 import com.grim3212.assorted.world.common.handler.WorldConfig;
 import com.grim3212.assorted.world.common.item.WorldItems;
 import com.grim3212.assorted.world.common.proxy.IProxy;
@@ -25,6 +27,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DistExecutor;
@@ -70,6 +73,8 @@ public class AssortedWorld {
 		ModLoadingContext.get().registerConfig(Type.COMMON, WorldConfig.COMMON_SPEC);
 
 		MinecraftForge.EVENT_BUS.register(new WorldGeneration());
+
+		CraftingHelper.register(EnabledCondition.Serializer.INSTANCE);
 	}
 
 	private void setup(final FMLCommonSetupEvent event) {
@@ -88,6 +93,7 @@ public class AssortedWorld {
 			datagenerator.addProvider(blockTagProvider);
 			datagenerator.addProvider(new WorldItemTagProvider(datagenerator, blockTagProvider, fileHelper));
 			datagenerator.addProvider(new WorldLootProvider(datagenerator));
+			datagenerator.addProvider(new WorldRecipes(datagenerator));
 		}
 
 		if (event.includeClient()) {

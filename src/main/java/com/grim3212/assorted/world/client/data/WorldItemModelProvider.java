@@ -29,6 +29,16 @@ public class WorldItemModelProvider extends ItemModelProvider {
 		for (Block rune : WorldBlocks.runeBlocks()) {
 			genericBlock(rune);
 		}
+
+		generatedItem(WorldBlocks.GUNPOWDER_REED.get());
+	}
+
+	private ItemModelBuilder generatedItem(String name) {
+		return withExistingParent(name, "item/generated").texture("layer0", prefix("item/" + name));
+	}
+
+	private ItemModelBuilder generatedItem(Block i) {
+		return generatedItem(name(i));
 	}
 
 	private ItemModelBuilder genericBlock(Block b) {
