@@ -157,10 +157,10 @@ public class PyramidPiece extends ScatteredFeaturePiece {
 			return Blocks.AIR;
 		}
 
-		if (placeSpawner(random, pos)) {
+		if (placeSpawner(random, pos, colHeight)) {
 			return Blocks.SPAWNER;
 		}
-		if (placeChest(random, pos)) {
+		if (placeChest(random, pos, colHeight)) {
 			return Blocks.CHEST;
 		} else {
 			return Blocks.AIR;
@@ -201,8 +201,8 @@ public class PyramidPiece extends ScatteredFeaturePiece {
 		return false;
 	}
 
-	private boolean placeSpawner(Random random, BlockPos pos) {
-		if ((pos.getY() == 0 || (pos.getY() - 1) % 6 == 0 && pos.getY() > 4) && placedSpawners.size() < maxHeight / 3) {
+	private boolean placeSpawner(Random random, BlockPos pos, int colHeight) {
+		if (pos.getY() == 0 && placedSpawners.size() < maxHeight / 3) {
 			if (random.nextInt(98) < 2) {
 				boolean flag = false;
 				for (int idx = 0; idx < placedSpawners.size(); idx++) {
@@ -222,8 +222,8 @@ public class PyramidPiece extends ScatteredFeaturePiece {
 		return false;
 	}
 
-	private boolean placeChest(Random random, BlockPos pos) {
-		if ((pos.getY() == 0 || (pos.getY() - 1) % 6 == 0 && pos.getY() > 4) && placedChests.size() < placedSpawners.size() * 2 && random.nextInt(28) < 3) {
+	private boolean placeChest(Random random, BlockPos pos, int colHeight) {
+		if (pos.getY() == 0 && placedChests.size() < placedSpawners.size() * 2 && random.nextInt(28) < 3) {
 			boolean flag = false;
 			for (int idx = 0; idx < placedChests.size(); idx++) {
 				int distance = (int) Math.round(Math.sqrt(placedChests.get(idx).distSqr(pos.above(pos.getY()))));
