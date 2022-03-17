@@ -21,9 +21,9 @@ public class WorldGeneration {
 		if (category != Biome.BiomeCategory.NETHER && category != Biome.BiomeCategory.THEEND) {
 			if (WorldConfig.COMMON.generateRandomite.get())
 				builder.addFeature(Decoration.UNDERGROUND_ORES, WorldFeaturePlacements.ORE_RANDOMITE);
-			if (category != Biome.BiomeCategory.OCEAN && category != Biome.BiomeCategory.RIVER && WorldConfig.COMMON.ruinChance.get() > 0)
+			if (category != Biome.BiomeCategory.OCEAN && category != Biome.BiomeCategory.RIVER && WorldConfig.COMMON.ruinRarity.get() > 0)
 				builder.addFeature(Decoration.SURFACE_STRUCTURES, WorldFeaturePlacements.RUIN);
-			if ((category == Biome.BiomeCategory.EXTREME_HILLS || category == Biome.BiomeCategory.MOUNTAIN) && WorldConfig.COMMON.spireChance.get() > 0)
+			if ((category == Biome.BiomeCategory.EXTREME_HILLS || category == Biome.BiomeCategory.MOUNTAIN) && WorldConfig.COMMON.spireRarity.get() > 0)
 				builder.addFeature(Decoration.SURFACE_STRUCTURES, WorldFeaturePlacements.SPIRE);
 		}
 	}

@@ -3,13 +3,13 @@ package com.grim3212.assorted.world.client.data;
 import com.grim3212.assorted.world.AssortedWorld;
 import com.grim3212.assorted.world.common.block.WorldBlocks;
 
-import net.minecraft.world.level.block.Block;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.core.Registry;
+import net.minecraft.world.level.block.Block;
 import net.minecraftforge.client.model.generators.ItemModelBuilder;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class WorldItemModelProvider extends ItemModelProvider {
 
@@ -37,7 +37,7 @@ public class WorldItemModelProvider extends ItemModelProvider {
 	}
 
 	private static String name(Block i) {
-		return Registry.BLOCK.getKey(i).getPath();
+		return ForgeRegistries.BLOCKS.getKey(i).getPath();
 	}
 
 	private ResourceLocation prefix(String name) {

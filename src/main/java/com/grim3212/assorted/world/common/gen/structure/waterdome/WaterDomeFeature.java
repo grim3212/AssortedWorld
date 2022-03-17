@@ -63,7 +63,7 @@ public class WaterDomeFeature extends StructureFeature<NoneFeatureConfiguration>
 		int xOff = 0;
 		int zOff = 0;
 		int numPieces = 0;
-		for (int idx = 0; idx < 4 + rand.nextInt(1 + WorldConfig.COMMON.waterDomeTries.get() / 2); idx++) {
+		for (int idx = 0; idx < 4 + rand.nextInt(1 + WorldConfig.COMMON.waterDomePieceMod.get()); idx++) {
 			int x = xOff + l * (1 + (1 + rad / 2) + rand.nextInt(1 + rad / 2));
 			int z = zOff + i1 * (1 + (1 + rad / 2) + rand.nextInt(1 + rad / 2));
 			rad = 3 + rand.nextInt(maxRadius);

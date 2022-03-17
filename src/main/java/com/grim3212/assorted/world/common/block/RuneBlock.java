@@ -1,7 +1,6 @@
 package com.grim3212.assorted.world.common.block;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
@@ -17,6 +16,7 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class RuneBlock extends Block {
 
@@ -103,7 +103,7 @@ public class RuneBlock extends Block {
 		}
 
 		public static MobEffect get(String loc) {
-			return Registry.MOB_EFFECT.get(new ResourceLocation(loc));
+			return ForgeRegistries.MOB_EFFECTS.getValue(new ResourceLocation(loc));
 		}
 
 		@Override

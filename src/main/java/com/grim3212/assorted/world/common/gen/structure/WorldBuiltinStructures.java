@@ -24,10 +24,10 @@ public class WorldBuiltinStructures {
 	public static Holder<StructureSet> WATER_DOMES;
 
 	public static void registerBuiltinStructures() {
-		SNOWBALLS = registerBuiltinStructure("snowball", WorldStructureFeatures.SNOWBALL.get().configured(NoneFeatureConfiguration.INSTANCE, BiomeTags.HAS_IGLOO), new RandomSpreadStructurePlacement(WorldConfig.COMMON.snowBallMaxChunkDistance.get(), (int) (WorldConfig.COMMON.snowBallMaxChunkDistance.get() * 0.42f), RandomSpreadType.LINEAR, 737462782));
-		FOUNTAINS = registerBuiltinStructure("fountain", WorldStructureFeatures.FOUNTAIN.get().configured(NoneFeatureConfiguration.INSTANCE, BiomeTags.HAS_SWAMP_HUT, true), new RandomSpreadStructurePlacement(WorldConfig.COMMON.fountainMaxChunkDistance.get(), (int) (WorldConfig.COMMON.fountainMaxChunkDistance.get() * 0.42f), RandomSpreadType.LINEAR, 983497234));
-		PYRAMIDS = registerBuiltinStructure("pyramid", WorldStructureFeatures.PYRAMID.get().configured(NoneFeatureConfiguration.INSTANCE, BiomeTags.HAS_DESERT_PYRAMID), new RandomSpreadStructurePlacement(32, 8, RandomSpreadType.LINEAR, 827612344));
-		WATER_DOMES = registerBuiltinStructure("water_dome", WorldStructureFeatures.WATER_DOME.get().configured(NoneFeatureConfiguration.INSTANCE, BiomeTags.IS_OCEAN), new RandomSpreadStructurePlacement(32, 8, RandomSpreadType.LINEAR, 432432568));
+		SNOWBALLS = registerBuiltinStructure("snowball", WorldStructureFeatures.SNOWBALL.get().configured(NoneFeatureConfiguration.INSTANCE, BiomeTags.HAS_IGLOO), new RandomSpreadStructurePlacement(WorldConfig.COMMON.snowBallSpacing.get(), WorldConfig.COMMON.snowBallSeparation.get(), RandomSpreadType.LINEAR, 737462782));
+		FOUNTAINS = registerBuiltinStructure("fountain", WorldStructureFeatures.FOUNTAIN.get().configured(NoneFeatureConfiguration.INSTANCE, BiomeTags.HAS_SWAMP_HUT, true), new RandomSpreadStructurePlacement(WorldConfig.COMMON.fountainSpacing.get(), WorldConfig.COMMON.fountainSeparation.get(), RandomSpreadType.LINEAR, 983497234));
+		PYRAMIDS = registerBuiltinStructure("pyramid", WorldStructureFeatures.PYRAMID.get().configured(NoneFeatureConfiguration.INSTANCE, BiomeTags.HAS_DESERT_PYRAMID), new RandomSpreadStructurePlacement(WorldConfig.COMMON.pyramidSpacing.get(), WorldConfig.COMMON.pyramidSeparation.get(), RandomSpreadType.LINEAR, 827612344));
+		WATER_DOMES = registerBuiltinStructure("water_dome", WorldStructureFeatures.WATER_DOME.get().configured(NoneFeatureConfiguration.INSTANCE, BiomeTags.IS_OCEAN), new RandomSpreadStructurePlacement(WorldConfig.COMMON.waterDomeSpacing.get(), WorldConfig.COMMON.waterDomeSeparation.get(), RandomSpreadType.LINEAR, 432432568));
 	}
 
 	static Holder<StructureSet> registerBuiltinStructure(String structureName, ConfiguredStructureFeature<?, ?> structureFeature, StructurePlacement placement) {
