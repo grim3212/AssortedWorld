@@ -1,4 +1,4 @@
-package com.grim3212.assorted.world.common.gen.structure.snowball;
+package com.grim3212.assorted.world.common.gen.structure.fountain;
 
 import com.mojang.serialization.Codec;
 
@@ -13,10 +13,10 @@ import net.minecraft.world.level.levelgen.structure.pieces.PieceGenerator;
 import net.minecraft.world.level.levelgen.structure.pieces.PieceGeneratorSupplier;
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePiecesBuilder;
 
-public class SnowballFeature extends StructureFeature<NoneFeatureConfiguration> {
+public class FountainFeature extends StructureFeature<NoneFeatureConfiguration> {
 
-	public SnowballFeature(Codec<NoneFeatureConfiguration> codec) {
-		super(codec, PieceGeneratorSupplier.simple(SnowballFeature::checkLocation, SnowballFeature::generatePieces));
+	public FountainFeature(Codec<NoneFeatureConfiguration> codec) {
+		super(codec, PieceGeneratorSupplier.simple(FountainFeature::checkLocation, FountainFeature::generatePieces));
 	}
 
 	@Override
@@ -36,12 +36,12 @@ public class SnowballFeature extends StructureFeature<NoneFeatureConfiguration> 
 		ChunkPos chunkPos = context.chunkPos();
 		BlockPos middlePos = chunkPos.getMiddleBlockPosition(0);
 		int topLandY = context.chunkGenerator().getFirstFreeHeight(middlePos.getX(), middlePos.getZ(), Heightmap.Types.WORLD_SURFACE_WG, context.heightAccessor());
-		BlockPos blockpos = new BlockPos(chunkPos.getMinBlockX(), topLandY + 30, chunkPos.getMinBlockZ());
+		BlockPos blockpos = new BlockPos(chunkPos.getMinBlockX(), topLandY, chunkPos.getMinBlockZ());
 
-		int radius = 3 * (3 + context.random().nextInt(5));
-		int centerPoints = 2 + context.random().nextInt(6);
+		int height = 4 * (3 + context.random().nextInt(3));
+		int type = context.random().nextInt(2);
 
-		// AssortedWorld.LOGGER.debug("Generating Snowball at {} with radius {} and {} center points", blockpos, radius, centerPoints);
-		builder.addPiece(new SnowballPiece(context.random(), blockpos, radius, centerPoints));
+		// AssortedWorld.LOGGER.debug("Generating Fountain at {} with height {} and of type {}", blockpos, height, type);
+		builder.addPiece(new FountainPiece(context.random(), blockpos, height, type));
 	}
 }

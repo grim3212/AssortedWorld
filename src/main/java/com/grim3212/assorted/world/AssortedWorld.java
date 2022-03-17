@@ -75,7 +75,7 @@ public class AssortedWorld {
 	private void setup(final FMLCommonSetupEvent event) {
 		event.enqueueWork(() -> {
 			WorldStructurePieceTypes.registerStructurePieces();
-			WorldBuiltinStructures.registerConfiguredStructures();
+			WorldBuiltinStructures.registerBuiltinStructures();
 		});
 	}
 

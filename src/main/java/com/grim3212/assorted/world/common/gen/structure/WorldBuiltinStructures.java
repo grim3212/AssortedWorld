@@ -17,40 +17,42 @@ import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadType;
 import net.minecraft.world.level.levelgen.structure.placement.StructurePlacement;
 
 public class WorldBuiltinStructures {
-	
-	public static Holder<ConfiguredStructureFeature<?, ?>> SNOWBALL;
+
 	public static Holder<StructureSet> SNOWBALLS;
+	public static Holder<StructureSet> FOUNTAINS;
+	public static Holder<StructureSet> PYRAMIDS;
+	public static Holder<StructureSet> WATER_DOMES;
 
-	public static void registerConfiguredStructures() {
-		SNOWBALL = BuiltinRegistries.register(BuiltinRegistries.CONFIGURED_STRUCTURE_FEATURE, WorldBuiltinStructures.SNOWBALL_CONFIGURED_STRUCTURE_FEATURE, WorldStructureFeatures.SNOWBALL.get().configured(NoneFeatureConfiguration.INSTANCE, BiomeTags.HAS_IGLOO));
-		
-		SNOWBALLS = register(SNOWBALL_STRUCTURE_SET, SNOWBALL, new RandomSpreadStructurePlacement(WorldConfig.COMMON.snowBallMaxChunkDistance.get(), (int) (WorldConfig.COMMON.snowBallMaxChunkDistance.get() * 0.42f), RandomSpreadType.LINEAR, 737462782));
+	public static void registerBuiltinStructures() {
+		SNOWBALLS = registerBuiltinStructure("snowball", WorldStructureFeatures.SNOWBALL.get().configured(NoneFeatureConfiguration.INSTANCE, BiomeTags.HAS_IGLOO), new RandomSpreadStructurePlacement(WorldConfig.COMMON.snowBallMaxChunkDistance.get(), (int) (WorldConfig.COMMON.snowBallMaxChunkDistance.get() * 0.42f), RandomSpreadType.LINEAR, 737462782));
+		FOUNTAINS = registerBuiltinStructure("fountain", WorldStructureFeatures.FOUNTAIN.get().configured(NoneFeatureConfiguration.INSTANCE, BiomeTags.HAS_SWAMP_HUT, true), new RandomSpreadStructurePlacement(WorldConfig.COMMON.fountainMaxChunkDistance.get(), (int) (WorldConfig.COMMON.fountainMaxChunkDistance.get() * 0.42f), RandomSpreadType.LINEAR, 983497234));
+		PYRAMIDS = registerBuiltinStructure("pyramid", WorldStructureFeatures.PYRAMID.get().configured(NoneFeatureConfiguration.INSTANCE, BiomeTags.HAS_DESERT_PYRAMID), new RandomSpreadStructurePlacement(32, 8, RandomSpreadType.LINEAR, 827612344));
+		WATER_DOMES = registerBuiltinStructure("water_dome", WorldStructureFeatures.WATER_DOME.get().configured(NoneFeatureConfiguration.INSTANCE, BiomeTags.IS_OCEAN), new RandomSpreadStructurePlacement(32, 8, RandomSpreadType.LINEAR, 432432568));
 	}
-	
-	
-//	public static void register
-	
-	
 
-	static Holder<StructureSet> register(ResourceKey<StructureSet> key, StructureSet set) {
+	static Holder<StructureSet> registerBuiltinStructure(String structureName, ConfiguredStructureFeature<?, ?> structureFeature, StructurePlacement placement) {
+		final ResourceKey<ConfiguredStructureFeature<?, ?>> featureKey = createFeatureKey(structureName);
+		final ResourceKey<StructureSet> structureSetKey = createStructureSetKey(structureName);
+		final Holder<ConfiguredStructureFeature<?, ?>> holderStructureFeature = BuiltinRegistries.register(BuiltinRegistries.CONFIGURED_STRUCTURE_FEATURE, featureKey, structureFeature);
+		return registerStructureSet(structureSetKey, holderStructureFeature, placement);
+	}
+
+	static Holder<StructureSet> registerStructureSet(ResourceKey<StructureSet> key, StructureSet set) {
 		return BuiltinRegistries.register(BuiltinRegistries.STRUCTURE_SETS, key, set);
 	}
 
-	static Holder<StructureSet> register(ResourceKey<StructureSet> key, Holder<ConfiguredStructureFeature<?, ?>> feature, StructurePlacement placement) {
-		return register(key, new StructureSet(feature, placement));
+	static Holder<StructureSet> registerStructureSet(ResourceKey<StructureSet> key, Holder<ConfiguredStructureFeature<?, ?>> feature, StructurePlacement placement) {
+		return registerStructureSet(key, new StructureSet(feature, placement));
 	}
 
-	public static final ResourceKey<ConfiguredStructureFeature<?, ?>> SNOWBALL_CONFIGURED_STRUCTURE_FEATURE = createFeatureKey("snowball");
-	public static final ResourceKey<StructureSet> SNOWBALL_STRUCTURE_SET = createStructureSetKey("snowball");
-
-	private static ResourceKey<ConfiguredStructureFeature<?, ?>> createFeatureKey(String s) {
+	static ResourceKey<ConfiguredStructureFeature<?, ?>> createFeatureKey(String s) {
 		return ResourceKey.create(Registry.CONFIGURED_STRUCTURE_FEATURE_REGISTRY, prefix(s));
 	}
 
-	private static ResourceKey<StructureSet> createStructureSetKey(String s) {
+	static ResourceKey<StructureSet> createStructureSetKey(String s) {
 		return ResourceKey.create(Registry.STRUCTURE_SET_REGISTRY, prefix(s));
 	}
-	
+
 	static ResourceLocation prefix(String s) {
 		return new ResourceLocation(AssortedWorld.MODID, s);
 	}

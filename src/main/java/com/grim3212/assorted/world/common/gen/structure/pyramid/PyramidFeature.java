@@ -1,4 +1,4 @@
-package com.grim3212.assorted.world.common.gen.structure.snowball;
+package com.grim3212.assorted.world.common.gen.structure.pyramid;
 
 import com.mojang.serialization.Codec;
 
@@ -13,10 +13,9 @@ import net.minecraft.world.level.levelgen.structure.pieces.PieceGenerator;
 import net.minecraft.world.level.levelgen.structure.pieces.PieceGeneratorSupplier;
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePiecesBuilder;
 
-public class SnowballFeature extends StructureFeature<NoneFeatureConfiguration> {
-
-	public SnowballFeature(Codec<NoneFeatureConfiguration> codec) {
-		super(codec, PieceGeneratorSupplier.simple(SnowballFeature::checkLocation, SnowballFeature::generatePieces));
+public class PyramidFeature extends StructureFeature<NoneFeatureConfiguration> {
+	public PyramidFeature(Codec<NoneFeatureConfiguration> codec) {
+		super(codec, PieceGeneratorSupplier.simple(PyramidFeature::checkLocation, PyramidFeature::generatePieces));
 	}
 
 	@Override
@@ -28,7 +27,7 @@ public class SnowballFeature extends StructureFeature<NoneFeatureConfiguration> 
 		if (!context.validBiomeOnTop(Heightmap.Types.WORLD_SURFACE_WG)) {
 			return false;
 		} else {
-			return context.getLowestY(12, 15) >= context.chunkGenerator().getSeaLevel();
+			return context.getLowestY(21, 21) >= context.chunkGenerator().getSeaLevel();
 		}
 	}
 
@@ -36,12 +35,12 @@ public class SnowballFeature extends StructureFeature<NoneFeatureConfiguration> 
 		ChunkPos chunkPos = context.chunkPos();
 		BlockPos middlePos = chunkPos.getMiddleBlockPosition(0);
 		int topLandY = context.chunkGenerator().getFirstFreeHeight(middlePos.getX(), middlePos.getZ(), Heightmap.Types.WORLD_SURFACE_WG, context.heightAccessor());
-		BlockPos blockpos = new BlockPos(chunkPos.getMinBlockX(), topLandY + 30, chunkPos.getMinBlockZ());
+		BlockPos blockpos = new BlockPos(chunkPos.getMinBlockX(), topLandY, chunkPos.getMinBlockZ());
 
-		int radius = 3 * (3 + context.random().nextInt(5));
-		int centerPoints = 2 + context.random().nextInt(6);
+		int maxHeight = 2 * (4 + context.random().nextInt(5));
+		int type = context.random().nextInt(2);
 
-		// AssortedWorld.LOGGER.debug("Generating Snowball at {} with radius {} and {} center points", blockpos, radius, centerPoints);
-		builder.addPiece(new SnowballPiece(context.random(), blockpos, radius, centerPoints));
+		// AssortedWorld.LOGGER.debug("Generating Pyramid at {} with maxHeight {} and of type {}", blockpos, maxHeight, type);
+		builder.addPiece(new PyramidPiece(context.random(), blockpos, maxHeight, type));
 	}
 }
