@@ -5,8 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import org.apache.commons.compress.utils.Lists;
-
+import com.google.common.collect.Lists;
 import com.grim3212.assorted.world.common.gen.structure.WorldStructurePieceTypes;
 import com.grim3212.assorted.world.common.lib.WorldLootTables;
 import com.grim3212.assorted.world.common.util.RuinUtil;
