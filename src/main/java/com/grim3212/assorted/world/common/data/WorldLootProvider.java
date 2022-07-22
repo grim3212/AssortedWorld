@@ -7,13 +7,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.grim3212.assorted.world.common.block.WorldBlocks;
 
+import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
-import net.minecraft.data.HashCache;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -31,10 +29,10 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.predicates.ExplosionCondition;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class WorldLootProvider implements DataProvider {
 
-	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 	private final DataGenerator generator;
 	private final List<Block> blocks = new ArrayList<>();
 
@@ -46,19 +44,23 @@ public class WorldLootProvider implements DataProvider {
 		}
 	}
 
+	private ResourceLocation key(Block b) {
+		return ForgeRegistries.BLOCKS.getKey(b);
+	}
+
 	@Override
-	public void run(HashCache cache) throws IOException {
+	public void run(CachedOutput cache) throws IOException {
 		Map<ResourceLocation, LootTable.Builder> tables = new HashMap<>();
 
 		for (Block b : blocks) {
-			tables.put(b.getRegistryName(), genRegular(b));
+			tables.put(key(b), genRegular(b));
 		}
 
 		tables.put(WorldBlocks.GUNPOWDER_REED.getId(), genRegular(WorldBlocks.GUNPOWDER_REED.get()));
 
 		for (Map.Entry<ResourceLocation, LootTable.Builder> e : tables.entrySet()) {
 			Path path = getPath(generator.getOutputFolder(), e.getKey());
-			DataProvider.save(GSON, cache, LootTables.serialize(e.getValue().setParamSet(LootContextParamSets.BLOCK).build()), path);
+			DataProvider.saveStable(cache, LootTables.serialize(e.getValue().setParamSet(LootContextParamSets.BLOCK).build()), path);
 		}
 
 		genRandomite(cache);
@@ -74,9 +76,8 @@ public class WorldLootProvider implements DataProvider {
 		return LootTable.lootTable().withPool(pool);
 	}
 
-	private void genRandomite(HashCache cache) throws IOException {
-		Block randomite = WorldBlocks.RANDOMITE_ORE.get();
-		Path randomitePath = getPath(generator.getOutputFolder(), randomite.getRegistryName());
+	private void genRandomite(CachedOutput cache) throws IOException {
+		Path randomitePath = getPath(generator.getOutputFolder(), WorldBlocks.RANDOMITE_ORE.getId());
 		LootPoolEntryContainer.Builder<?> eggOption = LootItem.lootTableItem(Items.EGG).setWeight(40);
 		LootPoolEntryContainer.Builder<?> coalOption = LootItem.lootTableItem(Items.COAL).setWeight(30).apply(ApplyBonusCount.addOreBonusCount(Enchantments.BLOCK_FORTUNE)).apply(ApplyExplosionDecay.explosionDecay());
 		LootPoolEntryContainer.Builder<?> slimeOption = LootItem.lootTableItem(Items.SLIME_BALL).setWeight(30).apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0F, 3.0F))).apply(ApplyBonusCount.addOreBonusCount(Enchantments.BLOCK_FORTUNE)).apply(ApplyExplosionDecay.explosionDecay());
@@ -90,7 +91,7 @@ public class WorldLootProvider implements DataProvider {
 		LootPoolEntryContainer.Builder<?> netherDebrisOption = LootItem.lootTableItem(Blocks.ANCIENT_DEBRIS).setWeight(1);
 		LootPool.Builder pool = LootPool.lootPool().name("main").setRolls(ConstantValue.exactly(1)).add(coalOption).add(ironOption).add(goldOption).add(diamondOption).add(redstoneOption).add(lapisOption).add(slimeOption).add(emeraldOption).add(quartzOption).add(netherDebrisOption).add(eggOption).when(ExplosionCondition.survivesExplosion());
 
-		DataProvider.save(GSON, cache, LootTables.serialize(LootTable.lootTable().withPool(pool).setParamSet(LootContextParamSets.BLOCK).build()), randomitePath);
+		DataProvider.saveStable(cache, LootTables.serialize(LootTable.lootTable().withPool(pool).setParamSet(LootContextParamSets.BLOCK).build()), randomitePath);
 	}
 
 	@Override

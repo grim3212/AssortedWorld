@@ -1,13 +1,12 @@
 package com.grim3212.assorted.world.common.gen.feature;
 
-import java.util.Random;
-
 import com.grim3212.assorted.world.common.handler.WorldConfig;
 import com.grim3212.assorted.world.common.util.RuinUtil;
 import com.mojang.serialization.Codec;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LeavesBlock;
@@ -32,7 +31,7 @@ public class SpireFeature extends Feature<NoneFeatureConfiguration> {
 
 	@Override
 	public boolean place(FeaturePlaceContext<NoneFeatureConfiguration> context) {
-		Random rand = context.random();
+		RandomSource rand = context.random();
 		BlockPos pos = context.origin();
 		WorldGenLevel level = context.level();
 
@@ -133,7 +132,7 @@ public class SpireFeature extends Feature<NoneFeatureConfiguration> {
 		}
 	}
 
-	private void generateColumn(WorldGenLevel level, Random random, BlockPos pos, int heightMod) {
+	private void generateColumn(WorldGenLevel level, RandomSource random, BlockPos pos, int heightMod) {
 		int startY = pos.getY();
 
 		for (pos = level.getHeightmapPos(Types.WORLD_SURFACE_WG, pos); pos.getY() < startY; pos = pos.above()) {
@@ -207,7 +206,7 @@ public class SpireFeature extends Feature<NoneFeatureConfiguration> {
 		}
 	}
 
-	private void clearArea(WorldGenLevel level, Random random, BlockPos pos) {
+	private void clearArea(WorldGenLevel level, RandomSource random, BlockPos pos) {
 		int startY = pos.getY();
 
 		for (pos = level.getHeightmapPos(Types.WORLD_SURFACE_WG, pos); pos.getY() < startY; pos = pos.above()) {

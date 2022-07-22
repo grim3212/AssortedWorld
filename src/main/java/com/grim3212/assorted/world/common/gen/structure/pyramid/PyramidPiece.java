@@ -3,10 +3,9 @@ package com.grim3212.assorted.world.common.gen.structure.pyramid;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import com.google.common.collect.Lists;
-import com.grim3212.assorted.world.common.gen.structure.WorldStructurePieceTypes;
+import com.grim3212.assorted.world.common.gen.structure.WorldStructures;
 import com.grim3212.assorted.world.common.lib.WorldLootTables;
 import com.grim3212.assorted.world.common.util.RuinUtil;
 
@@ -14,9 +13,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.StructureFeatureManager;
+import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -37,8 +37,8 @@ public class PyramidPiece extends ScatteredFeaturePiece {
 	private List<BlockPos> placedSpawners;
 	private List<BlockPos> placedChests;
 
-	public PyramidPiece(Random random, BlockPos pos, int maxHeight, int type) {
-		super(WorldStructurePieceTypes.PYRAMID, pos.getX(), pos.getY() - 1 - maxHeight, pos.getZ(), maxHeight * 2, maxHeight * 2 + 1, maxHeight * 2, getRandomHorizontalDirection(random));
+	public PyramidPiece(RandomSource random, BlockPos pos, int maxHeight, int type) {
+		super(WorldStructures.PYRAMID_STRUCTURE_PIECE.get(), pos.getX(), pos.getY() - 1 - maxHeight, pos.getZ(), maxHeight * 2, maxHeight * 2 + 1, maxHeight * 2, getRandomHorizontalDirection(random));
 		this.maxHeight = maxHeight;
 		this.type = type;
 		this.placedSpawners = Lists.newArrayList();
@@ -46,7 +46,7 @@ public class PyramidPiece extends ScatteredFeaturePiece {
 	}
 
 	public PyramidPiece(StructurePieceSerializationContext context, CompoundTag tagCompound) {
-		super(WorldStructurePieceTypes.PYRAMID, tagCompound);
+		super(WorldStructures.PYRAMID_STRUCTURE_PIECE.get(), tagCompound);
 		this.maxHeight = tagCompound.getInt("maxHeight");
 		this.type = tagCompound.getInt("type");
 
@@ -83,7 +83,7 @@ public class PyramidPiece extends ScatteredFeaturePiece {
 	}
 
 	@Override
-	public void postProcess(WorldGenLevel reader, StructureFeatureManager structureManager, ChunkGenerator generator, Random rand, BoundingBox bb, ChunkPos chunkPos, BlockPos pos) {
+	public void postProcess(WorldGenLevel reader, StructureManager structureManager, ChunkGenerator generator, RandomSource rand, BoundingBox bb, ChunkPos chunkPos, BlockPos pos) {
 		if (this.updateAverageGroundHeight(reader, bb, 0)) {
 			Map<BlockPos, Block> blockCache = new HashMap<>();
 			BlockPos offSetPos = pos.below(maxHeight / 2);
@@ -115,7 +115,7 @@ public class PyramidPiece extends ScatteredFeaturePiece {
 		}
 	}
 
-	private void setBlockState(WorldGenLevel world, BlockPos p, BlockState s, Random rand) {
+	private void setBlockState(WorldGenLevel world, BlockPos p, BlockState s, RandomSource rand) {
 		world.setBlock(p, s, 2);
 
 		if (s.getBlock() == Blocks.CHEST) {
@@ -138,7 +138,7 @@ public class PyramidPiece extends ScatteredFeaturePiece {
 		}
 	}
 
-	private Block blockToPlace(Random random, BlockPos pos, int colHeight, boolean genBlockEntities) {
+	private Block blockToPlace(RandomSource random, BlockPos pos, int colHeight, boolean genBlockEntities) {
 		if (pos.getX() == 0 && pos.getY() == 0 && pos.getZ() == 0) {
 			return RuinUtil.randomRune(random);
 		}
@@ -166,7 +166,7 @@ public class PyramidPiece extends ScatteredFeaturePiece {
 		}
 	}
 
-	private boolean placeStone(Random random, BlockPos pos, int colHeight) {
+	private boolean placeStone(RandomSource random, BlockPos pos, int colHeight) {
 		int y = pos.getY();
 
 		if (y == -1) {
@@ -200,7 +200,7 @@ public class PyramidPiece extends ScatteredFeaturePiece {
 		return false;
 	}
 
-	private boolean placeSpawner(Random random, BlockPos pos, int colHeight) {
+	private boolean placeSpawner(RandomSource random, BlockPos pos, int colHeight) {
 		if (pos.getY() == 0 && placedSpawners.size() < maxHeight / 3) {
 			if (random.nextInt(98) < 2) {
 				boolean flag = false;
@@ -221,7 +221,7 @@ public class PyramidPiece extends ScatteredFeaturePiece {
 		return false;
 	}
 
-	private boolean placeChest(Random random, BlockPos pos, int colHeight) {
+	private boolean placeChest(RandomSource random, BlockPos pos, int colHeight) {
 		if (pos.getY() == 0 && placedChests.size() < placedSpawners.size() * 2 && random.nextInt(28) < 3) {
 			boolean flag = false;
 			for (int idx = 0; idx < placedChests.size(); idx++) {

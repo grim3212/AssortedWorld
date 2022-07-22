@@ -2,18 +2,18 @@ package com.grim3212.assorted.world.common.gen.structure.fountain;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
-import com.grim3212.assorted.world.common.gen.structure.WorldStructurePieceTypes;
+import com.grim3212.assorted.world.common.gen.structure.WorldStructures;
 import com.grim3212.assorted.world.common.handler.WorldConfig;
 import com.grim3212.assorted.world.common.lib.WorldLootTables;
 import com.grim3212.assorted.world.common.util.RuinUtil;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.StructureFeatureManager;
+import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -37,15 +37,15 @@ public class FountainPiece extends ScatteredFeaturePiece {
 	private int spawnerSkipCount;
 	private boolean runePlaced;
 
-	public FountainPiece(Random random, BlockPos pos, int height, int type) {
-		super(WorldStructurePieceTypes.FOUNTAIN, pos.getX(), pos.getY(), pos.getZ(), height, height, height, getRandomHorizontalDirection(random));
+	public FountainPiece(RandomSource random, BlockPos pos, int height, int type) {
+		super(WorldStructures.FOUNTAIN_STRUCTURE_PIECE.get(), pos.getX(), pos.getY(), pos.getZ(), height, height, height, getRandomHorizontalDirection(random));
 		this.height = height;
 		this.type = type;
 		this.runePlaced = false;
 	}
 
 	public FountainPiece(StructurePieceSerializationContext context, CompoundTag tagCompound) {
-		super(WorldStructurePieceTypes.FOUNTAIN, tagCompound);
+		super(WorldStructures.FOUNTAIN_STRUCTURE_PIECE.get(), tagCompound);
 		this.height = tagCompound.getInt("height");
 		this.type = tagCompound.getInt("type");
 		this.runePlaced = false;
@@ -59,7 +59,7 @@ public class FountainPiece extends ScatteredFeaturePiece {
 	}
 
 	@Override
-	public void postProcess(WorldGenLevel reader, StructureFeatureManager structureManager, ChunkGenerator generator, Random rand, BoundingBox bb, ChunkPos chunkPos, BlockPos pos) {
+	public void postProcess(WorldGenLevel reader, StructureManager structureManager, ChunkGenerator generator, RandomSource rand, BoundingBox bb, ChunkPos chunkPos, BlockPos pos) {
 		if (this.updateAverageGroundHeight(reader, bb, 0)) {
 			int halfWidth = halfWidth(height);
 			int colHeight = 0;
@@ -82,7 +82,7 @@ public class FountainPiece extends ScatteredFeaturePiece {
 		}
 	}
 
-	private void setBlockState(WorldGenLevel world, BlockPos p, BlockState s, Random rand) {
+	private void setBlockState(WorldGenLevel world, BlockPos p, BlockState s, RandomSource rand) {
 		world.setBlock(p, s, 2);
 
 		if (s.getBlock() == Blocks.CHEST) {
@@ -112,7 +112,7 @@ public class FountainPiece extends ScatteredFeaturePiece {
 		}
 	}
 
-	private Block blockToPlace(Random random, BlockPos pos, int colHeight) {
+	private Block blockToPlace(RandomSource random, BlockPos pos, int colHeight) {
 		if (pos.getX() != 0 && pos.getY() == -1 && pos.getZ() != 0 && (double) random.nextFloat() <= WorldConfig.COMMON.runeChance.get() && !runePlaced) {
 			runePlaced = true;
 			return RuinUtil.randomRune(random);
@@ -141,7 +141,7 @@ public class FountainPiece extends ScatteredFeaturePiece {
 		}
 	}
 
-	private Block randomStoneBrick(Random random) {
+	private Block randomStoneBrick(RandomSource random) {
 		int i = random.nextInt(3);
 		if (i == 1) {
 			return Blocks.CRACKED_STONE_BRICKS;
@@ -165,7 +165,7 @@ public class FountainPiece extends ScatteredFeaturePiece {
 		}
 	}
 
-	private boolean placeStone(Random random, BlockPos pos, int colHeight) {
+	private boolean placeStone(RandomSource random, BlockPos pos, int colHeight) {
 		if (pos.getX() == 0 && pos.getZ() == 0) {
 			return false;
 		}
@@ -187,7 +187,7 @@ public class FountainPiece extends ScatteredFeaturePiece {
 		}
 	}
 
-	private boolean placeSpawner(Random random, BlockPos pos) {
+	private boolean placeSpawner(RandomSource random, BlockPos pos) {
 		if (pos.getY() == 0 && placedSpawners < 2) {
 			if (spawnerSkipCount == 0) {
 				if (random.nextInt(64) < 2) {
@@ -205,7 +205,7 @@ public class FountainPiece extends ScatteredFeaturePiece {
 		return false;
 	}
 
-	private boolean placeChest(Random random, BlockPos pos) {
+	private boolean placeChest(RandomSource random, BlockPos pos) {
 		if (pos.getY() == 0 && placedChests < placedSpawners * 2 && random.nextInt(28) < 3) {
 			placedChests++;
 			return true;

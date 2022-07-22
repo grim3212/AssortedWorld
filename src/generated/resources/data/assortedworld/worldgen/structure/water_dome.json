@@ -1,0 +1,6 @@
+{
+  "type": "assortedworld:water_dome",
+  "biomes": "#assortedworld:has_structure/water_dome",
+  "spawn_overrides": {},
+  "step": "surface_structures"
+}

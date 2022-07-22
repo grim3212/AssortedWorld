@@ -2,64 +2,66 @@
   "type": "minecraft:block",
   "pools": [
     {
-      "name": "main",
-      "rolls": 1.0,
       "bonus_rolls": 0.0,
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ],
       "entries": [
         {
           "type": "minecraft:item",
-          "weight": 30,
           "functions": [
             {
-              "function": "minecraft:apply_bonus",
               "enchantment": "minecraft:fortune",
-              "formula": "minecraft:ore_drops"
+              "formula": "minecraft:ore_drops",
+              "function": "minecraft:apply_bonus"
             },
             {
               "function": "minecraft:explosion_decay"
             }
           ],
-          "name": "minecraft:coal"
+          "name": "minecraft:coal",
+          "weight": 30
         },
         {
           "type": "minecraft:item",
-          "weight": 20,
-          "name": "minecraft:iron_ore"
+          "name": "minecraft:iron_ore",
+          "weight": 20
         },
         {
           "type": "minecraft:item",
-          "weight": 18,
-          "name": "minecraft:gold_ore"
+          "name": "minecraft:gold_ore",
+          "weight": 18
         },
         {
           "type": "minecraft:item",
-          "weight": 10,
           "functions": [
             {
-              "function": "minecraft:apply_bonus",
               "enchantment": "minecraft:fortune",
-              "formula": "minecraft:ore_drops"
+              "formula": "minecraft:ore_drops",
+              "function": "minecraft:apply_bonus"
             }
           ],
-          "name": "minecraft:diamond"
+          "name": "minecraft:diamond",
+          "weight": 10
         },
         {
           "type": "minecraft:item",
-          "weight": 16,
           "functions": [
             {
-              "function": "minecraft:set_count",
+              "add": false,
               "count": {
                 "type": "minecraft:uniform",
-                "min": 4.0,
-                "max": 5.0
+                "max": 5.0,
+                "min": 4.0
               },
-              "add": false
+              "function": "minecraft:set_count"
             },
             {
-              "function": "minecraft:apply_bonus",
               "enchantment": "minecraft:fortune",
               "formula": "minecraft:uniform_bonus_count",
+              "function": "minecraft:apply_bonus",
               "parameters": {
                 "bonusMultiplier": 1
               }
@@ -68,85 +70,86 @@
               "function": "minecraft:explosion_decay"
             }
           ],
-          "name": "minecraft:redstone"
+          "name": "minecraft:redstone",
+          "weight": 16
         },
         {
           "type": "minecraft:item",
-          "weight": 15,
           "functions": [
             {
-              "function": "minecraft:set_count",
+              "add": false,
               "count": {
                 "type": "minecraft:uniform",
-                "min": 4.0,
-                "max": 9.0
+                "max": 9.0,
+                "min": 4.0
               },
-              "add": false
+              "function": "minecraft:set_count"
             },
             {
-              "function": "minecraft:apply_bonus",
               "enchantment": "minecraft:fortune",
-              "formula": "minecraft:ore_drops"
+              "formula": "minecraft:ore_drops",
+              "function": "minecraft:apply_bonus"
             },
             {
               "function": "minecraft:explosion_decay"
             }
           ],
-          "name": "minecraft:lapis_lazuli"
+          "name": "minecraft:lapis_lazuli",
+          "weight": 15
         },
         {
           "type": "minecraft:item",
-          "weight": 30,
           "functions": [
             {
-              "function": "minecraft:set_count",
+              "add": false,
               "count": {
                 "type": "minecraft:uniform",
-                "min": 2.0,
-                "max": 3.0
+                "max": 3.0,
+                "min": 2.0
               },
-              "add": false
+              "function": "minecraft:set_count"
             },
             {
-              "function": "minecraft:apply_bonus",
               "enchantment": "minecraft:fortune",
-              "formula": "minecraft:ore_drops"
+              "formula": "minecraft:ore_drops",
+              "function": "minecraft:apply_bonus"
             },
             {
               "function": "minecraft:explosion_decay"
             }
           ],
-          "name": "minecraft:slime_ball"
+          "name": "minecraft:slime_ball",
+          "weight": 30
         },
         {
           "type": "minecraft:item",
-          "weight": 18,
           "functions": [
             {
-              "function": "minecraft:apply_bonus",
               "enchantment": "minecraft:fortune",
-              "formula": "minecraft:ore_drops"
+              "formula": "minecraft:ore_drops",
+              "function": "minecraft:apply_bonus"
             },
             {
               "function": "minecraft:explosion_decay"
             }
           ],
-          "name": "minecraft:emerald"
+          "name": "minecraft:emerald",
+          "weight": 18
         },
         {
           "type": "minecraft:item",
-          "weight": 20,
           "functions": [
             {
-              "function": "minecraft:apply_bonus",
               "enchantment": "minecraft:fortune",
-              "formula": "minecraft:ore_drops"
+              "formula": "minecraft:ore_drops",
+              "function": "minecraft:apply_bonus"
             },
             {
               "function": "minecraft:explosion_decay"
             }
           ],
-          "name": "minecraft:quartz"
+          "name": "minecraft:quartz",
+          "weight": 20
         },
         {
           "type": "minecraft:item",
@@ -154,15 +157,12 @@
         },
         {
           "type": "minecraft:item",
-          "weight": 40,
-          "name": "minecraft:egg"
+          "name": "minecraft:egg",
+          "weight": 40
         }
       ],
-      "conditions": [
-        {
-          "condition": "minecraft:survives_explosion"
-        }
-      ]
+      "name": "main",
+      "rolls": 1.0
     }
   ]
 }

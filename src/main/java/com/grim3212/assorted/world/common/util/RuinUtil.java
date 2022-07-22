@@ -2,10 +2,10 @@ package com.grim3212.assorted.world.common.util;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Random;
 
 import com.grim3212.assorted.world.common.block.WorldBlocks;
 
+import net.minecraft.util.RandomSource;
 import net.minecraft.util.random.WeightedEntry;
 import net.minecraft.util.random.WeightedRandom;
 import net.minecraft.world.entity.EntityType;
@@ -75,7 +75,7 @@ public class RuinUtil {
 	 * @param rand World generation random number generator
 	 * @return The mob name
 	 */
-	public static EntityType<?> getRandomRuneMob(Random rand) {
+	public static EntityType<?> getRandomRuneMob(RandomSource rand) {
 		if (rand.nextInt(3) > 0) {
 			RuneMob mob = WeightedRandom.getRandomItem(rand, runeMobs).orElseThrow();
 			return mob.type;
@@ -95,7 +95,7 @@ public class RuinUtil {
 		return (int) distanceBetweenD(x1, z1, x2, z2);
 	}
 
-	public static Block randomRune(Random random) {
+	public static Block randomRune(RandomSource random) {
 		return WorldBlocks.runeBlocks()[random.nextInt(WorldBlocks.runeBlocks().length)];
 	}
 

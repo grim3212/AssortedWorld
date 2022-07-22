@@ -1,15 +1,14 @@
 package com.grim3212.assorted.world.common.gen.structure.waterdome;
 
-import java.util.Random;
-
-import com.grim3212.assorted.world.common.gen.structure.WorldStructurePieceTypes;
+import com.grim3212.assorted.world.common.gen.structure.WorldStructures;
 import com.grim3212.assorted.world.common.util.RuinUtil;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.StructureFeatureManager;
+import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -28,8 +27,8 @@ public class WaterDomePiece extends ScatteredFeaturePiece {
 	private final int zOffset;
 	private boolean placeRune;
 
-	public WaterDomePiece(Random random, BlockPos pos, int radius, int xOffset, int zOffset, boolean placeRune) {
-		super(WorldStructurePieceTypes.WATER_DOME, pos.getX(), pos.getY(), pos.getZ(), (radius * 2) + 1, radius, (radius * 2) + 1, getRandomHorizontalDirection(random));
+	public WaterDomePiece(RandomSource random, BlockPos pos, int radius, int xOffset, int zOffset, boolean placeRune) {
+		super(WorldStructures.WATER_DOME_STRUCTURE_PIECE.get(), pos.getX(), pos.getY(), pos.getZ(), (radius * 2) + 1, radius, (radius * 2) + 1, getRandomHorizontalDirection(random));
 		this.radius = radius;
 		this.xOffset = xOffset;
 		this.zOffset = zOffset;
@@ -37,7 +36,7 @@ public class WaterDomePiece extends ScatteredFeaturePiece {
 	}
 
 	public WaterDomePiece(StructurePieceSerializationContext context, CompoundTag tagCompound) {
-		super(WorldStructurePieceTypes.WATER_DOME, tagCompound);
+		super(WorldStructures.WATER_DOME_STRUCTURE_PIECE.get(), tagCompound);
 		this.radius = tagCompound.getInt("radius");
 		this.xOffset = tagCompound.getInt("xOffset");
 		this.zOffset = tagCompound.getInt("zOffset");
@@ -54,7 +53,7 @@ public class WaterDomePiece extends ScatteredFeaturePiece {
 	}
 
 	@Override
-	public void postProcess(WorldGenLevel reader, StructureFeatureManager structureManager, ChunkGenerator generator, Random rand, BoundingBox bb, ChunkPos chunkPos, BlockPos pos) {
+	public void postProcess(WorldGenLevel reader, StructureManager structureManager, ChunkGenerator generator, RandomSource rand, BoundingBox bb, ChunkPos chunkPos, BlockPos pos) {
 		BlockPos centerPoint = this.getLocatorPosition();
 		int i = reader.getHeight(Heightmap.Types.OCEAN_FLOOR_WG, centerPoint.getX(), centerPoint.getZ());
 
@@ -89,7 +88,7 @@ public class WaterDomePiece extends ScatteredFeaturePiece {
 
 	}
 
-	private Block blockToPlace(Random random, BlockPos pos, BlockPos point1, int type) {
+	private Block blockToPlace(RandomSource random, BlockPos pos, BlockPos point1, int type) {
 		int blocks = 0;
 		int places = 0;
 		int equalPoints = 0;

@@ -3,16 +3,16 @@ package com.grim3212.assorted.world.common.gen.structure.snowball;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import com.google.common.collect.Lists;
-import com.grim3212.assorted.world.common.gen.structure.WorldStructurePieceTypes;
+import com.grim3212.assorted.world.common.gen.structure.WorldStructures;
 import com.grim3212.assorted.world.common.util.RuinUtil;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.StructureFeatureManager;
+import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -29,14 +29,14 @@ public class SnowballPiece extends ScatteredFeaturePiece {
 	private List<BlockPos> centrePoints;
 	private List<Integer> radii;
 
-	public SnowballPiece(Random random, BlockPos pos, int radius, int numCenterPoints) {
-		super(WorldStructurePieceTypes.SNOWBALL, pos.getX(), pos.getY(), pos.getZ(), radius * 2, radius * (numCenterPoints + 1), radius * 2, getRandomHorizontalDirection(random));
+	public SnowballPiece(RandomSource random, BlockPos pos, int radius, int numCenterPoints) {
+		super(WorldStructures.SNOWBALL_STRUCTURE_PIECE.get(), pos.getX(), pos.getY(), pos.getZ(), radius * 2, radius * (numCenterPoints + 1), radius * 2, getRandomHorizontalDirection(random));
 		this.radius = radius;
 		this.numCenterPoints = numCenterPoints;
 	}
 
 	public SnowballPiece(StructurePieceSerializationContext context, CompoundTag tagCompound) {
-		super(WorldStructurePieceTypes.SNOWBALL, tagCompound);
+		super(WorldStructures.SNOWBALL_STRUCTURE_PIECE.get(), tagCompound);
 		this.radius = tagCompound.getInt("radius");
 		this.numCenterPoints = tagCompound.getInt("numCenterPoints");
 	}
@@ -49,7 +49,7 @@ public class SnowballPiece extends ScatteredFeaturePiece {
 	}
 
 	@Override
-	public void postProcess(WorldGenLevel reader, StructureFeatureManager structureManager, ChunkGenerator generator, Random rand, BoundingBox bb, ChunkPos chunkPos, BlockPos pos) {
+	public void postProcess(WorldGenLevel reader, StructureManager structureManager, ChunkGenerator generator, RandomSource rand, BoundingBox bb, ChunkPos chunkPos, BlockPos pos) {
 		if (this.updateAverageGroundHeight(reader, bb, 0)) {
 			this.centrePoints = Lists.newArrayList(BlockPos.ZERO);
 			this.radii = Lists.newArrayList(radius);
@@ -96,7 +96,7 @@ public class SnowballPiece extends ScatteredFeaturePiece {
 		}
 	}
 
-	private Block blockToPlace(Random random, BlockPos pos, BlockPos point1, BlockPos point2) {
+	private Block blockToPlace(RandomSource random, BlockPos pos, BlockPos point1, BlockPos point2) {
 		int points = 0;
 		int places = 0;
 		for (int point = 0; point < centrePoints.size(); point++) {

@@ -1,7 +1,5 @@
 package com.grim3212.assorted.world.common.gen.feature;
 
-import java.util.Random;
-
 import com.grim3212.assorted.world.common.handler.WorldConfig;
 import com.grim3212.assorted.world.common.lib.WorldLootTables;
 import com.grim3212.assorted.world.common.util.RuinUtil;
@@ -9,6 +7,7 @@ import com.mojang.serialization.Codec;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Blocks;
@@ -42,7 +41,7 @@ public class RuinFeature extends Feature<NoneFeatureConfiguration> {
 
 	@Override
 	public boolean place(FeaturePlaceContext<NoneFeatureConfiguration> context) {
-		Random rand = context.random();
+		RandomSource rand = context.random();
 		BlockPos pos = context.origin();
 		WorldGenLevel level = context.level();
 
@@ -154,7 +153,7 @@ public class RuinFeature extends Feature<NoneFeatureConfiguration> {
 		}
 	}
 
-	private void generateColumn(WorldGenLevel level, Random random, BlockPos pos) {
+	private void generateColumn(WorldGenLevel level, RandomSource random, BlockPos pos) {
 		int y = pos.getY();
 		pos = level.getHeightmapPos(Types.WORLD_SURFACE_WG, pos);
 		int topY = pos.getY();
@@ -206,7 +205,7 @@ public class RuinFeature extends Feature<NoneFeatureConfiguration> {
 
 	}
 
-	private void clearArea(WorldGenLevel level, Random random, BlockPos pos) {
+	private void clearArea(WorldGenLevel level, RandomSource random, BlockPos pos) {
 		int y = pos.getY();
 		pos = level.getHeightmapPos(Types.WORLD_SURFACE_WG, pos);
 		int topY = pos.getY();
@@ -265,7 +264,7 @@ public class RuinFeature extends Feature<NoneFeatureConfiguration> {
 		}
 	}
 
-	private void genChest(WorldGenLevel level, Random random, BlockPos pos) {
+	private void genChest(WorldGenLevel level, RandomSource random, BlockPos pos) {
 		if (!placedChest) {
 			level.setBlock(pos, Blocks.CHEST.defaultBlockState().setValue(ChestBlock.FACING, Direction.from2DDataValue(random.nextInt(4))), 2);
 			ChestBlockEntity tileentitychest = (ChestBlockEntity) level.getBlockEntity(pos);
@@ -275,7 +274,7 @@ public class RuinFeature extends Feature<NoneFeatureConfiguration> {
 		}
 	}
 
-	private void genMobSpawner(WorldGenLevel level, Random random, BlockPos pos) {
+	private void genMobSpawner(WorldGenLevel level, RandomSource random, BlockPos pos) {
 		if (!placedSpawn) {
 			level.setBlock(pos, Blocks.SPAWNER.defaultBlockState(), 2);
 			SpawnerBlockEntity tileentitymobspawner = (SpawnerBlockEntity) level.getBlockEntity(pos);
