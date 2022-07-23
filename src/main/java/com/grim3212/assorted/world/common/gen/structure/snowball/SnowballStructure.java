@@ -22,6 +22,9 @@ public class SnowballStructure extends Structure {
 	}
 
 	private static boolean extraSpawningChecks(Structure.GenerationContext context) {
+		if (!WorldStructures.validBiomeOnTop(context, Heightmap.Types.WORLD_SURFACE_WG)) {
+			return false;
+		}
 		return Structure.getLowestY(context, 12, 15) >= context.chunkGenerator().getSeaLevel();
 	}
 
@@ -52,7 +55,7 @@ public class SnowballStructure extends Structure {
 		int topLandY = context.chunkGenerator().getFirstFreeHeight(middlePos.getX(), middlePos.getZ(), Heightmap.Types.WORLD_SURFACE_WG, context.heightAccessor(), context.randomState());
 		BlockPos blockpos = new BlockPos(chunkPos.getMinBlockX(), topLandY + 30, chunkPos.getMinBlockZ());
 
-		int radius = 3 * (3 + context.random().nextInt(5));
+		int radius = (2 * (2 + context.random().nextInt(5))) + 3;
 		int centerPoints = 2 + context.random().nextInt(6);
 
 		builder.addPiece(new SnowballPiece(context.random(), blockpos, radius, centerPoints));

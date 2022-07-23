@@ -22,6 +22,9 @@ public class FountainStructure extends Structure {
 	}
 
 	private static boolean extraSpawningChecks(Structure.GenerationContext context) {
+		if (!WorldStructures.validBiomeOnTop(context, Heightmap.Types.WORLD_SURFACE_WG)) {
+			return false;
+		}
 		return Structure.getLowestY(context, 12, 15) >= context.chunkGenerator().getSeaLevel();
 	}
 

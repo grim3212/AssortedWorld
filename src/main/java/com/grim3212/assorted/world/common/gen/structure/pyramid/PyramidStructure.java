@@ -21,6 +21,9 @@ public class PyramidStructure extends Structure {
 	}
 
 	private static boolean extraSpawningChecks(Structure.GenerationContext context) {
+		if (!WorldStructures.validBiomeOnTop(context, Heightmap.Types.WORLD_SURFACE_WG)) {
+			return false;
+		}
 		return Structure.getLowestY(context, 21, 21) >= context.chunkGenerator().getSeaLevel();
 	}
 

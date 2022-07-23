@@ -25,6 +25,7 @@ public class WorldItemModelProvider extends ItemModelProvider {
 	@Override
 	protected void registerModels() {
 		genericBlock(WorldBlocks.RANDOMITE_ORE.get());
+		genericBlock(WorldBlocks.DEEPSLATE_RANDOMITE_ORE.get());
 
 		for (Block rune : WorldBlocks.runeBlocks()) {
 			genericBlock(rune);

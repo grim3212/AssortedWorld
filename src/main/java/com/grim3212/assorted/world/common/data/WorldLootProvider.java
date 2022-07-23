@@ -63,7 +63,8 @@ public class WorldLootProvider implements DataProvider {
 			DataProvider.saveStable(cache, LootTables.serialize(e.getValue().setParamSet(LootContextParamSets.BLOCK).build()), path);
 		}
 
-		genRandomite(cache);
+		genRandomite(cache, WorldBlocks.RANDOMITE_ORE.getId());
+		genRandomite(cache, WorldBlocks.DEEPSLATE_RANDOMITE_ORE.getId());
 	}
 
 	private static Path getPath(Path root, ResourceLocation id) {
@@ -76,8 +77,8 @@ public class WorldLootProvider implements DataProvider {
 		return LootTable.lootTable().withPool(pool);
 	}
 
-	private void genRandomite(CachedOutput cache) throws IOException {
-		Path randomitePath = getPath(generator.getOutputFolder(), WorldBlocks.RANDOMITE_ORE.getId());
+	private void genRandomite(CachedOutput cache, ResourceLocation block) throws IOException {
+		Path randomitePath = getPath(generator.getOutputFolder(), block);
 		LootPoolEntryContainer.Builder<?> eggOption = LootItem.lootTableItem(Items.EGG).setWeight(40);
 		LootPoolEntryContainer.Builder<?> coalOption = LootItem.lootTableItem(Items.COAL).setWeight(30).apply(ApplyBonusCount.addOreBonusCount(Enchantments.BLOCK_FORTUNE)).apply(ApplyExplosionDecay.explosionDecay());
 		LootPoolEntryContainer.Builder<?> slimeOption = LootItem.lootTableItem(Items.SLIME_BALL).setWeight(30).apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0F, 3.0F))).apply(ApplyBonusCount.addOreBonusCount(Enchantments.BLOCK_FORTUNE)).apply(ApplyExplosionDecay.explosionDecay());

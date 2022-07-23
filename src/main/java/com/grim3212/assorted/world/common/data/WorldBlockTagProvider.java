@@ -19,12 +19,12 @@ public class WorldBlockTagProvider extends BlockTagsProvider {
 	@Override
 	protected void addTags() {
 		this.tag(Tags.Blocks.ORES).addTag(WorldTags.Blocks.ORES_RANDOMITE);
-		this.tag(WorldTags.Blocks.ORES_RANDOMITE).add(WorldBlocks.RANDOMITE_ORE.get());
+		this.tag(WorldTags.Blocks.ORES_RANDOMITE).add(WorldBlocks.RANDOMITE_ORE.get(), WorldBlocks.DEEPSLATE_RANDOMITE_ORE.get());
 		this.tag(WorldTags.Blocks.RUNES).add(WorldBlocks.runeBlocks());
 
 		this.tag(BlockTags.MINEABLE_WITH_PICKAXE).add(WorldBlocks.runeBlocks());
-		this.tag(BlockTags.MINEABLE_WITH_PICKAXE).add(WorldBlocks.RANDOMITE_ORE.get());
-		this.tag(BlockTags.NEEDS_STONE_TOOL).add(WorldBlocks.RANDOMITE_ORE.get());
+		this.tag(BlockTags.MINEABLE_WITH_PICKAXE).add(WorldBlocks.RANDOMITE_ORE.get(), WorldBlocks.DEEPSLATE_RANDOMITE_ORE.get());
+		this.tag(BlockTags.NEEDS_STONE_TOOL).add(WorldBlocks.RANDOMITE_ORE.get(), WorldBlocks.DEEPSLATE_RANDOMITE_ORE.get());
 		
 		this.tag(BlockTags.MINEABLE_WITH_AXE).add(WorldBlocks.GUNPOWDER_REED.get());
 	}

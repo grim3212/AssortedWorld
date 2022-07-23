@@ -7,12 +7,15 @@ import com.grim3212.assorted.world.AssortedWorld;
 import com.grim3212.assorted.world.common.block.RuneBlock.RuneType;
 import com.grim3212.assorted.world.common.item.WorldItems;
 
+import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.DropExperienceBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.MaterialColor;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
@@ -22,7 +25,9 @@ public class WorldBlocks {
 	public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, AssortedWorld.MODID);
 	public static final DeferredRegister<Item> ITEMS = WorldItems.ITEMS;
 
-	public static final RegistryObject<Block> RANDOMITE_ORE = register("randomite_ore", () -> new Block(Properties.of(Material.STONE).sound(SoundType.STONE).strength(1.6f, 1.0f).requiresCorrectToolForDrops()));
+	public static final RegistryObject<Block> RANDOMITE_ORE = register("randomite_ore", () -> new DropExperienceBlock(Properties.of(Material.STONE).sound(SoundType.STONE).strength(1.6f, 1.0f).requiresCorrectToolForDrops(), UniformInt.of(2, 5)));
+	public static final RegistryObject<Block> DEEPSLATE_RANDOMITE_ORE = register("deepslate_randomite_ore", () -> new DropExperienceBlock(Properties.of(Material.STONE, MaterialColor.DEEPSLATE).sound(SoundType.STONE).strength(4.5F, 3.0f).requiresCorrectToolForDrops(), UniformInt.of(2, 5)));
+
 	public static final RegistryObject<RuneBlock> UR_RUNE = register("ur_rune", () -> new RuneBlock(RuneType.UR));
 	public static final RegistryObject<RuneBlock> EOH_RUNE = register("eoh_rune", () -> new RuneBlock(RuneType.EOH));
 	public static final RegistryObject<RuneBlock> HAGEL_RUNE = register("hagel_rune", () -> new RuneBlock(RuneType.HAGEL));

@@ -24,6 +24,7 @@ public class WorldBlockstateProvider extends BlockStateProvider {
 	@Override
 	protected void registerStatesAndModels() {
 		simpleBlock(WorldBlocks.RANDOMITE_ORE.get());
+		simpleBlock(WorldBlocks.DEEPSLATE_RANDOMITE_ORE.get());
 
 		for (Block rune : WorldBlocks.runeBlocks()) {
 			simpleBlock(rune);

@@ -24,6 +24,10 @@ public class WaterDomeStructure extends Structure {
 	}
 
 	private static boolean extraSpawningChecks(Structure.GenerationContext context) {
+		if (!WorldStructures.validBiomeOnTop(context, Heightmap.Types.OCEAN_FLOOR_WG)) {
+			return false;
+		}
+
 		int i = context.chunkPos().getMiddleBlockX();
 		int j = context.chunkPos().getMiddleBlockZ();
 		int k = context.chunkGenerator().getFirstOccupiedHeight(i, j, Heightmap.Types.OCEAN_FLOOR_WG, context.heightAccessor(), context.randomState());

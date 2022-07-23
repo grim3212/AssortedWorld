@@ -9,6 +9,7 @@ import com.google.gson.JsonElement;
 import com.grim3212.assorted.world.AssortedWorld;
 import com.grim3212.assorted.world.common.block.WorldBlocks;
 import com.grim3212.assorted.world.common.gen.WorldBiomeTags;
+import com.grim3212.assorted.world.common.gen.feature.WorldTargets;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderSet;
@@ -16,7 +17,6 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
-import net.minecraft.data.worldgen.features.OreFeatures;
 import net.minecraft.data.worldgen.placement.PlacementUtils;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
@@ -62,16 +62,6 @@ public class WorldFeatureProvider {
 	private static final ResourceLocation RANDOMITE_KEY = new ResourceLocation(AssortedWorld.MODID, "ore_randomite");
 	private static final ResourceLocation GUNPOWDER_REED_KEY = new ResourceLocation(AssortedWorld.MODID, "patch_gunpowder_reed");
 
-	public static final ResourceKey<ConfiguredFeature<?, ?>> RUIN_RESOURCE_KEY = configuredFeatureResourceKey(RUIN_KEY);
-	public static final ResourceKey<ConfiguredFeature<?, ?>> SPIRE_RESOURCE_KEY = configuredFeatureResourceKey(SPIRE_KEY);
-	public static final ResourceKey<ConfiguredFeature<?, ?>> RANDOMITE_RESOURCE_KEY = configuredFeatureResourceKey(RANDOMITE_KEY);
-	public static final ResourceKey<ConfiguredFeature<?, ?>> GUNPOWDER_REED_RESOURCE_KEY = configuredFeatureResourceKey(GUNPOWDER_REED_KEY);
-
-	public static final ResourceKey<PlacedFeature> RUIN_PLACED_RESOURCE_KEY = placedFeatureResourceKey(RUIN_KEY);
-	public static final ResourceKey<PlacedFeature> SPIRE_PLACED_RESOURCE_KEY = placedFeatureResourceKey(SPIRE_KEY);
-	public static final ResourceKey<PlacedFeature> RANDOMITE_PLACED_RESOURCE_KEY = placedFeatureResourceKey(RANDOMITE_KEY);
-	public static final ResourceKey<PlacedFeature> GUNPOWDER_PLACED_REED_RESOURCE_KEY = placedFeatureResourceKey(GUNPOWDER_REED_KEY);
-
 	private static ResourceKey<ConfiguredFeature<?, ?>> configuredFeatureResourceKey(ResourceLocation key) {
 		return ResourceKey.create(Registry.CONFIGURED_FEATURE_REGISTRY, key);
 	}
@@ -92,7 +82,7 @@ public class WorldFeatureProvider {
 
 		map.put(RUIN_KEY, new ConfiguredFeature<>(features.get(RUIN_KEY), NoneFeatureConfiguration.INSTANCE));
 		map.put(SPIRE_KEY, new ConfiguredFeature<>(features.get(SPIRE_KEY), NoneFeatureConfiguration.INSTANCE));
-		map.put(RANDOMITE_KEY, new ConfiguredFeature<>(Feature.ORE, new OreConfiguration(OreFeatures.NATURAL_STONE, WorldBlocks.RANDOMITE_ORE.get().defaultBlockState(), 8)));
+		map.put(RANDOMITE_KEY, new ConfiguredFeature<>(Feature.ORE, new OreConfiguration(WorldTargets.ORE_RANDOMITE_TARGET_LIST, 8)));
 		map.put(GUNPOWDER_REED_KEY, new ConfiguredFeature<>(Feature.RANDOM_PATCH, new RandomPatchConfiguration(20, 4, 0, PlacementUtils.inlinePlaced(Feature.BLOCK_COLUMN, BlockColumnConfiguration.simple(BiasedToBottomInt.of(2, 4), BlockStateProvider.simple(WorldBlocks.GUNPOWDER_REED.get())), BlockPredicateFilter.forPredicate(BlockPredicate.allOf(BlockPredicate.ONLY_IN_AIR_PREDICATE, BlockPredicate.wouldSurvive(WorldBlocks.GUNPOWDER_REED.get().defaultBlockState(), BlockPos.ZERO),
 				BlockPredicate.anyOf(BlockPredicate.matchesFluids(new BlockPos(1, -1, 0), Fluids.WATER, Fluids.FLOWING_WATER), BlockPredicate.matchesFluids(new BlockPos(-1, -1, 0), Fluids.WATER, Fluids.FLOWING_WATER), BlockPredicate.matchesFluids(new BlockPos(0, -1, 1), Fluids.WATER, Fluids.FLOWING_WATER), BlockPredicate.matchesFluids(new BlockPos(0, -1, -1), Fluids.WATER, Fluids.FLOWING_WATER))))))));
 
@@ -108,10 +98,10 @@ public class WorldFeatureProvider {
 
 		Registry<ConfiguredFeature<?, ?>> configuredFeatures = registries.registryOrThrow(Registry.CONFIGURED_FEATURE_REGISTRY);
 
-		map.put(RUIN_KEY, new PlacedFeature(configuredFeatures.getOrCreateHolderOrThrow(RUIN_RESOURCE_KEY), heightmapPlacement(350)));
-		map.put(SPIRE_KEY, new PlacedFeature(configuredFeatures.getOrCreateHolderOrThrow(SPIRE_RESOURCE_KEY), heightmapPlacement(350)));
-		map.put(RANDOMITE_KEY, new PlacedFeature(configuredFeatures.getOrCreateHolderOrThrow(RANDOMITE_RESOURCE_KEY), commonOrePlacement(12, HeightRangePlacement.triangle(VerticalAnchor.BOTTOM, VerticalAnchor.TOP))));
-		map.put(GUNPOWDER_REED_KEY, new PlacedFeature(configuredFeatures.getOrCreateHolderOrThrow(GUNPOWDER_REED_RESOURCE_KEY), heightmapPlacement(8)));
+		map.put(RUIN_KEY, new PlacedFeature(configuredFeatures.getOrCreateHolderOrThrow(configuredFeatureResourceKey(RUIN_KEY)), heightmapPlacement(350)));
+		map.put(SPIRE_KEY, new PlacedFeature(configuredFeatures.getOrCreateHolderOrThrow(configuredFeatureResourceKey(SPIRE_KEY)), heightmapPlacement(350)));
+		map.put(RANDOMITE_KEY, new PlacedFeature(configuredFeatures.getOrCreateHolderOrThrow(configuredFeatureResourceKey(RANDOMITE_KEY)), commonOrePlacement(12, HeightRangePlacement.triangle(VerticalAnchor.BOTTOM, VerticalAnchor.TOP))));
+		map.put(GUNPOWDER_REED_KEY, new PlacedFeature(configuredFeatures.getOrCreateHolderOrThrow(configuredFeatureResourceKey(GUNPOWDER_REED_KEY)), heightmapPlacement(8)));
 
 		return map;
 	}
@@ -137,13 +127,13 @@ public class WorldFeatureProvider {
 
 		Registry<PlacedFeature> placedFeatures = registries.registryOrThrow(Registry.PLACED_FEATURE_REGISTRY);
 
-		final BiomeModifier randomite = new AddFeaturesBiomeModifier(overworldTag, HolderSet.direct(placedFeatures.getOrCreateHolderOrThrow(RANDOMITE_PLACED_RESOURCE_KEY)), Decoration.UNDERGROUND_ORES);
+		final BiomeModifier randomite = new AddFeaturesBiomeModifier(overworldTag, HolderSet.direct(placedFeatures.getOrCreateHolderOrThrow(placedFeatureResourceKey(RANDOMITE_KEY))), Decoration.UNDERGROUND_ORES);
 		entries.put(RANDOMITE_BIOME_MODIFIER_NAME, randomite);
-		final BiomeModifier gunpowderReeds = new AddFeaturesBiomeModifier(overworldTag, HolderSet.direct(placedFeatures.getOrCreateHolderOrThrow(GUNPOWDER_PLACED_REED_RESOURCE_KEY)), Decoration.VEGETAL_DECORATION);
+		final BiomeModifier gunpowderReeds = new AddFeaturesBiomeModifier(overworldTag, HolderSet.direct(placedFeatures.getOrCreateHolderOrThrow(placedFeatureResourceKey(GUNPOWDER_REED_KEY))), Decoration.VEGETAL_DECORATION);
 		entries.put(GUNPOWDER_REEDS_BIOME_MODIFIER_NAME, gunpowderReeds);
-		final BiomeModifier ruins = new AddFeaturesBiomeModifier(ruinTag, HolderSet.direct(placedFeatures.getOrCreateHolderOrThrow(RUIN_PLACED_RESOURCE_KEY)), Decoration.SURFACE_STRUCTURES);
+		final BiomeModifier ruins = new AddFeaturesBiomeModifier(ruinTag, HolderSet.direct(placedFeatures.getOrCreateHolderOrThrow(placedFeatureResourceKey(RUIN_KEY))), Decoration.SURFACE_STRUCTURES);
 		entries.put(RUINS_BIOME_MODIFIER_NAME, ruins);
-		final BiomeModifier spires = new AddFeaturesBiomeModifier(spireTag, HolderSet.direct(placedFeatures.getOrCreateHolderOrThrow(SPIRE_PLACED_RESOURCE_KEY)), Decoration.SURFACE_STRUCTURES);
+		final BiomeModifier spires = new AddFeaturesBiomeModifier(spireTag, HolderSet.direct(placedFeatures.getOrCreateHolderOrThrow(placedFeatureResourceKey(SPIRE_KEY))), Decoration.SURFACE_STRUCTURES);
 		entries.put(SPIRES_BIOME_MODIFIER_NAME, spires);
 
 		return JsonCodecProvider.forDatapackRegistry(generator, existingFileHelper, AssortedWorld.MODID, ops, ForgeRegistries.Keys.BIOME_MODIFIERS, entries);
