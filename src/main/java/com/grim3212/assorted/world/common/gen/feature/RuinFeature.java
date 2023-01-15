@@ -283,7 +283,7 @@ public class RuinFeature extends Feature<NoneFeatureConfiguration> {
 				type = EntityType.ZOMBIE;
 			}
 
-			tileentitymobspawner.getSpawner().setEntityId(type);
+			tileentitymobspawner.setEntityId(type, random);
 			placedSpawn = true;
 		}
 	}

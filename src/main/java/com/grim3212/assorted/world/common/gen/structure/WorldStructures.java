@@ -12,7 +12,7 @@ import com.grim3212.assorted.world.common.gen.structure.waterdome.WaterDomeStruc
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.QuartPos;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.structure.Structure;
@@ -22,8 +22,8 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
 
 public class WorldStructures {
-	public static final DeferredRegister<StructureType<?>> STRUCTURE_TYPES = DeferredRegister.create(Registry.STRUCTURE_TYPE_REGISTRY, AssortedWorld.MODID);
-	public static final DeferredRegister<StructurePieceType> STRUCTURE_PIECES = DeferredRegister.create(Registry.STRUCTURE_PIECE_REGISTRY, AssortedWorld.MODID);
+	public static final DeferredRegister<StructureType<?>> STRUCTURE_TYPES = DeferredRegister.create(Registries.STRUCTURE_TYPE, AssortedWorld.MODID);
+	public static final DeferredRegister<StructurePieceType> STRUCTURE_PIECES = DeferredRegister.create(Registries.STRUCTURE_PIECE, AssortedWorld.MODID);
 
 	public static final RegistryObject<StructureType<SnowballStructure>> SNOWBALL_STRUCTURE_TYPE = STRUCTURE_TYPES.register("snowball", () -> () -> SnowballStructure.CODEC);
 	public static final RegistryObject<StructurePieceType> SNOWBALL_STRUCTURE_PIECE = STRUCTURE_PIECES.register("snowball_piece", () -> SnowballPiece::new);

@@ -133,7 +133,7 @@ public class PyramidPiece extends ScatteredFeaturePiece {
 				if (type == null) {
 					type = EntityType.ZOMBIE;
 				}
-				((SpawnerBlockEntity) te).getSpawner().setEntityId(type);
+				((SpawnerBlockEntity) te).setEntityId(type, rand);
 			}
 		}
 	}

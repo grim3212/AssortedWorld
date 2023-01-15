@@ -1,34 +1,36 @@
 package com.grim3212.assorted.world;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.google.gson.JsonElement;
 import com.grim3212.assorted.world.client.data.WorldBlockstateProvider;
 import com.grim3212.assorted.world.client.data.WorldItemModelProvider;
 import com.grim3212.assorted.world.client.proxy.ClientProxy;
 import com.grim3212.assorted.world.common.block.WorldBlocks;
+import com.grim3212.assorted.world.common.creative.WorldCreativeTab;
 import com.grim3212.assorted.world.common.data.WorldBiomeTagProvider;
 import com.grim3212.assorted.world.common.data.WorldBlockTagProvider;
-import com.grim3212.assorted.world.common.data.WorldFeatureProvider;
+import com.grim3212.assorted.world.common.data.WorldGenProvider;
 import com.grim3212.assorted.world.common.data.WorldItemTagProvider;
 import com.grim3212.assorted.world.common.data.WorldLootProvider;
+import com.grim3212.assorted.world.common.data.WorldLootProvider.BlockTables;
 import com.grim3212.assorted.world.common.data.WorldRecipes;
-import com.grim3212.assorted.world.common.data.WorldStructureProvider;
 import com.grim3212.assorted.world.common.gen.feature.WorldFeatures;
 import com.grim3212.assorted.world.common.gen.structure.WorldStructures;
 import com.grim3212.assorted.world.common.handler.WorldConfig;
 import com.grim3212.assorted.world.common.item.WorldItems;
 import com.grim3212.assorted.world.common.proxy.IProxy;
-import com.mojang.serialization.JsonOps;
 
-import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.resources.RegistryOps;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.data.PackOutput;
+import net.minecraft.data.loot.LootTableProvider;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -48,14 +50,6 @@ public class AssortedWorld {
 	public static IProxy proxy = new IProxy() {
 	};
 
-	public static final CreativeModeTab ASSORTED_WORLD_ITEM_GROUP = (new CreativeModeTab(AssortedWorld.MODID) {
-		@Override
-		@OnlyIn(Dist.CLIENT)
-		public ItemStack makeIcon() {
-			return new ItemStack(WorldBlocks.RANDOMITE_ORE.get());
-		}
-	});
-
 	public AssortedWorld() {
 		DistExecutor.unsafeCallWhenOn(Dist.CLIENT, () -> () -> proxy = new ClientProxy());
 		proxy.starting();
@@ -63,6 +57,7 @@ public class AssortedWorld {
 		final IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
 
 		modBus.addListener(this::gatherData);
+		modBus.addListener(WorldCreativeTab::registerTabs);
 
 		WorldBlocks.BLOCKS.register(modBus);
 		WorldItems.ITEMS.register(modBus);
@@ -75,25 +70,19 @@ public class AssortedWorld {
 
 	private void gatherData(final GatherDataEvent event) {
 		DataGenerator datagenerator = event.getGenerator();
+		PackOutput packOutput = datagenerator.getPackOutput();
 		ExistingFileHelper fileHelper = event.getExistingFileHelper();
+		CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
 
-		WorldBlockTagProvider blockTagProvider = new WorldBlockTagProvider(datagenerator, fileHelper);
+		WorldBlockTagProvider blockTagProvider = new WorldBlockTagProvider(packOutput, lookupProvider, fileHelper);
 		datagenerator.addProvider(event.includeServer(), blockTagProvider);
-		datagenerator.addProvider(event.includeServer(), new WorldBiomeTagProvider(datagenerator, fileHelper));
-		datagenerator.addProvider(event.includeServer(), new WorldItemTagProvider(datagenerator, blockTagProvider, fileHelper));
-		datagenerator.addProvider(event.includeServer(), new WorldLootProvider(datagenerator));
-		datagenerator.addProvider(event.includeServer(), new WorldRecipes(datagenerator));
+		datagenerator.addProvider(event.includeServer(), new WorldBiomeTagProvider(packOutput, lookupProvider, fileHelper));
+		datagenerator.addProvider(event.includeServer(), new WorldItemTagProvider(packOutput, lookupProvider, blockTagProvider, fileHelper));
+		datagenerator.addProvider(event.includeServer(), new WorldLootProvider(packOutput, Collections.emptySet(), List.of(new LootTableProvider.SubProviderEntry(BlockTables::new, LootContextParamSets.BLOCK))));
+		datagenerator.addProvider(event.includeServer(), new WorldRecipes(packOutput));
+		datagenerator.addProvider(event.includeServer(), WorldGenProvider.datpackEntriesProvider(packOutput, lookupProvider));
 
-		final RegistryAccess registries = RegistryAccess.builtinCopy();
-		final RegistryOps<JsonElement> ops = RegistryOps.create(JsonOps.INSTANCE, registries);
-		datagenerator.addProvider(event.includeServer(), WorldFeatureProvider.getConfiguredFeatures(datagenerator, fileHelper, registries, ops));
-		datagenerator.addProvider(event.includeServer(), WorldFeatureProvider.getPlacedFeatures(datagenerator, fileHelper, registries, ops));
-		datagenerator.addProvider(event.includeServer(), WorldFeatureProvider.getBiomeModifiers(datagenerator, fileHelper, registries, ops));
-
-		datagenerator.addProvider(event.includeServer(), WorldStructureProvider.getStructures(datagenerator, fileHelper, registries, ops));
-		datagenerator.addProvider(event.includeServer(), WorldStructureProvider.getStructureSets(datagenerator, fileHelper, registries, ops));
-
-		datagenerator.addProvider(event.includeClient(), new WorldBlockstateProvider(datagenerator, fileHelper));
-		datagenerator.addProvider(event.includeClient(), new WorldItemModelProvider(datagenerator, fileHelper));
+		datagenerator.addProvider(event.includeClient(), new WorldBlockstateProvider(packOutput, fileHelper));
+		datagenerator.addProvider(event.includeClient(), new WorldItemModelProvider(packOutput, fileHelper));
 	}
 }

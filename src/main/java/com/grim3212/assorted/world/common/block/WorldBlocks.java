@@ -62,7 +62,7 @@ public class WorldBlocks {
 	}
 
 	private static Supplier<BlockItem> item(final RegistryObject<? extends Block> block) {
-		return () -> new BlockItem(block.get(), new Item.Properties().tab(AssortedWorld.ASSORTED_WORLD_ITEM_GROUP));
+		return () -> new BlockItem(block.get(), new Item.Properties());
 	}
 
 	public static Block[] runeBlocks() {

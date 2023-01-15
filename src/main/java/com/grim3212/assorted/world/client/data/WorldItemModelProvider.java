@@ -3,7 +3,7 @@ package com.grim3212.assorted.world.client.data;
 import com.grim3212.assorted.world.AssortedWorld;
 import com.grim3212.assorted.world.common.block.WorldBlocks;
 
-import net.minecraft.data.DataGenerator;
+import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.client.model.generators.ItemModelBuilder;
@@ -13,8 +13,8 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 public class WorldItemModelProvider extends ItemModelProvider {
 
-	public WorldItemModelProvider(DataGenerator generator, ExistingFileHelper existingFileHelper) {
-		super(generator, AssortedWorld.MODID, existingFileHelper);
+	public WorldItemModelProvider(PackOutput output, ExistingFileHelper existingFileHelper) {
+		super(output, AssortedWorld.MODID, existingFileHelper);
 	}
 
 	@Override
