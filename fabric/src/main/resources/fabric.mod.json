@@ -17,6 +17,9 @@
     "main": [
       "com.grim3212.assorted.world.AssortedWorldFabric"
     ],
+    "client": [
+      "com.grim3212.assorted.world.client.AssortedWorldFabricClient"
+    ],
     "fabric-datagen": [
       "com.grim3212.assorted.world.common.data.AssortedWorldFabricDatagen"
     ]

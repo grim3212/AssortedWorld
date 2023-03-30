@@ -1,16 +1,11 @@
 package com.grim3212.assorted.world.data;
 
-import com.grim3212.assorted.lib.annotations.LoaderImplement;
-import com.grim3212.assorted.lib.mixin.data.AccessorBlockLootSubProvider;
+import com.grim3212.assorted.lib.data.LibBlockLootProvider;
 import com.grim3212.assorted.world.common.block.WorldBlocks;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.data.loot.packs.VanillaBlockLoot;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
@@ -22,16 +17,18 @@ import net.minecraft.world.level.storage.loot.predicates.ExplosionCondition;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
 
-import java.util.*;
-import java.util.function.BiConsumer;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-public class WorldBlockLoot extends VanillaBlockLoot {
+public class WorldBlockLoot extends LibBlockLootProvider {
 
     private final List<Block> blocks = new ArrayList<>();
 
     public WorldBlockLoot() {
+        super(() -> WorldBlocks.BLOCKS.getEntries().stream().map(Supplier::get).collect(Collectors.toList()));
+
         for (Block rune : WorldBlocks.runeBlocks()) {
             this.blocks.add(rune);
         }
@@ -64,35 +61,4 @@ public class WorldBlockLoot extends VanillaBlockLoot {
         LootPool.Builder pool = LootPool.lootPool().setRolls(ConstantValue.exactly(3)).add(coalOption).add(ironOption).add(goldOption).add(diamondOption).add(redstoneOption).add(lapisOption).add(slimeOption).add(emeraldOption).add(quartzOption).add(netherDebrisOption).add(eggOption).when(ExplosionCondition.survivesExplosion());
         return LootTable.lootTable().withPool(pool);
     }
-
-    @Override
-    public void generate(BiConsumer<ResourceLocation, LootTable.Builder> biConsumer) {
-        this.generate();
-        Set<ResourceLocation> set = new HashSet<>();
-        AccessorBlockLootSubProvider provider = ((AccessorBlockLootSubProvider) this);
-
-        for (Block block : getKnownBlocks()) {
-            if (block.isEnabled(provider.assortedlib_getEnabledFeatures())) {
-                ResourceLocation resourcelocation = block.getLootTable();
-                if (resourcelocation != BuiltInLootTables.EMPTY && set.add(resourcelocation)) {
-                    LootTable.Builder loottable$builder = provider.assortedlib_getMap().remove(resourcelocation);
-                    if (loottable$builder == null) {
-                        throw new IllegalStateException(String.format(Locale.ROOT, "Missing loottable '%s' for '%s'", resourcelocation, BuiltInRegistries.BLOCK.getKey(block)));
-                    }
-
-                    biConsumer.accept(resourcelocation, loottable$builder);
-                }
-            }
-        }
-
-        if (!provider.assortedlib_getMap().isEmpty()) {
-            throw new IllegalStateException("Created block loot tables for non-blocks: " + provider.assortedlib_getMap().keySet());
-        }
-    }
-
-    @LoaderImplement(loader = LoaderImplement.Loader.FORGE, value = "BlockLootSubProvider")
-    protected Iterable<Block> getKnownBlocks() {
-        return WorldBlocks.BLOCKS.getEntries().stream().map(Supplier::get).collect(Collectors.toList());
-    }
-
 }

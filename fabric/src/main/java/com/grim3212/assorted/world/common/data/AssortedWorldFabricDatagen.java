@@ -1,8 +1,9 @@
 package com.grim3212.assorted.world.common.data;
 
-import com.grim3212.assorted.world.data.WorldBlockLoot;
-import com.grim3212.assorted.world.data.WorldGenData;
-import com.grim3212.assorted.world.data.WorldRecipes;
+import com.grim3212.assorted.lib.data.FabricBiomeTagProvider;
+import com.grim3212.assorted.lib.data.FabricBlockTagProvider;
+import com.grim3212.assorted.lib.data.FabricItemTagProvider;
+import com.grim3212.assorted.world.data.*;
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.minecraft.core.RegistrySetBuilder;
@@ -17,9 +18,9 @@ public class AssortedWorldFabricDatagen implements DataGeneratorEntrypoint {
     public void onInitializeDataGenerator(FabricDataGenerator fabricDataGenerator) {
         FabricDataGenerator.Pack pack = fabricDataGenerator.createPack();
 
-        FabricBlockTagProvider provider = pack.addProvider(FabricBlockTagProvider::new);
-        pack.addProvider((output, registriesFuture) -> new FabricItemTagProvider(output, registriesFuture, provider));
-        pack.addProvider((output, registriesFuture) -> new FabricBiomeTagProvider(output, registriesFuture));
+        FabricBlockTagProvider provider = pack.addProvider((output, registriesFuture) -> new FabricBlockTagProvider(output, registriesFuture, new WorldBlockTagProvider(output, registriesFuture)));
+        pack.addProvider((output, registriesFuture) -> new FabricItemTagProvider(output, registriesFuture, provider, new WorldItemTagProvider(output, registriesFuture, provider)));
+        pack.addProvider((output, registriesFuture) -> new FabricBiomeTagProvider(output, registriesFuture, new WorldBiomeTagProvider(output, registriesFuture)));
 
         pack.addProvider((output, registriesFuture) -> new WorldRecipes(output));
         pack.addProvider((output, registriesFuture) -> new LootTableProvider(output, Collections.emptySet(), List.of(new LootTableProvider.SubProviderEntry(WorldBlockLoot::new, LootContextParamSets.BLOCK))));
