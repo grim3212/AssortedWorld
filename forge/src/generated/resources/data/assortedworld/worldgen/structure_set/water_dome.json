@@ -1,0 +1,14 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 432432568,
+    "separation": 14,
+    "spacing": 32
+  },
+  "structures": [
+    {
+      "structure": "assortedworld:water_dome",
+      "weight": 1
+    }
+  ]
+}

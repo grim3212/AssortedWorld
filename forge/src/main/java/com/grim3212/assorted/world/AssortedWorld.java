@@ -5,7 +5,7 @@ import com.grim3212.assorted.world.client.data.WorldItemModelProvider;
 import com.grim3212.assorted.world.common.data.ForgeBiomeTagProvider;
 import com.grim3212.assorted.world.common.data.ForgeBlockTagProvider;
 import com.grim3212.assorted.world.common.data.ForgeItemTagProvider;
-import com.grim3212.assorted.world.common.data.WorldGenProvider;
+import com.grim3212.assorted.world.common.data.ForgeWorldGenProvider;
 import com.grim3212.assorted.world.data.WorldBlockLoot;
 import com.grim3212.assorted.world.data.WorldRecipes;
 import net.minecraft.core.HolderLookup;
@@ -48,8 +48,8 @@ public class AssortedWorld {
 
         datagenerator.addProvider(event.includeServer(), new WorldRecipes(packOutput));
         datagenerator.addProvider(event.includeServer(), new LootTableProvider(packOutput, Collections.emptySet(), List.of(new LootTableProvider.SubProviderEntry(WorldBlockLoot::new, LootContextParamSets.BLOCK))));
-        
-        datagenerator.addProvider(event.includeServer(), WorldGenProvider.datpackEntriesProvider(packOutput, lookupProvider));
+
+        datagenerator.addProvider(event.includeServer(), ForgeWorldGenProvider.datpackEntriesProvider(packOutput, lookupProvider));
 
         datagenerator.addProvider(event.includeClient(), new WorldBlockstateProvider(packOutput, fileHelper));
         datagenerator.addProvider(event.includeClient(), new WorldItemModelProvider(packOutput, fileHelper));

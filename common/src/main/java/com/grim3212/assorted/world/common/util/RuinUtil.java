@@ -1,12 +1,12 @@
 package com.grim3212.assorted.world.common.util;
 
+import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.world.common.block.WorldBlocks;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.random.WeightedEntry;
 import net.minecraft.util.random.WeightedRandom;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.common.DungeonHooks;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -25,7 +25,7 @@ public class RuinUtil {
      * mob is already in the spawn list, the rarity will be added to the existing
      * one, causing the mob to be more common.
      *
-     * @param name   The entity type of the monster
+     * @param type   The entity type of the monster
      * @param rarity The rarity of selecting this mob over others. Must be greater
      *               then 0. Vanilla Minecraft has the following mobs: Spider 100
      *               Skeleton 100 Zombie 200 Meaning, Zombies are twice as common as
@@ -81,7 +81,7 @@ public class RuinUtil {
 
             // We still want to be able to pull from this in case of modded mobs
             // added
-            return DungeonHooks.getRandomDungeonMob(rand);
+            return Services.PLATFORM.getRandomDungeonEntity(rand);
         }
     }
 

@@ -1,6 +1,5 @@
-package com.grim3212.assorted.world.common.data;
+package com.grim3212.assorted.world.data;
 
-import com.google.common.collect.Maps;
 import com.grim3212.assorted.world.Constants;
 import com.grim3212.assorted.world.api.WorldTags;
 import com.grim3212.assorted.world.common.block.WorldBlocks;
@@ -10,18 +9,17 @@ import com.grim3212.assorted.world.common.gen.structure.fountain.FountainStructu
 import com.grim3212.assorted.world.common.gen.structure.pyramid.PyramidStructure;
 import com.grim3212.assorted.world.common.gen.structure.snowball.SnowballStructure;
 import com.grim3212.assorted.world.common.gen.structure.waterdome.WaterDomeStructure;
-import net.minecraft.core.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderGetter;
+import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.PackOutput;
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.data.worldgen.placement.PlacementUtils;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.BiomeTags;
 import net.minecraft.util.valueproviders.BiasedToBottomInt;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.GenerationStep;
-import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import net.minecraft.world.level.levelgen.VerticalAnchor;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
@@ -38,39 +36,27 @@ import net.minecraft.world.level.levelgen.structure.TerrainAdjustment;
 import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadStructurePlacement;
 import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadType;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraftforge.common.Tags;
-import net.minecraftforge.common.data.DatapackBuiltinEntriesProvider;
-import net.minecraftforge.common.world.BiomeModifier;
-import net.minecraftforge.common.world.ForgeBiomeModifiers;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 
-public class WorldGenProvider {
+public class WorldGenData {
 
     private static final ResourceLocation SNOWBALL_KEY = new ResourceLocation(Constants.MOD_ID, "snowball");
     private static final ResourceLocation PYRAMID_KEY = new ResourceLocation(Constants.MOD_ID, "pyramid");
     private static final ResourceLocation FOUNTAIN_KEY = new ResourceLocation(Constants.MOD_ID, "fountain");
     private static final ResourceLocation WATER_DOME_KEY = new ResourceLocation(Constants.MOD_ID, "water_dome");
 
-    public static final ResourceKey<Structure> SNOWBALL_RESOURCE_KEY = structureResourceKey(SNOWBALL_KEY);
-    public static final ResourceKey<Structure> PYRAMID_RESOURCE_KEY = structureResourceKey(PYRAMID_KEY);
-    public static final ResourceKey<Structure> FOUNTAIN_RESOURCE_KEY = structureResourceKey(FOUNTAIN_KEY);
-    public static final ResourceKey<Structure> WATER_DOME_RESOURCE_KEY = structureResourceKey(WATER_DOME_KEY);
+    private static final ResourceKey<Structure> SNOWBALL_RESOURCE_KEY = structureResourceKey(SNOWBALL_KEY);
+    private static final ResourceKey<Structure> PYRAMID_RESOURCE_KEY = structureResourceKey(PYRAMID_KEY);
+    private static final ResourceKey<Structure> FOUNTAIN_RESOURCE_KEY = structureResourceKey(FOUNTAIN_KEY);
+    private static final ResourceKey<Structure> WATER_DOME_RESOURCE_KEY = structureResourceKey(WATER_DOME_KEY);
 
-    public static final ResourceLocation RANDOMITE_BIOME_MODIFIER_NAME = new ResourceLocation(Constants.MOD_ID, "add_randomite");
-    public static final ResourceLocation GUNPOWDER_REEDS_BIOME_MODIFIER_NAME = new ResourceLocation(Constants.MOD_ID, "add_gunpowder_reeds");
-    public static final ResourceLocation RUINS_BIOME_MODIFIER_NAME = new ResourceLocation(Constants.MOD_ID, "add_ruins");
-    public static final ResourceLocation SPIRES_BIOME_MODIFIER_NAME = new ResourceLocation(Constants.MOD_ID, "add_spires");
-
-    private static final ResourceLocation RUIN_KEY = new ResourceLocation(Constants.MOD_ID, "ruin");
-    private static final ResourceLocation SPIRE_KEY = new ResourceLocation(Constants.MOD_ID, "spire");
-    private static final ResourceLocation RANDOMITE_KEY = new ResourceLocation(Constants.MOD_ID, "ore_randomite");
-    private static final ResourceLocation GUNPOWDER_REED_KEY = new ResourceLocation(Constants.MOD_ID, "patch_gunpowder_reed");
+    public static final ResourceLocation RUIN_KEY = new ResourceLocation(Constants.MOD_ID, "ruin");
+    public static final ResourceLocation SPIRE_KEY = new ResourceLocation(Constants.MOD_ID, "spire");
+    public static final ResourceLocation RANDOMITE_KEY = new ResourceLocation(Constants.MOD_ID, "ore_randomite");
+    public static final ResourceLocation GUNPOWDER_REED_KEY = new ResourceLocation(Constants.MOD_ID, "patch_gunpowder_reed");
 
     private static ResourceKey<Structure> structureResourceKey(ResourceLocation key) {
         return ResourceKey.create(Registries.STRUCTURE, key);
@@ -78,46 +64,6 @@ public class WorldGenProvider {
 
     private static ResourceKey<ConfiguredFeature<?, ?>> configuredFeatureResourceKey(ResourceLocation key) {
         return ResourceKey.create(Registries.CONFIGURED_FEATURE, key);
-    }
-
-    private static ResourceKey<PlacedFeature> placedFeatureResourceKey(ResourceLocation key) {
-        return ResourceKey.create(Registries.PLACED_FEATURE, key);
-    }
-
-    public static DatapackBuiltinEntriesProvider datpackEntriesProvider(final PackOutput output, final CompletableFuture<HolderLookup.Provider> registries) {
-        RegistrySetBuilder coreBuilder = new RegistrySetBuilder();
-
-        coreBuilder.add(Registries.STRUCTURE, context -> {
-            getStructures(context).forEach((r, f) -> {
-                context.register(r, f);
-            });
-        });
-
-        coreBuilder.add(Registries.STRUCTURE_SET, context -> {
-            getStructureSets(context).forEach((r, f) -> {
-                context.register(ResourceKey.create(Registries.STRUCTURE_SET, r), f);
-            });
-        });
-
-        coreBuilder.add(Registries.CONFIGURED_FEATURE, context -> {
-            getConfiguredFeatures().forEach((r, f) -> {
-                context.register(ResourceKey.create(Registries.CONFIGURED_FEATURE, r), f);
-            });
-        });
-
-        coreBuilder.add(Registries.PLACED_FEATURE, context -> {
-            getPlacedFeatures(context).forEach((r, f) -> {
-                context.register(ResourceKey.create(Registries.PLACED_FEATURE, r), f);
-            });
-        });
-
-        coreBuilder.add(ForgeRegistries.Keys.BIOME_MODIFIERS, context -> {
-            getBiomeModifiers(context).forEach((r, f) -> {
-                context.register(ResourceKey.create(ForgeRegistries.Keys.BIOME_MODIFIERS, r), f);
-            });
-        });
-
-        return new DatapackBuiltinEntriesProvider(output, registries, coreBuilder, Set.of(Constants.MOD_ID));
     }
 
     private static Map<ResourceKey<Structure>, Structure> getStructures(BootstapContext<Structure> context) {
@@ -171,6 +117,32 @@ public class WorldGenProvider {
         return map;
     }
 
+    public static void addToRegistrySetBuilder(RegistrySetBuilder builder) {
+        builder.add(Registries.STRUCTURE, context -> {
+            WorldGenData.getStructures(context).forEach((r, f) -> {
+                context.register(r, f);
+            });
+        });
+
+        builder.add(Registries.STRUCTURE_SET, context -> {
+            WorldGenData.getStructureSets(context).forEach((r, f) -> {
+                context.register(ResourceKey.create(Registries.STRUCTURE_SET, r), f);
+            });
+        });
+
+        builder.add(Registries.CONFIGURED_FEATURE, context -> {
+            WorldGenData.getConfiguredFeatures().forEach((r, f) -> {
+                context.register(ResourceKey.create(Registries.CONFIGURED_FEATURE, r), f);
+            });
+        });
+
+        builder.add(Registries.PLACED_FEATURE, context -> {
+            WorldGenData.getPlacedFeatures(context).forEach((r, f) -> {
+                context.register(ResourceKey.create(Registries.PLACED_FEATURE, r), f);
+            });
+        });
+    }
+
     private static List<PlacementModifier> orePlacement(PlacementModifier placement, PlacementModifier modifier) {
         return List.of(placement, InSquarePlacement.spread(), modifier, BiomeFilter.biome());
     }
@@ -182,26 +154,4 @@ public class WorldGenProvider {
     private static List<PlacementModifier> heightmapPlacement(int rarity) {
         return List.of(RarityFilter.onAverageOnceEvery(rarity), InSquarePlacement.spread(), PlacementUtils.HEIGHTMAP, BiomeFilter.biome());
     }
-
-    public static Map<ResourceLocation, BiomeModifier> getBiomeModifiers(BootstapContext<BiomeModifier> context) {
-        final Map<ResourceLocation, BiomeModifier> entries = Maps.newHashMap();
-
-        HolderGetter<PlacedFeature> holdergetter = context.lookup(Registries.PLACED_FEATURE);
-
-        final HolderSet.Named<Biome> overworldTag = context.lookup(Registries.BIOME).getOrThrow(BiomeTags.IS_OVERWORLD);
-        final HolderSet.Named<Biome> ruinTag = context.lookup(Registries.BIOME).getOrThrow(WorldTags.Biomes.SUPPORTS_RUIN_GENERATION);
-        final HolderSet.Named<Biome> spireTag = context.lookup(Registries.BIOME).getOrThrow(Tags.Biomes.IS_MOUNTAIN);
-
-        final BiomeModifier randomite = new ForgeBiomeModifiers.AddFeaturesBiomeModifier(overworldTag, HolderSet.direct(holdergetter.getOrThrow(placedFeatureResourceKey(RANDOMITE_KEY))), Decoration.UNDERGROUND_ORES);
-        entries.put(RANDOMITE_BIOME_MODIFIER_NAME, randomite);
-        final BiomeModifier gunpowderReeds = new ForgeBiomeModifiers.AddFeaturesBiomeModifier(overworldTag, HolderSet.direct(holdergetter.getOrThrow(placedFeatureResourceKey(GUNPOWDER_REED_KEY))), Decoration.VEGETAL_DECORATION);
-        entries.put(GUNPOWDER_REEDS_BIOME_MODIFIER_NAME, gunpowderReeds);
-        final BiomeModifier ruins = new ForgeBiomeModifiers.AddFeaturesBiomeModifier(ruinTag, HolderSet.direct(holdergetter.getOrThrow(placedFeatureResourceKey(RUIN_KEY))), Decoration.SURFACE_STRUCTURES);
-        entries.put(RUINS_BIOME_MODIFIER_NAME, ruins);
-        final BiomeModifier spires = new ForgeBiomeModifiers.AddFeaturesBiomeModifier(spireTag, HolderSet.direct(holdergetter.getOrThrow(placedFeatureResourceKey(SPIRE_KEY))), Decoration.SURFACE_STRUCTURES);
-        entries.put(SPIRES_BIOME_MODIFIER_NAME, spires);
-
-        return entries;
-    }
-
 }

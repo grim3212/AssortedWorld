@@ -1,0 +1,24 @@
+{
+  "values": [
+    {
+      "id": "#forge:is_dry/overworld",
+      "required": false
+    },
+    {
+      "id": "#forge:is_sparse/overworld",
+      "required": false
+    },
+    {
+      "id": "#forge:is_plains",
+      "required": false
+    },
+    {
+      "id": "#forge:is_dense/overworld",
+      "required": false
+    },
+    {
+      "id": "#forge:is_coniferous",
+      "required": false
+    }
+  ]
+}

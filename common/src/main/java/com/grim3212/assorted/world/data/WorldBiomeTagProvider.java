@@ -31,10 +31,10 @@ public class WorldBiomeTagProvider extends TagsProvider<Biome> {
     }
 
     public void addCommonTags(Function<TagKey<Biome>, TagAppender<Biome>> tagger) {
-        tagger.apply(WorldTags.Biomes.SUPPORTS_RUIN_GENERATION).addTag(LibCommonTags.Biomes.IS_DRY_OVERWORLD).addTag(LibCommonTags.Biomes.IS_SPARSE_OVERWORLD).addTag(LibCommonTags.Biomes.IS_PLAINS).addTag(LibCommonTags.Biomes.IS_DENSE_OVERWORLD).addTag(LibCommonTags.Biomes.IS_CONIFEROUS);
-        tagger.apply(WorldTags.Biomes.HAS_FOUNTAIN).addTag(LibCommonTags.Biomes.IS_SWAMP);
-        tagger.apply(WorldTags.Biomes.HAS_PYRAMID).addTag(BiomeTags.HAS_DESERT_PYRAMID);
-        tagger.apply(WorldTags.Biomes.HAS_SNOWBALL).addTag(LibCommonTags.Biomes.IS_SNOWY);
-        tagger.apply(WorldTags.Biomes.HAS_WATER_DOME).addTag(BiomeTags.IS_OCEAN);
+        tagger.apply(WorldTags.Biomes.SUPPORTS_RUIN_GENERATION).addOptionalTag(LibCommonTags.Biomes.IS_DRY_OVERWORLD.location()).addOptionalTag(LibCommonTags.Biomes.IS_SPARSE_OVERWORLD.location()).addOptionalTag(LibCommonTags.Biomes.IS_PLAINS.location()).addOptionalTag(LibCommonTags.Biomes.IS_DENSE_OVERWORLD.location()).addOptionalTag(LibCommonTags.Biomes.IS_CONIFEROUS.location());
+        tagger.apply(WorldTags.Biomes.HAS_FOUNTAIN).addOptionalTag(LibCommonTags.Biomes.IS_SWAMP.location());
+        tagger.apply(WorldTags.Biomes.HAS_PYRAMID).addOptionalTag(BiomeTags.HAS_DESERT_PYRAMID.location());
+        tagger.apply(WorldTags.Biomes.HAS_SNOWBALL).addOptionalTag(LibCommonTags.Biomes.IS_SNOWY.location());
+        tagger.apply(WorldTags.Biomes.HAS_WATER_DOME).addOptionalTag(BiomeTags.IS_OCEAN.location());
     }
 }
