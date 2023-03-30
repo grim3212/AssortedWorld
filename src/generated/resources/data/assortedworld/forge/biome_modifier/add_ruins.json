@@ -1,6 +1,0 @@
-{
-  "type": "forge:add_features",
-  "biomes": "#assortedworld:supports_ruin_generation",
-  "features": "assortedworld:ruin",
-  "step": "surface_structures"
-}

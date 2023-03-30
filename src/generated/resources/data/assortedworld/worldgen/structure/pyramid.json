@@ -1,6 +1,0 @@
-{
-  "type": "assortedworld:pyramid",
-  "biomes": "#assortedworld:has_structure/pyramid",
-  "spawn_overrides": {},
-  "step": "surface_structures"
-}

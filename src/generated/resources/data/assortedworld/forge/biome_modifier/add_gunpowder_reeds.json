@@ -1,6 +1,0 @@
-{
-  "type": "forge:add_features",
-  "biomes": "#minecraft:is_overworld",
-  "features": "assortedworld:patch_gunpowder_reed",
-  "step": "vegetal_decoration"
-}

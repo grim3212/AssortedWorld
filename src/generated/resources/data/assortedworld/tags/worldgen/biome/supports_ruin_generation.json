@@ -1,9 +1,0 @@
-{
-  "values": [
-    "#forge:is_dry/overworld",
-    "#forge:is_sparse/overworld",
-    "#forge:is_plains",
-    "#forge:is_dense/overworld",
-    "#forge:is_coniferous"
-  ]
-}
