@@ -1,5 +1,7 @@
 package com.grim3212.assorted.world.data;
 
+import com.google.common.collect.Lists;
+import com.grim3212.assorted.lib.data.LibWorldGenProvider;
 import com.grim3212.assorted.world.Constants;
 import com.grim3212.assorted.world.api.WorldTags;
 import com.grim3212.assorted.world.common.block.WorldBlocks;
@@ -11,6 +13,7 @@ import com.grim3212.assorted.world.common.gen.structure.snowball.SnowballStructu
 import com.grim3212.assorted.world.common.gen.structure.waterdome.WaterDomeStructure;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderGetter;
+import net.minecraft.core.Registry;
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstapContext;
@@ -41,7 +44,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class WorldGenData {
+public class WorldGenData extends LibWorldGenProvider {
 
     private static final ResourceLocation SNOWBALL_KEY = new ResourceLocation(Constants.MOD_ID, "snowball");
     private static final ResourceLocation PYRAMID_KEY = new ResourceLocation(Constants.MOD_ID, "pyramid");
@@ -117,7 +120,8 @@ public class WorldGenData {
         return map;
     }
 
-    public static void addToRegistrySetBuilder(RegistrySetBuilder builder) {
+    @Override
+    public void addToWorldGem(RegistrySetBuilder builder) {
         builder.add(Registries.STRUCTURE, context -> {
             WorldGenData.getStructures(context).forEach((r, f) -> {
                 context.register(r, f);
@@ -141,6 +145,11 @@ public class WorldGenData {
                 context.register(ResourceKey.create(Registries.PLACED_FEATURE, r), f);
             });
         });
+    }
+
+    @Override
+    public List<ResourceKey<? extends Registry<?>>> registries() {
+        return Lists.newArrayList(Registries.STRUCTURE, Registries.STRUCTURE_SET, Registries.CONFIGURED_FEATURE, Registries.PLACED_FEATURE);
     }
 
     private static List<PlacementModifier> orePlacement(PlacementModifier placement, PlacementModifier modifier) {

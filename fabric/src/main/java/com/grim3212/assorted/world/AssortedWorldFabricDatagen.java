@@ -1,8 +1,9 @@
-package com.grim3212.assorted.world.common.data;
+package com.grim3212.assorted.world;
 
 import com.grim3212.assorted.lib.data.FabricBiomeTagProvider;
 import com.grim3212.assorted.lib.data.FabricBlockTagProvider;
 import com.grim3212.assorted.lib.data.FabricItemTagProvider;
+import com.grim3212.assorted.lib.data.FabricWorldGenProvider;
 import com.grim3212.assorted.world.data.*;
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
@@ -25,11 +26,20 @@ public class AssortedWorldFabricDatagen implements DataGeneratorEntrypoint {
         pack.addProvider((output, registriesFuture) -> new WorldRecipes(output));
         pack.addProvider((output, registriesFuture) -> new LootTableProvider(output, Collections.emptySet(), List.of(new LootTableProvider.SubProviderEntry(WorldBlockLoot::new, LootContextParamSets.BLOCK))));
 
-        pack.addProvider((output, registriesFuture) -> new FabricWorldGenProvider(output, registriesFuture));
+        pack.addProvider((output, registriesFuture) -> new FabricWorldGenProvider(output, registriesFuture, Constants.MOD_ID, getWorldGenData()));
     }
 
     @Override
     public void buildRegistry(RegistrySetBuilder registryBuilder) {
-        WorldGenData.addToRegistrySetBuilder(registryBuilder);
+        getWorldGenData().addToWorldGem(registryBuilder);
+    }
+
+    private WorldGenData worldGenData;
+
+    private WorldGenData getWorldGenData() {
+        if (this.worldGenData == null) {
+            this.worldGenData = new WorldGenData();
+        }
+        return this.worldGenData;
     }
 }

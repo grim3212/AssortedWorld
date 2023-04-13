@@ -142,6 +142,11 @@ processResources {
     configure { finalizedBy(replaceResources) }
 }
 
+sourcesJar {
+    // Exclude datagenerator .cache directory
+    exclude '.cache'
+}
+
 jar.finalizedBy('reobfJar')
 
 publishing {

@@ -6,12 +6,11 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.tags.TagKey;
-import net.minecraft.util.Tuple;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 public class WorldItemTagProvider extends LibItemTagProvider {
@@ -21,8 +20,8 @@ public class WorldItemTagProvider extends LibItemTagProvider {
     }
 
     @Override
-    public void addCommonTags(Function<TagKey<Item>, IntrinsicTagAppender<Item>> tagger, Consumer<Tuple<TagKey<Block>, TagKey<Item>>> copier) {
-        copier.accept(new Tuple<>(WorldTags.Blocks.ORES_RANDOMITE, WorldTags.Items.ORES_RANDOMITE));
-        copier.accept(new Tuple<>(WorldTags.Blocks.RUNES, WorldTags.Items.RUNES));
+    public void addCommonTags(Function<TagKey<Item>, IntrinsicTagAppender<Item>> tagger, BiConsumer<TagKey<Block>, TagKey<Item>> copier) {
+        copier.accept(WorldTags.Blocks.ORES_RANDOMITE, WorldTags.Items.ORES_RANDOMITE);
+        copier.accept(WorldTags.Blocks.RUNES, WorldTags.Items.RUNES);
     }
 }
