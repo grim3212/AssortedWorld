@@ -4,7 +4,6 @@ import com.grim3212.assorted.lib.data.LibItemTagProvider;
 import com.grim3212.assorted.world.api.WorldTags;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
-import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -15,7 +14,7 @@ import java.util.function.Function;
 
 public class WorldItemTagProvider extends LibItemTagProvider {
 
-    public WorldItemTagProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookup, TagsProvider<Block> blockTags) {
+    public WorldItemTagProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookup, CompletableFuture<TagLookup<Block>> blockTags) {
         super(output, lookup, blockTags);
     }
 

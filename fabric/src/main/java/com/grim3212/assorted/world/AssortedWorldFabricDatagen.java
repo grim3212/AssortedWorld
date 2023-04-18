@@ -20,7 +20,7 @@ public class AssortedWorldFabricDatagen implements DataGeneratorEntrypoint {
         FabricDataGenerator.Pack pack = fabricDataGenerator.createPack();
 
         FabricBlockTagProvider provider = pack.addProvider((output, registriesFuture) -> new FabricBlockTagProvider(output, registriesFuture, new WorldBlockTagProvider(output, registriesFuture)));
-        pack.addProvider((output, registriesFuture) -> new FabricItemTagProvider(output, registriesFuture, provider, new WorldItemTagProvider(output, registriesFuture, provider)));
+        pack.addProvider((output, registriesFuture) -> new FabricItemTagProvider(output, registriesFuture, provider.contentsGetter(), new WorldItemTagProvider(output, registriesFuture, provider.contentsGetter())));
         pack.addProvider((output, registriesFuture) -> new FabricBiomeTagProvider(output, registriesFuture, new WorldBiomeTagProvider(output, registriesFuture)));
 
         pack.addProvider((output, registriesFuture) -> new WorldRecipes(output));

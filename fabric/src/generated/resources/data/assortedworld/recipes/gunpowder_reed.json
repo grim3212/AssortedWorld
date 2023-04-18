@@ -16,5 +16,6 @@
   ],
   "result": {
     "item": "assortedworld:gunpowder_reed"
-  }
+  },
+  "show_notification": true
 }

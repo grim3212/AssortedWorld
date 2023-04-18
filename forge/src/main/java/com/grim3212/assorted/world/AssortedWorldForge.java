@@ -40,7 +40,7 @@ public class AssortedWorldForge {
         // Server
         ForgeBlockTagProvider blockTagProvider = new ForgeBlockTagProvider(packOutput, lookupProvider, fileHelper, Constants.MOD_ID, new WorldBlockTagProvider(packOutput, lookupProvider));
         datagenerator.addProvider(event.includeServer(), blockTagProvider);
-        datagenerator.addProvider(event.includeServer(), new ForgeItemTagProvider(packOutput, lookupProvider, blockTagProvider, fileHelper, Constants.MOD_ID, new WorldItemTagProvider(packOutput, lookupProvider, blockTagProvider)));
+        datagenerator.addProvider(event.includeServer(), new ForgeItemTagProvider(packOutput, lookupProvider, blockTagProvider.contentsGetter(), fileHelper, Constants.MOD_ID, new WorldItemTagProvider(packOutput, lookupProvider, blockTagProvider.contentsGetter())));
         datagenerator.addProvider(event.includeServer(), new ForgeBiomeTagProvider(packOutput, lookupProvider, fileHelper, Constants.MOD_ID, new WorldBiomeTagProvider(packOutput, lookupProvider)));
         datagenerator.addProvider(event.includeServer(), new WorldRecipes(packOutput));
         datagenerator.addProvider(event.includeServer(), new LootTableProvider(packOutput, Collections.emptySet(), List.of(new LootTableProvider.SubProviderEntry(WorldBlockLoot::new, LootContextParamSets.BLOCK))));
