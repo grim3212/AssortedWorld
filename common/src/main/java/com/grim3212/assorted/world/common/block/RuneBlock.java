@@ -16,7 +16,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
+import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.BlockHitResult;
 
 public class RuneBlock extends Block {
@@ -24,7 +25,7 @@ public class RuneBlock extends Block {
     private final RuneType runeType;
 
     public RuneBlock(RuneType runeType) {
-        super(Properties.of(Material.STONE).sound(SoundType.STONE).strength(50f));
+        super(Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).sound(SoundType.STONE).strength(50f));
         this.runeType = runeType;
     }
 

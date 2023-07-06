@@ -163,5 +163,6 @@
       ],
       "rolls": 3.0
     }
-  ]
+  ],
+  "random_sequence": "assortedworld:blocks/randomite_ore"
 }

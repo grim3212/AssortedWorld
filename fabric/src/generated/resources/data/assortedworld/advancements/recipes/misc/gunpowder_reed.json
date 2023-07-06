@@ -28,5 +28,6 @@
     "recipes": [
       "assortedworld:gunpowder_reed"
     ]
-  }
+  },
+  "sends_telemetry_event": false
 }

@@ -11,8 +11,9 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DropExperienceBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.material.Material;
-import net.minecraft.world.level.material.MaterialColor;
+import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
+import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.material.PushReaction;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -22,8 +23,8 @@ public class WorldBlocks {
     public static final RegistryProvider<Block> BLOCKS = RegistryProvider.create(Registries.BLOCK, Constants.MOD_ID);
     public static final RegistryProvider<Item> ITEMS = RegistryProvider.create(Registries.ITEM, Constants.MOD_ID);
 
-    public static final IRegistryObject<Block> RANDOMITE_ORE = register("randomite_ore", () -> new DropExperienceBlock(BlockBehaviour.Properties.of(Material.STONE).sound(SoundType.STONE).strength(1.6f, 1.0f).requiresCorrectToolForDrops(), UniformInt.of(2, 5)));
-    public static final IRegistryObject<Block> DEEPSLATE_RANDOMITE_ORE = register("deepslate_randomite_ore", () -> new DropExperienceBlock(BlockBehaviour.Properties.of(Material.STONE, MaterialColor.DEEPSLATE).sound(SoundType.STONE).strength(4.5F, 3.0f).requiresCorrectToolForDrops(), UniformInt.of(2, 5)));
+    public static final IRegistryObject<Block> RANDOMITE_ORE = register("randomite_ore", () -> new DropExperienceBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).sound(SoundType.STONE).strength(1.6f, 1.0f).requiresCorrectToolForDrops(), UniformInt.of(2, 5)));
+    public static final IRegistryObject<Block> DEEPSLATE_RANDOMITE_ORE = register("deepslate_randomite_ore", () -> new DropExperienceBlock(BlockBehaviour.Properties.of().mapColor(MapColor.DEEPSLATE).instrument(NoteBlockInstrument.BASEDRUM).sound(SoundType.STONE).strength(4.5F, 3.0f).requiresCorrectToolForDrops(), UniformInt.of(2, 5)));
 
     public static final IRegistryObject<RuneBlock> UR_RUNE = register("ur_rune", () -> new RuneBlock(RuneBlock.RuneType.UR));
     public static final IRegistryObject<RuneBlock> EOH_RUNE = register("eoh_rune", () -> new RuneBlock(RuneBlock.RuneType.EOH));
@@ -42,7 +43,7 @@ public class WorldBlocks {
     public static final IRegistryObject<RuneBlock> THORN_RUNE = register("thorn_rune", () -> new RuneBlock(RuneBlock.RuneType.THORN));
     public static final IRegistryObject<RuneBlock> OS_RUNE = register("os_rune", () -> new RuneBlock(RuneBlock.RuneType.OS));
 
-    public static final IRegistryObject<GunpowderReedBlock> GUNPOWDER_REED = register("gunpowder_reed", () -> new GunpowderReedBlock(BlockBehaviour.Properties.of(Material.PLANT).noCollission().randomTicks().instabreak().lightLevel((l) -> 5).explosionResistance(200F).sound(SoundType.GRASS)));
+    public static final IRegistryObject<GunpowderReedBlock> GUNPOWDER_REED = register("gunpowder_reed", () -> new GunpowderReedBlock(BlockBehaviour.Properties.of().mapColor(MapColor.PLANT).pushReaction(PushReaction.DESTROY).isRedstoneConductor((state, getter, pos) -> false).forceSolidOff().noCollission().randomTicks().instabreak().lightLevel((l) -> 5).explosionResistance(200F).sound(SoundType.GRASS)));
 
     private static <T extends Block> IRegistryObject<T> register(String name, Supplier<? extends T> sup) {
         return register(name, sup, block -> item(block));

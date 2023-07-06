@@ -163,5 +163,6 @@
       ],
       "rolls": 3.0
     }
-  ]
+  ],
+  "random_sequence": "assortedworld:blocks/deepslate_randomite_ore"
 }

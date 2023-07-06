@@ -30,5 +30,6 @@
     "recipes": [
       "assortedworld:gunpowder"
     ]
-  }
+  },
+  "sends_telemetry_event": false
 }
