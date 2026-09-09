@@ -13,6 +13,14 @@ public class WorldLootTables {
     public static final ResourceKey<LootTable> CHESTS_PYRAMID = create("chests/pyramid");
     public static final ResourceKey<LootTable> CHESTS_RUIN = create("chests/ruin");
 
+    // One table per water dome ribbing material. The material is rolled 1-in-20 for each of the
+    // three precious variants, so cobblestone is the everyday dome and the other three are the
+    // rare ones; the loot climbs in the same order.
+    public static final ResourceKey<LootTable> CHESTS_WATER_DOME_COBBLESTONE = create("chests/water_dome/cobblestone");
+    public static final ResourceKey<LootTable> CHESTS_WATER_DOME_GLOWSTONE = create("chests/water_dome/glowstone");
+    public static final ResourceKey<LootTable> CHESTS_WATER_DOME_IRON = create("chests/water_dome/iron");
+    public static final ResourceKey<LootTable> CHESTS_WATER_DOME_OBSIDIAN = create("chests/water_dome/obsidian");
+
     private static ResourceKey<LootTable> create(String name) {
         return ResourceKey.create(Registries.LOOT_TABLE, Identifier.fromNamespaceAndPath(Constants.MOD_ID, name));
     }
