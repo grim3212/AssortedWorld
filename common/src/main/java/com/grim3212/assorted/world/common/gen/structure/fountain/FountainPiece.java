@@ -76,6 +76,21 @@ public class FountainPiece extends ScatteredFeaturePiece {
             int halfWidth = halfWidth(height);
             int colHeight = 0;
 
+            // Both of these exist because postProcess runs once per chunk the piece overlaps. The
+            // counters are instance fields that were never reset, so the first pass spent the whole
+            // fountain's spawner and chest budget and every later pass placed none — harmless only
+            // while every pass also rewrote the whole fountain. Now that a pass writes just its own
+            // chunk, the budget has to be spent from scratch each time, and the block decisions have
+            // to come from a source that does not change between passes or the chunks disagree.
+            // Both of these must come from the box, and only after updateAverageGroundHeight above
+            // has moved it: the pos argument is read before postProcess runs, so it carries the
+            // pre-move height on the first pass and the post-move height on every later one.
+            BlockPos origin = RuinUtil.pieceOrigin(this.getBoundingBox());
+            RandomSource pieceRandom = RuinUtil.pieceRandom(reader, this.getBoundingBox());
+            this.placedSpawners = 0;
+            this.placedChests = 0;
+            this.spawnerSkipCount = 0;
+
             Map<BlockPos, Block> blockCache = new HashMap<>();
 
             BlockPos newPos;
@@ -85,12 +100,19 @@ public class FountainPiece extends ScatteredFeaturePiece {
                     for (int y = -1; y <= colHeight; y++) {
                         newPos = new BlockPos(x, y, z);
 
-                        blockCache.put(pos.offset(newPos), blockToPlace(rand, newPos, colHeight));
+                        blockCache.put(origin.offset(newPos), blockToPlace(pieceRandom, newPos, colHeight));
                     }
                 }
             }
 
-            blockCache.forEach((p, b) -> setBlockState(reader, p, b.defaultBlockState(), rand));
+            // Only the part inside the chunk being generated is written. Writing the rest reached
+            // into chunks the generator had not cleared us for, which is what the "unsafe terrain
+            // read during worldgen" error was reporting.
+            blockCache.forEach((p, b) -> {
+                if (bb.isInside(p)) {
+                    setBlockState(reader, p, b.defaultBlockState(), rand);
+                }
+            });
         }
     }
 

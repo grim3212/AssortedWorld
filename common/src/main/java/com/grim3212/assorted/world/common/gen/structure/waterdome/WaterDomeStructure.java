@@ -106,18 +106,25 @@ public class WaterDomeStructure extends Structure {
         // dome's pieces disagreed with each other. One roll per dome, and it decides the loot too.
         WaterDomeType domeType = WaterDomeType.random(rand);
 
-        // A dome either has loot or it does not; the ones that do get one or two chests, spread
-        // over randomly chosen pieces.
+        // A dome either has loot or it does not; the ones that do get one or two chests. The first
+        // always goes in the rune piece. A dome is a chain of lobes marching in one direction that
+        // averages 50 blocks end to end, so a chest dropped in a uniformly chosen lobe sits a
+        // median 25 blocks from the rune and reads as belonging to some other structure entirely.
+        // Anchoring one to the rune lobe makes that lobe the dome's treasure chamber; the second,
+        // when there is one, is scattered down the chain as a reason to follow it.
         int[] chestsPerPiece = new int[pieceCount];
         if (rand.nextDouble() < WorldCommonMod.COMMON_CONFIG.waterDomeChestChance.get()) {
-            int chestCount = 1 + rand.nextInt(2);
-            for (int idx = 0; idx < chestCount; idx++) {
+            chestsPerPiece[0]++;
+            if (rand.nextBoolean()) {
                 chestsPerPiece[rand.nextInt(pieceCount)]++;
             }
         }
 
         for (int idx = 0; idx < pieceCount; idx++) {
-            builder.addPiece(new WaterDomePiece(context.random(), blockpos.offset(xs[idx], 0, zs[idx]), rads[idx], xs[idx], zs[idx], idx == 0, runeIndex, domeType, chestsPerPiece[idx]));
+            // xs/zs are the lobe centres, and the piece now builds its box around that centre. The
+            // spacing between consecutive lobes is therefore exactly the step rolled above, as it
+            // has always been.
+            builder.addPiece(new WaterDomePiece(context.random(), blockpos.offset(xs[idx], 0, zs[idx]), rads[idx], idx == 0, runeIndex, domeType, chestsPerPiece[idx]));
         }
     }
 }

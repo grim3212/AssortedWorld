@@ -2,11 +2,16 @@ package com.grim3212.assorted.world.common.util;
 
 import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.world.common.block.WorldBlocks;
+import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.random.WeightedRandom;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.levelgen.LegacyRandomSource;
+import net.minecraft.world.level.levelgen.WorldgenRandom;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -104,6 +109,42 @@ public class RuinUtil {
      */
     public static int randomRuneIndex(RandomSource random) {
         return random.nextInt(WorldBlocks.runeBlocks().length);
+    }
+
+    /**
+     * A random source that depends only on where a structure piece is, never on which chunk is
+     * being generated.
+     * <p>
+     * {@code postProcess} runs once per chunk a piece overlaps and is handed a fresh
+     * {@link RandomSource} each time, so anything decided from that one differs between passes.
+     * That was invisible while every pass rewrote the whole structure and the last one simply won.
+     * Now that each pass writes only its own chunk, two passes that disagree leave a seam along the
+     * chunk border, so every block decision has to come from here instead.
+     */
+    public static RandomSource pieceRandom(WorldGenLevel reader, BoundingBox boundingBox) {
+        // setLargeFeatureWithSalt is vanilla's own "same answer for this spot in this world" seeding
+        // and is not deprecated, unlike Mth.getSeed. minY rides along as the salt so two pieces
+        // stacked over one another do not share a stream.
+        WorldgenRandom random = new WorldgenRandom(new LegacyRandomSource(0L));
+        random.setLargeFeatureWithSalt(reader.getSeed(), boundingBox.minX(), boundingBox.minZ(), boundingBox.minY());
+        return random;
+    }
+
+    /**
+     * The origin a scattered-feature piece should build from: the centre of its own bounding box in
+     * x and z, at the box floor in y.
+     * <p>
+     * This is what {@code StructureStart.placeInChunk} passes as {@code postProcess}'s {@code pos}
+     * argument — but it reads the box <em>before</em> calling {@code postProcess}, and
+     * {@code ScatteredFeaturePiece.updateAverageGroundHeight} <em>moves the box vertically</em> the
+     * first time it runs. So that argument is the pre-move height on the first pass and the
+     * post-move height on every later one. It never showed while each pass rewrote the whole
+     * structure and the last one won; now that a pass writes only its own chunk, the chunks land at
+     * two different heights and the structure comes out in slabs. Call this after
+     * {@code updateAverageGroundHeight} instead and every pass agrees.
+     */
+    public static BlockPos pieceOrigin(BoundingBox boundingBox) {
+        return new BlockPos(boundingBox.getCenter().getX(), boundingBox.minY(), boundingBox.getCenter().getZ());
     }
 
     public static Block runeAt(int index) {

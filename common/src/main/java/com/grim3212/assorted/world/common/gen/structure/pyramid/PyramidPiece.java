@@ -1,7 +1,6 @@
 package com.grim3212.assorted.world.common.gen.structure.pyramid;
 
 import com.google.common.collect.Lists;
-import com.mojang.serialization.Codec;
 import com.grim3212.assorted.world.api.WorldLootTables;
 import com.grim3212.assorted.world.common.gen.structure.WorldStructures;
 import com.grim3212.assorted.world.common.util.RuinUtil;
@@ -30,8 +29,6 @@ import java.util.Map;
 
 public class PyramidPiece extends ScatteredFeaturePiece {
 
-    private static final Codec<List<BlockPos>> BLOCK_POS_LIST_CODEC = BlockPos.CODEC.listOf();
-
     private final int maxHeight;
     private final int type;
     private final int runeIndex;
@@ -54,10 +51,10 @@ public class PyramidPiece extends ScatteredFeaturePiece {
         this.type = tagCompound.getIntOr("type", 0);
         this.runeIndex = tagCompound.getIntOr("runeIndex", 0);
 
-        // NbtUtils lost its BlockPos helpers; positions round trip through BlockPos.CODEC now,
-        // which stores each one as an int array rather than an {X,Y,Z} compound.
-        this.placedSpawners = Lists.newArrayList(tagCompound.read("placedSpawners", BLOCK_POS_LIST_CODEC).orElse(List.of()));
-        this.placedChests = Lists.newArrayList(tagCompound.read("placedChests", BLOCK_POS_LIST_CODEC).orElse(List.of()));
+        // Not read back any more: postProcess regenerates them from a position-seeded source, so
+        // they are working state for one pass rather than something that has to survive a reload.
+        this.placedSpawners = Lists.newArrayList();
+        this.placedChests = Lists.newArrayList();
     }
 
     @Override
@@ -66,21 +63,28 @@ public class PyramidPiece extends ScatteredFeaturePiece {
         tagCompound.putInt("maxHeight", this.maxHeight);
         tagCompound.putInt("type", this.type);
         tagCompound.putInt("runeIndex", this.runeIndex);
-
-        tagCompound.store("placedSpawners", BLOCK_POS_LIST_CODEC, this.placedSpawners);
-        tagCompound.store("placedChests", BLOCK_POS_LIST_CODEC, this.placedChests);
     }
 
     @Override
     public void postProcess(WorldGenLevel reader, StructureManager structureManager, ChunkGenerator generator, RandomSource rand, BoundingBox bb, ChunkPos chunkPos, BlockPos pos) {
         if (this.updateAverageGroundHeight(reader, bb, 0)) {
             Map<BlockPos, Block> blockCache = new HashMap<>();
-            BlockPos offSetPos = pos.below(maxHeight / 2);
+
+            // From the box, and only after updateAverageGroundHeight above has moved it: the pos
+            // argument is read before postProcess runs, so it carries the pre-move height on the
+            // first pass and the post-move height on every later one.
+            BlockPos offSetPos = RuinUtil.pieceOrigin(this.getBoundingBox()).below(maxHeight / 2);
 
             int halfWidth = halfWidth(maxHeight);
             int colHeight = 0;
 
-            boolean genBlockEntities = this.placedSpawners.size() == 0 && this.placedChests.size() == 0;
+            // Every pass works the whole pyramid out again, from a source that depends only on
+            // where it stands. The spawner and chest positions used to be generated once and
+            // carried in NBT precisely because a second pass would have re-rolled them differently;
+            // making the passes agree is what lets each of them write only its own chunk.
+            RandomSource pieceRandom = RuinUtil.pieceRandom(reader, this.getBoundingBox());
+            this.placedSpawners.clear();
+            this.placedChests.clear();
 
             BlockPos newPos;
             for (int x = -halfWidth; x <= halfWidth; x++) {
@@ -89,18 +93,23 @@ public class PyramidPiece extends ScatteredFeaturePiece {
                     for (int y = -1; y <= colHeight; y++) {
                         newPos = new BlockPos(x, y, z);
 
-                        blockCache.put(offSetPos.offset(newPos), blockToPlace(rand, newPos, colHeight, genBlockEntities));
+                        blockCache.put(offSetPos.offset(newPos), blockToPlace(pieceRandom, newPos, colHeight));
                     }
                 }
             }
 
-            this.placedSpawners.forEach((p) -> blockCache.put(offSetPos.offset(p), Blocks.SPAWNER));
-            this.placedChests.forEach((p) -> blockCache.put(offSetPos.offset(p), Blocks.CHEST));
-
             // Outside the triple for is actually saving a lot of time
             // 38 size was generating in about ~16s
             // Now it is generating in about ~2s
-            blockCache.forEach((p, b) -> setBlockState(reader, p, b.defaultBlockState(), rand));
+            //
+            // Only the part inside the chunk being generated is written. Writing the rest reached
+            // into chunks the generator had not cleared us for, which is what the "unsafe terrain
+            // read during worldgen" error was reporting.
+            blockCache.forEach((p, b) -> {
+                if (bb.isInside(p)) {
+                    setBlockState(reader, p, b.defaultBlockState(), rand);
+                }
+            });
         }
     }
 
@@ -127,7 +136,7 @@ public class PyramidPiece extends ScatteredFeaturePiece {
         }
     }
 
-    private Block blockToPlace(RandomSource random, BlockPos pos, int colHeight, boolean genBlockEntities) {
+    private Block blockToPlace(RandomSource random, BlockPos pos, int colHeight) {
         // Exactly one rune per pyramid, at the centre of the base course regardless of size.
         if (pos.getX() == 0 && pos.getY() == 0 && pos.getZ() == 0) {
             return RuinUtil.runeAt(this.runeIndex);
@@ -142,10 +151,6 @@ public class PyramidPiece extends ScatteredFeaturePiece {
                 return Blocks.SANDSTONE;
             }
         }
-        if (!genBlockEntities) {
-            return Blocks.AIR;
-        }
-
         if (placeSpawner(random, pos, colHeight)) {
             return Blocks.SPAWNER;
         }

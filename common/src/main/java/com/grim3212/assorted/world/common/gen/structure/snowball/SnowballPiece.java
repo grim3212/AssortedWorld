@@ -30,7 +30,11 @@ public class SnowballPiece extends ScatteredFeaturePiece {
     private List<Integer> radii;
 
     public SnowballPiece(RandomSource random, BlockPos pos, int radius, int numCenterPoints) {
-        super(WorldStructures.SNOWBALL_STRUCTURE_PIECE.get(), pos.getX(), pos.getY(), pos.getZ(), radius * 2, radius * (numCenterPoints + 1), radius * 2, getRandomHorizontalDirection(random));
+        // (radius * 2) + 1, not radius * 2: the spheres run from -radius to +radius inclusive about
+        // the box's centre, so a width of radius * 2 left the outermost ring one block outside the
+        // box. Now that writes are clipped to it that block would simply never be placed. The
+        // centre is unchanged, so the snowball itself does not move.
+        super(WorldStructures.SNOWBALL_STRUCTURE_PIECE.get(), pos.getX(), pos.getY(), pos.getZ(), (radius * 2) + 1, radius * (numCenterPoints + 1), (radius * 2) + 1, getRandomHorizontalDirection(random));
         this.radius = radius;
         this.numCenterPoints = numCenterPoints;
         this.runeIndex = RuinUtil.randomRuneIndex(random);
@@ -54,6 +58,11 @@ public class SnowballPiece extends ScatteredFeaturePiece {
     @Override
     public void postProcess(WorldGenLevel reader, StructureManager structureManager, ChunkGenerator generator, RandomSource rand, BoundingBox bb, ChunkPos chunkPos, BlockPos pos) {
         if (this.updateAverageGroundHeight(reader, bb, 0)) {
+            // From the box, and only after updateAverageGroundHeight above has moved it: the pos
+            // argument is read before postProcess runs, so it carries the pre-move height on the
+            // first pass and the post-move height on every later one.
+            BlockPos origin = RuinUtil.pieceOrigin(this.getBoundingBox());
+
             this.centrePoints = Lists.newArrayList(BlockPos.ZERO);
             this.radii = Lists.newArrayList(radius);
 
@@ -64,7 +73,7 @@ public class SnowballPiece extends ScatteredFeaturePiece {
                 int off = newY + rad;
                 rad -= 3;
                 newY = off;
-                if (rad < 3 || pos.getY() + newY + rad > reader.getMaxY()) {
+                if (rad < 3 || origin.getY() + newY + rad > reader.getMaxY()) {
                     break;
                 }
 
@@ -83,19 +92,26 @@ public class SnowballPiece extends ScatteredFeaturePiece {
                         for (int y = -radi; y <= radi; y++) {
                             BlockPos newPoint = new BlockPos(x, y + point.getY(), z);
 
-                            if (pos.getY() + (int) newPoint.getY() > reader.getMaxY()) {
+                            if (origin.getY() + (int) newPoint.getY() > reader.getMaxY()) {
                                 break;
                             }
-                            Block block = blockToPlace(rand, pos, newPoint, point);
+                            Block block = blockToPlace(rand, origin, newPoint, point);
                             if (block != null) {
-                                blockCache.put(new BlockPos(pos.getX() + x, pos.getY() + newPoint.getY(), pos.getZ() + z), block);
+                                blockCache.put(new BlockPos(origin.getX() + x, origin.getY() + newPoint.getY(), origin.getZ() + z), block);
                             }
                         }
                     }
                 }
             }
 
-            blockCache.forEach((p, b) -> reader.setBlock(p, b.defaultBlockState(), 2));
+            // The whole snowball is still worked out on every pass — blockToPlace is purely
+            // geometric, so every pass agrees — but only the part inside the chunk being generated
+            // is written. Writing the rest is what the "unsafe terrain read" error was about.
+            blockCache.forEach((p, b) -> {
+                if (bb.isInside(p)) {
+                    reader.setBlock(p, b.defaultBlockState(), 2);
+                }
+            });
         }
     }
 
