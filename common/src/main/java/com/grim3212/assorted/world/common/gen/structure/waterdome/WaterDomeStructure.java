@@ -2,6 +2,7 @@ package com.grim3212.assorted.world.common.gen.structure.waterdome;
 
 import com.grim3212.assorted.world.WorldCommonMod;
 import com.grim3212.assorted.world.common.gen.structure.WorldStructures;
+import com.grim3212.assorted.world.common.util.RuinUtil;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.ChunkPos;
@@ -76,18 +77,47 @@ public class WaterDomeStructure extends Structure {
 
         int rad = 3 + rand.nextInt(maxRadius);
 
+        // The piece count is rolled once. It used to be re-rolled on every iteration of the loop
+        // condition, which capped the dome well below the configured waterDomePieceMod.
+        int pieceCount = 4 + rand.nextInt(1 + WorldCommonMod.COMMON_CONFIG.waterDomePieceMod.get());
+        int[] xs = new int[pieceCount];
+        int[] zs = new int[pieceCount];
+        int[] rads = new int[pieceCount];
+
         int xOff = 0;
         int zOff = 0;
-        int numPieces = 0;
-        for (int idx = 0; idx < 4 + rand.nextInt(1 + WorldCommonMod.COMMON_CONFIG.waterDomePieceMod.get()); idx++) {
+        for (int idx = 0; idx < pieceCount; idx++) {
             int x = xOff + l * (1 + (1 + rad / 2) + rand.nextInt(1 + rad / 2));
             int z = zOff + i1 * (1 + (1 + rad / 2) + rand.nextInt(1 + rad / 2));
             rad = 3 + rand.nextInt(maxRadius);
             xOff = x;
             zOff = z;
 
-            numPieces++;
-            builder.addPiece(new WaterDomePiece(context.random(), blockpos.offset(x, 0, z), rad, x, z, numPieces == 1));
+            xs[idx] = x;
+            zs[idx] = z;
+            rads[idx] = rad;
+        }
+
+        // Exactly one rune per dome, in the first piece. It is rolled here rather than in
+        // postProcess so it survives the piece being processed once per chunk it overlaps.
+        int runeIndex = RuinUtil.randomRuneIndex(rand);
+
+        // The ribbing material used to be re-rolled inside every postProcess pass, which meant a
+        // dome's pieces disagreed with each other. One roll per dome, and it decides the loot too.
+        WaterDomeType domeType = WaterDomeType.random(rand);
+
+        // A dome either has loot or it does not; the ones that do get one or two chests, spread
+        // over randomly chosen pieces.
+        int[] chestsPerPiece = new int[pieceCount];
+        if (rand.nextDouble() < WorldCommonMod.COMMON_CONFIG.waterDomeChestChance.get()) {
+            int chestCount = 1 + rand.nextInt(2);
+            for (int idx = 0; idx < chestCount; idx++) {
+                chestsPerPiece[rand.nextInt(pieceCount)]++;
+            }
+        }
+
+        for (int idx = 0; idx < pieceCount; idx++) {
+            builder.addPiece(new WaterDomePiece(context.random(), blockpos.offset(xs[idx], 0, zs[idx]), rads[idx], xs[idx], zs[idx], idx == 0, runeIndex, domeType, chestsPerPiece[idx]));
         }
     }
 }

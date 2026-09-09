@@ -1,8 +1,11 @@
 package com.grim3212.assorted.world.common.gen.structure.waterdome;
 
+import com.google.common.collect.Lists;
 import com.grim3212.assorted.world.common.gen.structure.WorldStructures;
 import com.grim3212.assorted.world.common.util.RuinUtil;
+import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
@@ -11,6 +14,9 @@ import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.ChestBlock;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
@@ -19,19 +25,38 @@ import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceSeriali
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 
+import java.util.List;
+
 public class WaterDomePiece extends ScatteredFeaturePiece {
+
+    private static final Codec<List<BlockPos>> BLOCK_POS_LIST_CODEC = BlockPos.CODEC.listOf();
 
     private final int radius;
     private final int xOffset;
     private final int zOffset;
-    private boolean placeRune;
 
-    public WaterDomePiece(RandomSource random, BlockPos pos, int radius, int xOffset, int zOffset, boolean placeRune) {
+    // Only the first piece of a dome carries the structure's single rune, at its own centre. Later
+    // overlapping pieces cannot clear it again because they only replace water.
+    private final boolean placesRune;
+    private final int runeIndex;
+
+    // Rolled once per dome so every piece is ribbed with the same material and every chest in the
+    // dome draws from the same table.
+    private final WaterDomeType domeType;
+
+    // Local offsets on the piece's floor course that get a loot chest. Decided at construction and
+    // serialised, because postProcess runs once per chunk the piece overlaps.
+    private final List<BlockPos> chestOffsets;
+
+    public WaterDomePiece(RandomSource random, BlockPos pos, int radius, int xOffset, int zOffset, boolean placesRune, int runeIndex, WaterDomeType domeType, int chestCount) {
         super(WorldStructures.WATER_DOME_STRUCTURE_PIECE.get(), pos.getX(), pos.getY(), pos.getZ(), (radius * 2) + 1, radius, (radius * 2) + 1, getRandomHorizontalDirection(random));
         this.radius = radius;
         this.xOffset = xOffset;
         this.zOffset = zOffset;
-        this.placeRune = placeRune;
+        this.placesRune = placesRune;
+        this.runeIndex = runeIndex;
+        this.domeType = domeType;
+        this.chestOffsets = rollChestOffsets(random, radius, chestCount);
     }
 
     public WaterDomePiece(StructurePieceSerializationContext context, CompoundTag tagCompound) {
@@ -39,7 +64,10 @@ public class WaterDomePiece extends ScatteredFeaturePiece {
         this.radius = tagCompound.getIntOr("radius", 0);
         this.xOffset = tagCompound.getIntOr("xOffset", 0);
         this.zOffset = tagCompound.getIntOr("zOffset", 0);
-        this.placeRune = tagCompound.getBooleanOr("placeRune", false);
+        this.placesRune = tagCompound.getBooleanOr("placesRune", false);
+        this.runeIndex = tagCompound.getIntOr("runeIndex", 0);
+        this.domeType = WaterDomeType.byOrdinal(tagCompound.getIntOr("domeType", 0));
+        this.chestOffsets = tagCompound.read("chestOffsets", BLOCK_POS_LIST_CODEC).orElse(List.of());
     }
 
     @Override
@@ -48,16 +76,16 @@ public class WaterDomePiece extends ScatteredFeaturePiece {
         tagCompound.putInt("radius", this.radius);
         tagCompound.putInt("xOffset", this.xOffset);
         tagCompound.putInt("zOffset", this.zOffset);
-        tagCompound.putBoolean("placeRune", placeRune);
+        tagCompound.putBoolean("placesRune", this.placesRune);
+        tagCompound.putInt("runeIndex", this.runeIndex);
+        tagCompound.putInt("domeType", this.domeType.ordinal());
+        tagCompound.store("chestOffsets", BLOCK_POS_LIST_CODEC, this.chestOffsets);
     }
 
     @Override
     public void postProcess(WorldGenLevel reader, StructureManager structureManager, ChunkGenerator generator, RandomSource rand, BoundingBox bb, ChunkPos chunkPos, BlockPos pos) {
         BlockPos centerPoint = this.getLocatorPosition();
         int i = reader.getHeight(Heightmap.Types.OCEAN_FLOOR_WG, centerPoint.getX(), centerPoint.getZ());
-
-        // Set type
-        int type = rand.nextInt(20);
 
         // Get correct position
         pos = new BlockPos(pos.getX(), i, pos.getZ());
@@ -67,19 +95,35 @@ public class WaterDomePiece extends ScatteredFeaturePiece {
                 for (int y = -radius; y <= radius; y++) {
                     BlockPos newPoint = new BlockPos(x + xOffset, y, z + zOffset);
 
-                    Block b = blockToPlace(rand, pos, newPoint, type);
+                    // Placed without the water check below: pos.y comes from this piece's own
+                    // locator, so on a sloping seabed the dome's centre is not always water and the
+                    // rune would be dropped.
+                    if (this.placesRune && x == 0 && y == 0 && z == 0) {
+                        reader.setBlock(pos.offset(newPoint), RuinUtil.runeAt(this.runeIndex).defaultBlockState(), 2);
+                        continue;
+                    }
+
+                    Block b = blockToPlace(pos, newPoint, this.domeType);
                     if (b == null) {
                         continue;
                     }
 
                     Block curBlock = reader.getBlockState(pos.offset(newPoint)).getBlock();
-                    if (curBlock == Blocks.WATER) {
-                        reader.setBlock(pos.offset(newPoint), b.defaultBlockState(), 2);
-                    } else {
-                        FluidState state = reader.getFluidState(pos.offset(newPoint));
-                        if (!state.isEmpty() && (state.getType() == Fluids.FLOWING_WATER || state.getType() == Fluids.WATER)) {
-                            reader.setBlock(pos.offset(newPoint), b.defaultBlockState(), 2);
+
+                    // Chests stand where the dome is hollow, on its floor course. The pieces of a
+                    // dome overlap and are processed in order, so by the time this one runs another
+                    // may already have carved the spot: a chest replaces air as well as water,
+                    // unlike the rest of the dome. It never replaces a chest, so a later pass over
+                    // the same piece cannot re-roll loot a player has taken.
+                    if (b == Blocks.AIR && this.chestOffsets.contains(new BlockPos(x, y, z))) {
+                        if (curBlock == Blocks.AIR || isWater(reader, pos.offset(newPoint), curBlock)) {
+                            setBlockState(reader, pos.offset(newPoint), Blocks.CHEST.defaultBlockState().setValue(ChestBlock.FACING, chestFacing()), rand);
                         }
+                        continue;
+                    }
+
+                    if (isWater(reader, pos.offset(newPoint), curBlock)) {
+                        setBlockState(reader, pos.offset(newPoint), b.defaultBlockState(), rand);
                     }
                 }
             }
@@ -87,7 +131,66 @@ public class WaterDomePiece extends ScatteredFeaturePiece {
 
     }
 
-    private Block blockToPlace(RandomSource random, BlockPos pos, BlockPos point1, int type) {
+    /** The dome only ever eats water — anything already solid there is left as terrain. */
+    private boolean isWater(WorldGenLevel reader, BlockPos pos, Block curBlock) {
+        if (curBlock == Blocks.WATER) {
+            return true;
+        }
+
+        FluidState state = reader.getFluidState(pos);
+        return !state.isEmpty() && (state.getType() == Fluids.FLOWING_WATER || state.getType() == Fluids.WATER);
+    }
+
+    private void setBlockState(WorldGenLevel reader, BlockPos pos, BlockState state, RandomSource rand) {
+        reader.setBlock(pos, state, 2);
+
+        if (state.getBlock() == Blocks.CHEST && reader.getBlockEntity(pos) instanceof ChestBlockEntity chest) {
+            chest.setLootTable(this.domeType.chestLoot(), rand.nextLong());
+        }
+    }
+
+    /** The piece's own orientation, so a chest's facing does not shift between postProcess passes. */
+    private Direction chestFacing() {
+        Direction orientation = this.getOrientation();
+        return orientation == null || orientation.getAxis().isVertical() ? Direction.NORTH : orientation;
+    }
+
+    /**
+     * Picks distinct spots on the floor course (local y 0, the lowest water block above the seabed)
+     * that sit well inside the shell, avoiding the centre column reserved for the rune.
+     */
+    private static List<BlockPos> rollChestOffsets(RandomSource random, int radius, int chestCount) {
+        List<BlockPos> offsets = Lists.newArrayList();
+        if (chestCount <= 0) {
+            return offsets;
+        }
+
+        // Two blocks in from the shell, so a chest never ends up embedded in the dome wall.
+        int maxOffset = Math.max(1, radius - 2);
+        for (int idx = 0; idx < chestCount; idx++) {
+            for (int attempt = 0; attempt < 16; attempt++) {
+                int x = random.nextInt((maxOffset * 2) + 1) - maxOffset;
+                int z = random.nextInt((maxOffset * 2) + 1) - maxOffset;
+
+                // (0, 0) is the rune's column, and no two chests share a spot.
+                if ((x == 0 && z == 0) || (x * x) + (z * z) > maxOffset * maxOffset) {
+                    continue;
+                }
+
+                BlockPos offset = new BlockPos(x, 0, z);
+                if (offsets.contains(offset)) {
+                    continue;
+                }
+
+                offsets.add(offset);
+                break;
+            }
+        }
+
+        return offsets;
+    }
+
+    private Block blockToPlace(BlockPos pos, BlockPos point1, WaterDomeType type) {
         int blocks = 0;
         int places = 0;
         int equalPoints = 0;
@@ -96,9 +199,6 @@ public class WaterDomePiece extends ScatteredFeaturePiece {
         int distance = (int) Math.round(Mth.sqrt((float) testPoint.distSqr(point1)));
         if (distance < radius) {
             places++;
-            if (point1.equals(testPoint) && placeRune) {
-                return RuinUtil.randomRune(random);
-            }
         }
         if (distance == radius) {
             blocks++;
@@ -108,23 +208,11 @@ public class WaterDomePiece extends ScatteredFeaturePiece {
         }
 
         if (places > 0) {
-            if (type % 4 != 0)
-                ;
             return Blocks.AIR;
         }
         if (blocks > 0) {
             if (equalPoints > 0) {
-                if (type == 5) {
-                    return Blocks.GLOWSTONE;
-                }
-                if (type == 10) {
-                    return Blocks.IRON_BLOCK;
-                }
-                if (type == 15) {
-                    return Blocks.OBSIDIAN;
-                } else {
-                    return Blocks.COBBLESTONE;
-                }
+                return type.ribBlock();
             } else {
                 return Blocks.GLASS;
             }
