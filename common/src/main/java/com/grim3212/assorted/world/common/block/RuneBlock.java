@@ -3,7 +3,7 @@ package com.grim3212.assorted.world.common.block;
 import com.grim3212.assorted.lib.platform.Services;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -105,7 +105,7 @@ public class RuneBlock extends Block {
         }
 
         public static MobEffect get(String loc) {
-            return Services.PLATFORM.getRegistry(Registries.MOB_EFFECT).getValue(new ResourceLocation(loc)).orElse(null);
+            return Services.PLATFORM.getRegistry(Registries.MOB_EFFECT).getValue(Identifier.parse(loc)).orElse(null);
         }
 
         @Override

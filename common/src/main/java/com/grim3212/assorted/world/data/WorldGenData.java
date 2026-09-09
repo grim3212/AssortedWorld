@@ -16,10 +16,10 @@ import net.minecraft.core.HolderGetter;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.worldgen.BootstapContext;
+import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.data.worldgen.placement.PlacementUtils;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.valueproviders.BiasedToBottomInt;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.GenerationStep;
@@ -46,30 +46,30 @@ import java.util.Map;
 
 public class WorldGenData extends LibWorldGenProvider {
 
-    private static final ResourceLocation SNOWBALL_KEY = new ResourceLocation(Constants.MOD_ID, "snowball");
-    private static final ResourceLocation PYRAMID_KEY = new ResourceLocation(Constants.MOD_ID, "pyramid");
-    private static final ResourceLocation FOUNTAIN_KEY = new ResourceLocation(Constants.MOD_ID, "fountain");
-    private static final ResourceLocation WATER_DOME_KEY = new ResourceLocation(Constants.MOD_ID, "water_dome");
+    private static final Identifier SNOWBALL_KEY = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "snowball");
+    private static final Identifier PYRAMID_KEY = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "pyramid");
+    private static final Identifier FOUNTAIN_KEY = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "fountain");
+    private static final Identifier WATER_DOME_KEY = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "water_dome");
 
     private static final ResourceKey<Structure> SNOWBALL_RESOURCE_KEY = structureResourceKey(SNOWBALL_KEY);
     private static final ResourceKey<Structure> PYRAMID_RESOURCE_KEY = structureResourceKey(PYRAMID_KEY);
     private static final ResourceKey<Structure> FOUNTAIN_RESOURCE_KEY = structureResourceKey(FOUNTAIN_KEY);
     private static final ResourceKey<Structure> WATER_DOME_RESOURCE_KEY = structureResourceKey(WATER_DOME_KEY);
 
-    public static final ResourceLocation RUIN_KEY = new ResourceLocation(Constants.MOD_ID, "ruin");
-    public static final ResourceLocation SPIRE_KEY = new ResourceLocation(Constants.MOD_ID, "spire");
-    public static final ResourceLocation RANDOMITE_KEY = new ResourceLocation(Constants.MOD_ID, "ore_randomite");
-    public static final ResourceLocation GUNPOWDER_REED_KEY = new ResourceLocation(Constants.MOD_ID, "patch_gunpowder_reed");
+    public static final Identifier RUIN_KEY = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "ruin");
+    public static final Identifier SPIRE_KEY = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "spire");
+    public static final Identifier RANDOMITE_KEY = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "ore_randomite");
+    public static final Identifier GUNPOWDER_REED_KEY = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "patch_gunpowder_reed");
 
-    private static ResourceKey<Structure> structureResourceKey(ResourceLocation key) {
+    private static ResourceKey<Structure> structureResourceKey(Identifier key) {
         return ResourceKey.create(Registries.STRUCTURE, key);
     }
 
-    private static ResourceKey<ConfiguredFeature<?, ?>> configuredFeatureResourceKey(ResourceLocation key) {
+    private static ResourceKey<ConfiguredFeature<?, ?>> configuredFeatureResourceKey(Identifier key) {
         return ResourceKey.create(Registries.CONFIGURED_FEATURE, key);
     }
 
-    private static Map<ResourceKey<Structure>, Structure> getStructures(BootstapContext<Structure> context) {
+    private static Map<ResourceKey<Structure>, Structure> getStructures(BootstrapContext<Structure> context) {
         Map<ResourceKey<Structure>, Structure> map = new HashMap<>();
 
         HolderGetter<Biome> holderGetter = context.lookup(Registries.BIOME);
@@ -82,8 +82,8 @@ public class WorldGenData extends LibWorldGenProvider {
         return map;
     }
 
-    private static Map<ResourceLocation, StructureSet> getStructureSets(BootstapContext<StructureSet> context) {
-        Map<ResourceLocation, StructureSet> map = new HashMap<>();
+    private static Map<Identifier, StructureSet> getStructureSets(BootstrapContext<StructureSet> context) {
+        Map<Identifier, StructureSet> map = new HashMap<>();
 
         HolderGetter<Structure> holderGetter = context.lookup(Registries.STRUCTURE);
 
@@ -95,8 +95,8 @@ public class WorldGenData extends LibWorldGenProvider {
         return map;
     }
 
-    private static Map<ResourceLocation, ConfiguredFeature<?, ?>> getConfiguredFeatures() {
-        Map<ResourceLocation, ConfiguredFeature<?, ?>> map = new HashMap<>();
+    private static Map<Identifier, ConfiguredFeature<?, ?>> getConfiguredFeatures() {
+        Map<Identifier, ConfiguredFeature<?, ?>> map = new HashMap<>();
 
         map.put(RUIN_KEY, new ConfiguredFeature<>(WorldFeatures.RUIN_FEATURE.get(), NoneFeatureConfiguration.INSTANCE));
         map.put(SPIRE_KEY, new ConfiguredFeature<>(WorldFeatures.SPIRE_FEATURE.get(), NoneFeatureConfiguration.INSTANCE));
@@ -107,8 +107,8 @@ public class WorldGenData extends LibWorldGenProvider {
         return map;
     }
 
-    private static Map<ResourceLocation, PlacedFeature> getPlacedFeatures(BootstapContext<PlacedFeature> context) {
-        Map<ResourceLocation, PlacedFeature> map = new HashMap<>();
+    private static Map<Identifier, PlacedFeature> getPlacedFeatures(BootstrapContext<PlacedFeature> context) {
+        Map<Identifier, PlacedFeature> map = new HashMap<>();
 
         HolderGetter<ConfiguredFeature<?, ?>> holderGetter = context.lookup(Registries.CONFIGURED_FEATURE);
 

@@ -2,7 +2,7 @@ package com.grim3212.assorted.world.client;
 
 import com.grim3212.assorted.lib.platform.ClientServices;
 import com.grim3212.assorted.world.common.block.WorldBlocks;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 
 public class WorldClient {
 

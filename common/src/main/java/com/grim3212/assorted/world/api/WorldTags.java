@@ -3,7 +3,7 @@ package com.grim3212.assorted.world.api;
 import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.world.Constants;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.biome.Biome;
@@ -17,11 +17,11 @@ public class WorldTags {
 
 
         private static TagKey<Block> worldTag(String name) {
-            return TagKey.create(Registries.BLOCK, new ResourceLocation(Constants.MOD_ID, name));
+            return TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(Constants.MOD_ID, name));
         }
 
         private static TagKey<Block> commonTag(String name) {
-            return TagKey.create(Registries.BLOCK, new ResourceLocation(Services.PLATFORM.getCommonTagPrefix(), name));
+            return TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(Services.PLATFORM.getCommonTagPrefix(), name));
         }
     }
 
@@ -30,11 +30,11 @@ public class WorldTags {
         public static final TagKey<Item> RUNES = worldTag("runes");
 
         private static TagKey<Item> worldTag(String name) {
-            return TagKey.create(Registries.ITEM, new ResourceLocation(Constants.MOD_ID, name));
+            return TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(Constants.MOD_ID, name));
         }
 
         private static TagKey<Item> commonTag(String name) {
-            return TagKey.create(Registries.ITEM, new ResourceLocation(Services.PLATFORM.getCommonTagPrefix(), name));
+            return TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(Services.PLATFORM.getCommonTagPrefix(), name));
         }
     }
 
@@ -47,7 +47,7 @@ public class WorldTags {
         public static final TagKey<Biome> HAS_WATER_DOME = create("has_structure/water_dome");
 
         private static TagKey<Biome> create(String n) {
-            return TagKey.create(Registries.BIOME, new ResourceLocation(Constants.MOD_ID, n));
+            return TagKey.create(Registries.BIOME, Identifier.fromNamespaceAndPath(Constants.MOD_ID, n));
         }
     }
 }

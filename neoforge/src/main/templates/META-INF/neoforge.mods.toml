@@ -1,9 +1,9 @@
-modLoader = "javafml"
-loaderVersion = "[44,)"
 license = "${license}"
 logoBlur = false
 issueTrackerURL = "${issue_tracker}"
-logoFile = "logo.png"
+# logoFile was deprecated in 26.x; logo.png is square, so it is the icon.
+iconFile = "logo.png"
+
 [[mods]]
 modId = "${mod_id}"
 version = "${version}"
@@ -12,21 +12,24 @@ authors = "${mod_author}"
 description = '''
 ${mod_description}
 '''
-[[dependencies.assortedworld]]
-modId = "forge"
-mandatory = true
-versionRange = "${forge_version_range}"
+
+[[dependencies.${mod_id}]]
+modId = "neoforge"
+type = "required"
+versionRange = "${neoforge_version_range}"
 ordering = "NONE"
 side = "BOTH"
-[[dependencies.assortedworld]]
+
+[[dependencies.${mod_id}]]
 modId = "minecraft"
-mandatory = true
-versionRange = "${forge_mc_version_range}"
+type = "required"
+versionRange = "${minecraft_version_range}"
 ordering = "NONE"
 side = "BOTH"
-[[dependencies.assortedworld]]
+
+[[dependencies.${mod_id}]]
 modId = "assortedlib"
-mandatory = true
+type = "required"
 versionRange = "[${assortedlib_version},)"
 ordering = "AFTER"
 side = "BOTH"

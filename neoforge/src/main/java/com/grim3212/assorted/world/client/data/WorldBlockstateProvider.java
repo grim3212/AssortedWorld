@@ -3,7 +3,7 @@ package com.grim3212.assorted.world.client.data;
 import com.grim3212.assorted.world.Constants;
 import com.grim3212.assorted.world.common.block.WorldBlocks;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ConfiguredModel;
@@ -12,7 +12,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 public class WorldBlockstateProvider extends BlockStateProvider {
 
-    private static final ResourceLocation CUTOUT_RENDER_TYPE = new ResourceLocation("minecraft:cutout");
+    private static final Identifier CUTOUT_RENDER_TYPE = Identifier.parse("minecraft:cutout");
 
     public WorldBlockstateProvider(PackOutput output, ExistingFileHelper exFileHelper) {
         super(output, Constants.MOD_ID, exFileHelper);

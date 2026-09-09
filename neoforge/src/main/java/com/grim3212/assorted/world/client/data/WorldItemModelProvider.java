@@ -3,7 +3,7 @@ package com.grim3212.assorted.world.client.data;
 import com.grim3212.assorted.world.Constants;
 import com.grim3212.assorted.world.common.block.WorldBlocks;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.client.model.generators.ItemModelBuilder;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
@@ -50,7 +50,7 @@ public class WorldItemModelProvider extends ItemModelProvider {
         return ForgeRegistries.BLOCKS.getKey(i).getPath();
     }
 
-    private ResourceLocation prefix(String name) {
-        return new ResourceLocation(Constants.MOD_ID, name);
+    private Identifier prefix(String name) {
+        return Identifier.fromNamespaceAndPath(Constants.MOD_ID, name);
     }
 }
