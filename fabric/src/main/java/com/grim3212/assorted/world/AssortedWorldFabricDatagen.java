@@ -23,8 +23,9 @@ public class AssortedWorldFabricDatagen implements DataGeneratorEntrypoint {
         pack.addProvider((output, registriesFuture) -> new FabricItemTagProvider(output, registriesFuture, provider.contentsGetter(), new WorldItemTagProvider(output, registriesFuture, provider.contentsGetter())));
         pack.addProvider((output, registriesFuture) -> new FabricBiomeTagProvider(output, registriesFuture, new WorldBiomeTagProvider(output, registriesFuture)));
 
-        pack.addProvider((output, registriesFuture) -> new WorldRecipes(output));
-        pack.addProvider((output, registriesFuture) -> new LootTableProvider(output, Collections.emptySet(), List.of(new LootTableProvider.SubProviderEntry(WorldBlockLoot::new, LootContextParamSets.BLOCK))));
+        // Recipe providers are not data providers any more - the Runner owns the output.
+        pack.addProvider((output, registriesFuture) -> new WorldRecipes.Runner(output, registriesFuture));
+        pack.addProvider((output, registriesFuture) -> new LootTableProvider(output, Collections.emptySet(), List.of(new LootTableProvider.SubProviderEntry(WorldBlockLoot::new, LootContextParamSets.BLOCK)), registriesFuture));
 
         pack.addProvider((output, registriesFuture) -> new FabricWorldGenProvider(output, registriesFuture, Constants.MOD_ID, getWorldGenData()));
     }

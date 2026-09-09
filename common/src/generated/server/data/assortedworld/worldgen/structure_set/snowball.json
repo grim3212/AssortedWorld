@@ -1,0 +1,14 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 737462782,
+    "separation": 21,
+    "spacing": 36
+  },
+  "structures": [
+    {
+      "structure": "assortedworld:snowball",
+      "weight": 1
+    }
+  ]
+}

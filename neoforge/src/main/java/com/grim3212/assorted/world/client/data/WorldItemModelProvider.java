@@ -2,18 +2,32 @@ package com.grim3212.assorted.world.client.data;
 
 import com.grim3212.assorted.world.Constants;
 import com.grim3212.assorted.world.common.block.WorldBlocks;
+import net.minecraft.client.data.models.BlockModelGenerators;
+import net.minecraft.client.data.models.ItemModelGenerators;
+import net.minecraft.client.data.models.ModelProvider;
+import net.minecraft.client.data.models.model.ModelTemplates;
+import net.minecraft.core.Holder;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.client.model.generators.ItemModelBuilder;
-import net.minecraftforge.client.model.generators.ItemModelProvider;
-import net.minecraftforge.common.data.ExistingFileHelper;
-import net.minecraftforge.registries.ForgeRegistries;
 
-public class WorldItemModelProvider extends ItemModelProvider {
+import java.util.stream.Stream;
 
-    public WorldItemModelProvider(PackOutput output, ExistingFileHelper existingFileHelper) {
-        super(output, Constants.MOD_ID, existingFileHelper);
+/**
+ * Forge's {@code ItemModelProvider} and {@code ItemModelBuilder} are gone, and so is the idea that
+ * an item model is a single json: an item points at a data-driven {@code ItemModel} in
+ * {@code assets/<ns>/items/}, which names the model to draw. {@link ItemModelGenerators} writes both
+ * halves.
+ * <p>
+ * Block items are not listed here at all - they belong to {@link WorldBlockstateProvider}, which
+ * points each one at its block model. The only item this provider owns is the gunpowder reed, whose
+ * item is a flat sprite rather than its cross-shaped block model.
+ */
+public class WorldItemModelProvider extends ModelProvider {
+
+    public WorldItemModelProvider(PackOutput output) {
+        super(output, Constants.MOD_ID);
     }
 
     @Override
@@ -22,35 +36,19 @@ public class WorldItemModelProvider extends ItemModelProvider {
     }
 
     @Override
-    protected void registerModels() {
-        genericBlock(WorldBlocks.RANDOMITE_ORE.get());
-        genericBlock(WorldBlocks.DEEPSLATE_RANDOMITE_ORE.get());
-
-        for (Block rune : WorldBlocks.runeBlocks()) {
-            genericBlock(rune);
-        }
-
-        generatedItem(WorldBlocks.GUNPOWDER_REED.get());
+    protected Stream<? extends Holder<Block>> getKnownBlocks() {
+        return Stream.empty();
     }
 
-    private ItemModelBuilder generatedItem(String name) {
-        return withExistingParent(name, "item/generated").texture("layer0", prefix("item/" + name));
+    @Override
+    protected Stream<? extends Holder<Item>> getKnownItems() {
+        return super.getKnownItems().filter(holder -> !(holder.value() instanceof BlockItem));
     }
 
-    private ItemModelBuilder generatedItem(Block i) {
-        return generatedItem(name(i));
-    }
-
-    private ItemModelBuilder genericBlock(Block b) {
-        String name = name(b);
-        return withExistingParent(name, prefix("block/" + name));
-    }
-
-    private static String name(Block i) {
-        return ForgeRegistries.BLOCKS.getKey(i).getPath();
-    }
-
-    private Identifier prefix(String name) {
-        return Identifier.fromNamespaceAndPath(Constants.MOD_ID, name);
+    @Override
+    protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerators itemModels) {
+        // The reed's item is a flat sprite, not its block model. generateFlatItem derives the
+        // texture from the item id, which is what the old `item/<name>` layer0 resolved to anyway.
+        itemModels.generateFlatItem(WorldBlocks.GUNPOWDER_REED.get().asItem(), ModelTemplates.FLAT_ITEM);
     }
 }

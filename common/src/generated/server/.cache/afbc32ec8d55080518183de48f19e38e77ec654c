@@ -1,0 +1,6 @@
+// 26.2	2026-09-09T08:26:50.5888505	Tags for minecraft:worldgen/biome mod id assortedworld
+8515e095cef948325e6c751ecf064ec468388b0d data/assortedworld/tags/worldgen/biome/has_structure/fountain.json
+a5bbc32a69464949211d1be82d01f2002926f674 data/assortedworld/tags/worldgen/biome/has_structure/pyramid.json
+0e03bdfc7919bb2546870bc2c4680066fbee35e6 data/assortedworld/tags/worldgen/biome/has_structure/snowball.json
+6c302eac16b314baddbaff8a4dc4cebd9405aab6 data/assortedworld/tags/worldgen/biome/has_structure/water_dome.json
+62f9aac951c0e280781466372cb498392fe36b11 data/assortedworld/tags/worldgen/biome/supports_ruin_generation.json
