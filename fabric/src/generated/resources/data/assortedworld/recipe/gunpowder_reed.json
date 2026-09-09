@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "key": {
     "R": "minecraft:sugar_cane",
-    "X": "#c:gunpowder"
+    "X": "#c:gunpowders"
   },
   "pattern": [
     "XXX",
