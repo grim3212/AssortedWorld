@@ -38,6 +38,7 @@ public class WorldCreativeItems {
         CreativeTabItems items = new CreativeTabItems();
 
         items.add(WorldBlocks.RANDOMITE_ORE.get());
+        items.add(WorldBlocks.DEEPSLATE_RANDOMITE_ORE.get());
         items.add(WorldBlocks.GUNPOWDER_REED.get());
         for (Block rune : WorldBlocks.runeBlocks()) {
             items.add(rune);
