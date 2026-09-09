@@ -98,6 +98,20 @@ public class RuinUtil {
     }
 
     /**
+     * Structure pieces pick a rune index once at construction and serialize it. postProcess runs
+     * again for every chunk the piece overlaps with a fresh RandomSource, so drawing the rune there
+     * would place a different block on each pass.
+     */
+    public static int randomRuneIndex(RandomSource random) {
+        return random.nextInt(WorldBlocks.runeBlocks().length);
+    }
+
+    public static Block runeAt(int index) {
+        Block[] runes = WorldBlocks.runeBlocks();
+        return runes[Math.floorMod(index, runes.length)];
+    }
+
+    /**
      * WeightedEntry and its IntrusiveBase are gone; a weight is a plain field on the entry and the
      * weight is read back through a ToIntFunction handed to {@link WeightedRandom}.
      */

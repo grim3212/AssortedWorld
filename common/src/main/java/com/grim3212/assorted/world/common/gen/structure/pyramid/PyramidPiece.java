@@ -34,6 +34,7 @@ public class PyramidPiece extends ScatteredFeaturePiece {
 
     private final int maxHeight;
     private final int type;
+    private final int runeIndex;
 
     private List<BlockPos> placedSpawners;
     private List<BlockPos> placedChests;
@@ -42,6 +43,7 @@ public class PyramidPiece extends ScatteredFeaturePiece {
         super(WorldStructures.PYRAMID_STRUCTURE_PIECE.get(), pos.getX(), pos.getY() - 1 - maxHeight, pos.getZ(), maxHeight * 2, maxHeight * 2 + 1, maxHeight * 2, getRandomHorizontalDirection(random));
         this.maxHeight = maxHeight;
         this.type = type;
+        this.runeIndex = RuinUtil.randomRuneIndex(random);
         this.placedSpawners = Lists.newArrayList();
         this.placedChests = Lists.newArrayList();
     }
@@ -50,6 +52,7 @@ public class PyramidPiece extends ScatteredFeaturePiece {
         super(WorldStructures.PYRAMID_STRUCTURE_PIECE.get(), tagCompound);
         this.maxHeight = tagCompound.getIntOr("maxHeight", 0);
         this.type = tagCompound.getIntOr("type", 0);
+        this.runeIndex = tagCompound.getIntOr("runeIndex", 0);
 
         // NbtUtils lost its BlockPos helpers; positions round trip through BlockPos.CODEC now,
         // which stores each one as an int array rather than an {X,Y,Z} compound.
@@ -62,6 +65,7 @@ public class PyramidPiece extends ScatteredFeaturePiece {
         super.addAdditionalSaveData(context, tagCompound);
         tagCompound.putInt("maxHeight", this.maxHeight);
         tagCompound.putInt("type", this.type);
+        tagCompound.putInt("runeIndex", this.runeIndex);
 
         tagCompound.store("placedSpawners", BLOCK_POS_LIST_CODEC, this.placedSpawners);
         tagCompound.store("placedChests", BLOCK_POS_LIST_CODEC, this.placedChests);
@@ -124,8 +128,9 @@ public class PyramidPiece extends ScatteredFeaturePiece {
     }
 
     private Block blockToPlace(RandomSource random, BlockPos pos, int colHeight, boolean genBlockEntities) {
+        // Exactly one rune per pyramid, at the centre of the base course regardless of size.
         if (pos.getX() == 0 && pos.getY() == 0 && pos.getZ() == 0) {
-            return RuinUtil.randomRune(random);
+            return RuinUtil.runeAt(this.runeIndex);
         }
         if (placeStone(random, pos, colHeight)) {
             if (type == 1) {

@@ -1,6 +1,5 @@
 package com.grim3212.assorted.world.common.gen.structure.fountain;
 
-import com.grim3212.assorted.world.WorldCommonMod;
 import com.grim3212.assorted.world.api.WorldLootTables;
 import com.grim3212.assorted.world.common.gen.structure.WorldStructures;
 import com.grim3212.assorted.world.common.util.RuinUtil;
@@ -32,23 +31,33 @@ public class FountainPiece extends ScatteredFeaturePiece {
     private final int height;
     private final int type;
 
+    private final int runeIndex;
+    private final int runeX;
+    private final int runeZ;
+
     private int placedSpawners;
     private int placedChests;
     private int spawnerSkipCount;
-    private boolean runePlaced;
 
     public FountainPiece(RandomSource random, BlockPos pos, int height, int type) {
         super(WorldStructures.FOUNTAIN_STRUCTURE_PIECE.get(), pos.getX(), pos.getY(), pos.getZ(), height, height, height, getRandomHorizontalDirection(random));
         this.height = height;
         this.type = type;
-        this.runePlaced = false;
+        this.runeIndex = RuinUtil.randomRuneIndex(random);
+
+        // One rune per fountain, sunk into the base course away from the central water column.
+        int halfWidth = halfWidth(height);
+        this.runeX = randomOffset(random, halfWidth);
+        this.runeZ = randomOffset(random, halfWidth);
     }
 
     public FountainPiece(StructurePieceSerializationContext context, CompoundTag tagCompound) {
         super(WorldStructures.FOUNTAIN_STRUCTURE_PIECE.get(), tagCompound);
         this.height = tagCompound.getIntOr("height", 0);
         this.type = tagCompound.getIntOr("type", 0);
-        this.runePlaced = false;
+        this.runeIndex = tagCompound.getIntOr("runeIndex", 0);
+        this.runeX = tagCompound.getIntOr("runeX", 1);
+        this.runeZ = tagCompound.getIntOr("runeZ", 1);
     }
 
     @Override
@@ -56,6 +65,9 @@ public class FountainPiece extends ScatteredFeaturePiece {
         super.addAdditionalSaveData(context, tagCompound);
         tagCompound.putInt("height", this.height);
         tagCompound.putInt("type", this.type);
+        tagCompound.putInt("runeIndex", this.runeIndex);
+        tagCompound.putInt("runeX", this.runeX);
+        tagCompound.putInt("runeZ", this.runeZ);
     }
 
     @Override
@@ -113,9 +125,8 @@ public class FountainPiece extends ScatteredFeaturePiece {
     }
 
     private Block blockToPlace(RandomSource random, BlockPos pos, int colHeight) {
-        if (pos.getX() != 0 && pos.getY() == -1 && pos.getZ() != 0 && (double) random.nextFloat() <= WorldCommonMod.COMMON_CONFIG.runeChance.get() && !runePlaced) {
-            runePlaced = true;
-            return RuinUtil.randomRune(random);
+        if (pos.getX() == this.runeX && pos.getY() == -1 && pos.getZ() == this.runeZ) {
+            return RuinUtil.runeAt(this.runeIndex);
         }
         if (placeWater(pos, colHeight)) {
             return Blocks.WATER;
@@ -139,6 +150,12 @@ public class FountainPiece extends ScatteredFeaturePiece {
         } else {
             return Blocks.AIR;
         }
+    }
+
+    /** A non-zero offset in [-halfWidth, halfWidth]; zero is the fountain's water column. */
+    private static int randomOffset(RandomSource random, int halfWidth) {
+        int off = 1 + random.nextInt(halfWidth);
+        return random.nextBoolean() ? off : -off;
     }
 
     private Block randomStoneBrick(RandomSource random) {

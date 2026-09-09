@@ -24,6 +24,7 @@ public class SnowballPiece extends ScatteredFeaturePiece {
 
     private final int radius;
     private final int numCenterPoints;
+    private final int runeIndex;
 
     private List<BlockPos> centrePoints;
     private List<Integer> radii;
@@ -32,12 +33,14 @@ public class SnowballPiece extends ScatteredFeaturePiece {
         super(WorldStructures.SNOWBALL_STRUCTURE_PIECE.get(), pos.getX(), pos.getY(), pos.getZ(), radius * 2, radius * (numCenterPoints + 1), radius * 2, getRandomHorizontalDirection(random));
         this.radius = radius;
         this.numCenterPoints = numCenterPoints;
+        this.runeIndex = RuinUtil.randomRuneIndex(random);
     }
 
     public SnowballPiece(StructurePieceSerializationContext context, CompoundTag tagCompound) {
         super(WorldStructures.SNOWBALL_STRUCTURE_PIECE.get(), tagCompound);
         this.radius = tagCompound.getIntOr("radius", 0);
         this.numCenterPoints = tagCompound.getIntOr("numCenterPoints", 0);
+        this.runeIndex = tagCompound.getIntOr("runeIndex", 0);
     }
 
     @Override
@@ -45,6 +48,7 @@ public class SnowballPiece extends ScatteredFeaturePiece {
         super.addAdditionalSaveData(context, tagCompound);
         tagCompound.putInt("radius", this.radius);
         tagCompound.putInt("numCenterPoints", this.numCenterPoints);
+        tagCompound.putInt("runeIndex", this.runeIndex);
     }
 
     @Override
@@ -114,8 +118,10 @@ public class SnowballPiece extends ScatteredFeaturePiece {
         }
 
         if (places > 0) {
+            // Exactly one rune per snowball, at the centre of the lowest sphere. Higher spheres
+            // start at y >= 3 so they can never reach this position again.
             if (point1.getX() == 0 && point1.getY() == 0 && point1.getZ() == 0) {
-                return RuinUtil.randomRune(random);
+                return RuinUtil.runeAt(this.runeIndex);
             }
 
             if (point1.getX() == 0 && point1.getZ() == 0) {

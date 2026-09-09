@@ -23,17 +23,29 @@ import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConf
 
 public class RuinFeature extends Feature<NoneFeatureConfiguration> {
 
-    private int skipCounter;
-    private boolean skipper;
-    private int torchSkip;
-    private int numTorches;
-    private boolean placedChest;
-    private boolean placedSpawn;
-    private boolean runePlaced;
+    /**
+     * Features are registry singletons shared across worldgen threads, so every per-ruin flag lives
+     * here and is created fresh in {@link #place}. These used to be fields on the feature itself,
+     * which meant the first ruin to place a chest or a rune stopped every later ruin from getting
+     * one.
+     */
+    private static final class Ruin {
+        private final int radius;
+        private final int type;
 
-    private int radius;
-    private int skip;
-    private int type;
+        private int skipCounter;
+        private boolean skipper;
+        private int torchSkip;
+        private int numTorches;
+        private boolean placedChest;
+        private boolean placedSpawn;
+        private boolean runePlaced;
+
+        private Ruin(int radius, int type) {
+            this.radius = radius;
+            this.type = type;
+        }
+    }
 
     public RuinFeature(Codec<NoneFeatureConfiguration> codec) {
         super(codec);
@@ -45,27 +57,29 @@ public class RuinFeature extends Feature<NoneFeatureConfiguration> {
         BlockPos pos = context.origin();
         WorldGenLevel level = context.level();
 
-        this.radius = 3 + rand.nextInt(5);
-        this.skip = rand.nextInt(4);
-        this.type = rand.nextInt(9);
+        int radius = 3 + rand.nextInt(5);
+        int skip = rand.nextInt(4);
+        int type = rand.nextInt(9);
 
-        if (this.type == 9) {
-            this.type = 7;
+        if (type == 9) {
+            type = 7;
         }
-        if (this.type == 7) {
-            this.radius += 2;
+        if (type == 7) {
+            radius += 2;
         }
+
+        Ruin ruin = new Ruin(radius, type);
 
         if (pos.getY() == 0) {
             return false;
         }
-        if (isAreaClear(level, pos)) {
+        if (isAreaClear(ruin, level, pos)) {
             int xOff = pos.getX() - radius;
             int zOff = pos.getZ() - radius;
             int size = radius * 2 + 1;
 
             if (skip != 0) {
-                skipCounter = rand.nextInt(skip);
+                ruin.skipCounter = rand.nextInt(skip);
             }
 
             for (int x = 0; x < size; x++) {
@@ -80,23 +94,23 @@ public class RuinFeature extends Feature<NoneFeatureConfiguration> {
                     if (RuinUtil.distanceBetween(pos.getX(), pos.getZ(), newPos.getX(), newPos.getZ()) == radius + radOff) {
                         fillWater(level, newPos);
                         if (skip != 0) {
-                            if (!skipper) {
-                                generateColumn(level, rand, newPos);
+                            if (!ruin.skipper) {
+                                generateColumn(ruin, level, rand, newPos);
                             }
-                            if (skipCounter == skip) {
-                                skipCounter = 0;
-                                skipper = !skipper;
+                            if (ruin.skipCounter == skip) {
+                                ruin.skipCounter = 0;
+                                ruin.skipper = !ruin.skipper;
                             } else {
-                                skipCounter++;
+                                ruin.skipCounter++;
                             }
                         } else {
-                            generateColumn(level, rand, newPos);
+                            generateColumn(ruin, level, rand, newPos);
                         }
                         continue;
                     }
                     if (RuinUtil.distanceBetween(pos.getX(), pos.getZ(), newPos.getX(), newPos.getZ()) < radius) {
                         fillWater(level, newPos);
-                        clearArea(level, rand, newPos);
+                        clearArea(ruin, level, rand, newPos);
                     }
                 }
             }
@@ -107,13 +121,13 @@ public class RuinFeature extends Feature<NoneFeatureConfiguration> {
         }
     }
 
-    private boolean isAreaClear(WorldGenLevel level, BlockPos pos) {
-        int xOff = pos.getX() - radius;
-        int zOff = pos.getZ() - radius;
-        int size = radius * 2 + 1;
+    private boolean isAreaClear(Ruin ruin, WorldGenLevel level, BlockPos pos) {
+        int xOff = pos.getX() - ruin.radius;
+        int zOff = pos.getZ() - ruin.radius;
+        int size = ruin.radius * 2 + 1;
         for (int x = 0; x < size; x++) {
             for (int z = 0; z < size; z++) {
-                if (RuinUtil.distanceBetween(pos.getX(), pos.getZ(), xOff + x, zOff + z) > radius) {
+                if (RuinUtil.distanceBetween(pos.getX(), pos.getZ(), xOff + x, zOff + z) > ruin.radius) {
                     continue;
                 }
                 BlockPos newPos = level.getHeightmapPos(Types.WORLD_SURFACE_WG, new BlockPos(xOff + x, pos.getY(), zOff + z));
@@ -153,14 +167,14 @@ public class RuinFeature extends Feature<NoneFeatureConfiguration> {
         }
     }
 
-    private void generateColumn(WorldGenLevel level, RandomSource random, BlockPos pos) {
+    private void generateColumn(Ruin ruin, WorldGenLevel level, RandomSource random, BlockPos pos) {
         int y = pos.getY();
         pos = level.getHeightmapPos(Types.WORLD_SURFACE_WG, pos);
         int topY = pos.getY();
 
         for (; topY < y; topY++) {
-            if (!runePlaced && (double) random.nextFloat() <= WorldCommonMod.COMMON_CONFIG.runeChance.get()) {
-                runePlaced = true;
+            if (!ruin.runePlaced && (double) random.nextFloat() <= WorldCommonMod.COMMON_CONFIG.runeChance.get()) {
+                ruin.runePlaced = true;
                 level.setBlock(pos, RuinUtil.randomRune(random).defaultBlockState(), 2);
                 continue;
             }
@@ -191,25 +205,25 @@ public class RuinFeature extends Feature<NoneFeatureConfiguration> {
                 continue;
             }
             BlockState stateUp = level.getBlockState(pos.above(off));
-            if (off == 0 || type == 7 || !stateUp.isFaceSturdy(level, pos.above(off), Direction.UP) || numTorches >= 8) {
+            if (off == 0 || ruin.type == 7 || !stateUp.isFaceSturdy(level, pos.above(off), Direction.UP) || ruin.numTorches >= 8) {
                 continue;
             }
-            if (torchSkip < 8) {
-                torchSkip++;
+            if (ruin.torchSkip < 8) {
+                ruin.torchSkip++;
             } else {
                 level.setBlock(pos.above(off), Blocks.TORCH.defaultBlockState(), 2);
-                numTorches++;
-                torchSkip = 0;
+                ruin.numTorches++;
+                ruin.torchSkip = 0;
             }
         }
 
     }
 
-    private void clearArea(WorldGenLevel level, RandomSource random, BlockPos pos) {
+    private void clearArea(Ruin ruin, WorldGenLevel level, RandomSource random, BlockPos pos) {
         int y = pos.getY();
         pos = level.getHeightmapPos(Types.WORLD_SURFACE_WG, pos);
         int topY = pos.getY();
-        if (type == 2 || type == 6) {
+        if (ruin.type == 2 || ruin.type == 6) {
             for (; topY < y; topY++) {
                 int blockType = random.nextInt(3);
                 if (blockType == 1) {
@@ -231,9 +245,9 @@ public class RuinFeature extends Feature<NoneFeatureConfiguration> {
             }
         }
 
-        if (type == 3 || type == 7) {
+        if (ruin.type == 3 || ruin.type == 7) {
             int blockType = random.nextInt(3);
-            if (type == 7) {
+            if (ruin.type == 7) {
                 blockType = random.nextInt(1);
             }
             if (blockType == 0) {
@@ -242,40 +256,40 @@ public class RuinFeature extends Feature<NoneFeatureConfiguration> {
                 level.setBlock(pos.above(5), Blocks.COBBLESTONE.defaultBlockState(), 2);
             }
             int genType = random.nextInt(10);
-            if (type == 7) {
+            if (ruin.type == 7) {
                 genType = random.nextInt(20);
             }
             if (genType == 1) {
-                generateColumn(level, random, pos);
-            } else if (genType > 5 && random.nextInt(50) == 1 && type == 7) {
-                genMobSpawner(level, random, pos);
+                generateColumn(ruin, level, random, pos);
+            } else if (genType > 5 && random.nextInt(50) == 1 && ruin.type == 7) {
+                genMobSpawner(ruin, level, random, pos);
                 return;
             }
         }
-        if (type == 4 || type == 8) {
+        if (ruin.type == 4 || ruin.type == 8) {
             if (random.nextInt(5) == 1) {
-                generateColumn(level, random, pos);
+                generateColumn(ruin, level, random, pos);
             }
         }
-        if (random.nextInt(250) == 1 && type < 4) {
-            genChest(level, random, pos);
-        } else if (type == 7 && placedSpawn && random.nextInt(2) == 1) {
-            genChest(level, random, pos);
+        if (random.nextInt(250) == 1 && ruin.type < 4) {
+            genChest(ruin, level, random, pos);
+        } else if (ruin.type == 7 && ruin.placedSpawn && random.nextInt(2) == 1) {
+            genChest(ruin, level, random, pos);
         }
     }
 
-    private void genChest(WorldGenLevel level, RandomSource random, BlockPos pos) {
-        if (!placedChest) {
+    private void genChest(Ruin ruin, WorldGenLevel level, RandomSource random, BlockPos pos) {
+        if (!ruin.placedChest) {
             level.setBlock(pos, Blocks.CHEST.defaultBlockState().setValue(ChestBlock.FACING, Direction.from2DDataValue(random.nextInt(4))), 2);
             ChestBlockEntity tileentitychest = (ChestBlockEntity) level.getBlockEntity(pos);
             tileentitychest.setLootTable(WorldLootTables.CHESTS_RUIN, random.nextLong());
 
-            placedChest = true;
+            ruin.placedChest = true;
         }
     }
 
-    private void genMobSpawner(WorldGenLevel level, RandomSource random, BlockPos pos) {
-        if (!placedSpawn) {
+    private void genMobSpawner(Ruin ruin, WorldGenLevel level, RandomSource random, BlockPos pos) {
+        if (!ruin.placedSpawn) {
             level.setBlock(pos, Blocks.SPAWNER.defaultBlockState(), 2);
             SpawnerBlockEntity tileentitymobspawner = (SpawnerBlockEntity) level.getBlockEntity(pos);
             EntityType<?> type = RuinUtil.getRandomRuneMob(random);
@@ -284,7 +298,7 @@ public class RuinFeature extends Feature<NoneFeatureConfiguration> {
             }
 
             tileentitymobspawner.setEntityId(type, random);
-            placedSpawn = true;
+            ruin.placedSpawn = true;
         }
     }
 
