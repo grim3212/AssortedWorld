@@ -3,7 +3,7 @@ package com.grim3212.assorted.world.common.gen.structure.fountain;
 import java.util.Optional;
 
 import com.grim3212.assorted.world.common.gen.structure.WorldStructures;
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.ChunkPos;
@@ -15,7 +15,7 @@ import net.minecraft.world.level.levelgen.structure.pieces.StructurePiecesBuilde
 
 public class FountainStructure extends Structure {
 
-	public static final Codec<FountainStructure> CODEC = simpleCodec(FountainStructure::new);
+	public static final MapCodec<FountainStructure> CODEC = simpleCodec(FountainStructure::new);
 
 	public FountainStructure(Structure.StructureSettings settings) {
 		super(settings);

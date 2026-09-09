@@ -2,7 +2,7 @@ package com.grim3212.assorted.world.common.gen.structure.waterdome;
 
 import com.grim3212.assorted.world.WorldCommonMod;
 import com.grim3212.assorted.world.common.gen.structure.WorldStructures;
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.levelgen.GenerationStep;
@@ -16,7 +16,7 @@ import java.util.Optional;
 
 public class WaterDomeStructure extends Structure {
 
-    public static final Codec<WaterDomeStructure> CODEC = simpleCodec(WaterDomeStructure::new);
+    public static final MapCodec<WaterDomeStructure> CODEC = simpleCodec(WaterDomeStructure::new);
 
     public WaterDomeStructure(Structure.StructureSettings settings) {
         super(settings);

@@ -1,15 +1,15 @@
 package com.grim3212.assorted.world.common.gen.structure.pyramid;
 
 import com.google.common.collect.Lists;
+import com.mojang.serialization.Codec;
 import com.grim3212.assorted.world.api.WorldLootTables;
 import com.grim3212.assorted.world.common.gen.structure.WorldStructures;
 import com.grim3212.assorted.world.common.util.RuinUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.NbtUtils;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.WorldGenLevel;
@@ -30,6 +30,8 @@ import java.util.Map;
 
 public class PyramidPiece extends ScatteredFeaturePiece {
 
+    private static final Codec<List<BlockPos>> BLOCK_POS_LIST_CODEC = BlockPos.CODEC.listOf();
+
     private final int maxHeight;
     private final int type;
 
@@ -46,20 +48,13 @@ public class PyramidPiece extends ScatteredFeaturePiece {
 
     public PyramidPiece(StructurePieceSerializationContext context, CompoundTag tagCompound) {
         super(WorldStructures.PYRAMID_STRUCTURE_PIECE.get(), tagCompound);
-        this.maxHeight = tagCompound.getInt("maxHeight");
-        this.type = tagCompound.getInt("type");
+        this.maxHeight = tagCompound.getIntOr("maxHeight", 0);
+        this.type = tagCompound.getIntOr("type", 0);
 
-        this.placedSpawners = Lists.newArrayList();
-        ListTag spawners = tagCompound.getList("placedSpawners", 10);
-        for (int i = 0; i < spawners.size(); i++) {
-            this.placedSpawners.add(NbtUtils.readBlockPos((CompoundTag) spawners.get(i)));
-        }
-
-        this.placedChests = Lists.newArrayList();
-        ListTag chests = tagCompound.getList("placedChests", 10);
-        for (int i = 0; i < chests.size(); i++) {
-            this.placedChests.add(NbtUtils.readBlockPos((CompoundTag) chests.get(i)));
-        }
+        // NbtUtils lost its BlockPos helpers; positions round trip through BlockPos.CODEC now,
+        // which stores each one as an int array rather than an {X,Y,Z} compound.
+        this.placedSpawners = Lists.newArrayList(tagCompound.read("placedSpawners", BLOCK_POS_LIST_CODEC).orElse(List.of()));
+        this.placedChests = Lists.newArrayList(tagCompound.read("placedChests", BLOCK_POS_LIST_CODEC).orElse(List.of()));
     }
 
     @Override
@@ -68,17 +63,8 @@ public class PyramidPiece extends ScatteredFeaturePiece {
         tagCompound.putInt("maxHeight", this.maxHeight);
         tagCompound.putInt("type", this.type);
 
-        ListTag spawners = new ListTag();
-        this.placedSpawners.forEach((p) -> {
-            spawners.add(NbtUtils.writeBlockPos(p));
-        });
-        tagCompound.put("placedSpawners", spawners);
-
-        ListTag chests = new ListTag();
-        this.placedChests.forEach((p) -> {
-            chests.add(NbtUtils.writeBlockPos(p));
-        });
-        tagCompound.put("placedChests", chests);
+        tagCompound.store("placedSpawners", BLOCK_POS_LIST_CODEC, this.placedSpawners);
+        tagCompound.store("placedChests", BLOCK_POS_LIST_CODEC, this.placedChests);
     }
 
     @Override
@@ -130,7 +116,7 @@ public class PyramidPiece extends ScatteredFeaturePiece {
             if (te instanceof SpawnerBlockEntity) {
                 EntityType<?> type = RuinUtil.getRandomRuneMob(rand);
                 if (type == null) {
-                    type = EntityType.ZOMBIE;
+                    type = EntityTypes.ZOMBIE;
                 }
                 ((SpawnerBlockEntity) te).setEntityId(type, rand);
             }

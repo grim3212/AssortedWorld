@@ -3,7 +3,7 @@ package com.grim3212.assorted.world.common.gen.structure.snowball;
 import java.util.Optional;
 
 import com.grim3212.assorted.world.common.gen.structure.WorldStructures;
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.ChunkPos;
@@ -15,7 +15,7 @@ import net.minecraft.world.level.levelgen.structure.pieces.StructurePiecesBuilde
 
 public class SnowballStructure extends Structure {
 
-	public static final Codec<SnowballStructure> CODEC = simpleCodec(SnowballStructure::new);
+	public static final MapCodec<SnowballStructure> CODEC = simpleCodec(SnowballStructure::new);
 
 	public SnowballStructure(Structure.StructureSettings settings) {
 		super(settings);

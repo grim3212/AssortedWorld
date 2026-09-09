@@ -36,10 +36,10 @@ public class WaterDomePiece extends ScatteredFeaturePiece {
 
     public WaterDomePiece(StructurePieceSerializationContext context, CompoundTag tagCompound) {
         super(WorldStructures.WATER_DOME_STRUCTURE_PIECE.get(), tagCompound);
-        this.radius = tagCompound.getInt("radius");
-        this.xOffset = tagCompound.getInt("xOffset");
-        this.zOffset = tagCompound.getInt("zOffset");
-        this.placeRune = tagCompound.getBoolean("placeRune");
+        this.radius = tagCompound.getIntOr("radius", 0);
+        this.xOffset = tagCompound.getIntOr("xOffset", 0);
+        this.zOffset = tagCompound.getIntOr("zOffset", 0);
+        this.placeRune = tagCompound.getBooleanOr("placeRune", false);
     }
 
     @Override

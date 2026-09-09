@@ -3,7 +3,7 @@ package com.grim3212.assorted.world.common.gen.structure.pyramid;
 import java.util.Optional;
 
 import com.grim3212.assorted.world.common.gen.structure.WorldStructures;
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.ChunkPos;
@@ -14,7 +14,7 @@ import net.minecraft.world.level.levelgen.structure.StructureType;
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePiecesBuilder;
 
 public class PyramidStructure extends Structure {
-	public static final Codec<PyramidStructure> CODEC = simpleCodec(PyramidStructure::new);
+	public static final MapCodec<PyramidStructure> CODEC = simpleCodec(PyramidStructure::new);
 
 	public PyramidStructure(Structure.StructureSettings settings) {
 		super(settings);

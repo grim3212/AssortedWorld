@@ -8,6 +8,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.WorldGenLevel;
@@ -45,8 +46,8 @@ public class FountainPiece extends ScatteredFeaturePiece {
 
     public FountainPiece(StructurePieceSerializationContext context, CompoundTag tagCompound) {
         super(WorldStructures.FOUNTAIN_STRUCTURE_PIECE.get(), tagCompound);
-        this.height = tagCompound.getInt("height");
-        this.type = tagCompound.getInt("type");
+        this.height = tagCompound.getIntOr("height", 0);
+        this.type = tagCompound.getIntOr("type", 0);
         this.runePlaced = false;
     }
 
@@ -97,7 +98,7 @@ public class FountainPiece extends ScatteredFeaturePiece {
             if (te instanceof SpawnerBlockEntity) {
                 EntityType<?> type = RuinUtil.getRandomRuneMob(rand);
                 if (type == null) {
-                    type = EntityType.ZOMBIE;
+                    type = EntityTypes.ZOMBIE;
                 }
                 ((SpawnerBlockEntity) te).setEntityId(type, rand);
             }

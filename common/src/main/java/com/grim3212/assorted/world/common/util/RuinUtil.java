@@ -3,9 +3,9 @@ package com.grim3212.assorted.world.common.util;
 import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.world.common.block.WorldBlocks;
 import net.minecraft.util.RandomSource;
-import net.minecraft.util.random.WeightedEntry;
 import net.minecraft.util.random.WeightedRandom;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.level.block.Block;
 
 import java.util.ArrayList;
@@ -42,7 +42,7 @@ public class RuinUtil {
             RuneMob mob = itr.next();
             if (type == mob.type) {
                 itr.remove();
-                rarity = mob.getWeight().asInt() + rarity;
+                rarity = mob.weight() + rarity;
                 break;
             }
         }
@@ -61,7 +61,7 @@ public class RuinUtil {
         for (RuneMob mob : runeMobs) {
             if (name.equals(mob.type)) {
                 runeMobs.remove(mob);
-                return mob.getWeight().asInt();
+                return mob.weight();
             }
         }
         return 0;
@@ -75,7 +75,7 @@ public class RuinUtil {
      */
     public static EntityType<?> getRandomRuneMob(RandomSource rand) {
         if (rand.nextInt(3) > 0) {
-            RuneMob mob = WeightedRandom.getRandomItem(rand, runeMobs).orElseThrow();
+            RuneMob mob = WeightedRandom.getRandomItem(rand, runeMobs, RuneMob::weight).orElseThrow();
             return mob.type;
         } else {
 
@@ -97,27 +97,41 @@ public class RuinUtil {
         return WorldBlocks.runeBlocks()[random.nextInt(WorldBlocks.runeBlocks().length)];
     }
 
-    public static class RuneMob extends WeightedEntry.IntrusiveBase {
+    /**
+     * WeightedEntry and its IntrusiveBase are gone; a weight is a plain field on the entry and the
+     * weight is read back through a ToIntFunction handed to {@link WeightedRandom}.
+     */
+    public static class RuneMob {
         public final EntityType<?> type;
+        private final int weight;
 
         public RuneMob(int weight, EntityType<?> type) {
-            super(weight);
+            this.weight = weight;
             this.type = type;
+        }
+
+        public int weight() {
+            return this.weight;
         }
 
         @Override
         public boolean equals(Object target) {
             return target instanceof RuneMob && type.equals(((RuneMob) target).type);
         }
+
+        @Override
+        public int hashCode() {
+            return this.type.hashCode();
+        }
     }
 
     static {
-        addRuneMob(EntityType.SKELETON, 100);
-        addRuneMob(EntityType.ZOMBIE, 200);
-        addRuneMob(EntityType.SPIDER, 100);
-        addRuneMob(EntityType.CAVE_SPIDER, 100);
-        addRuneMob(EntityType.CREEPER, 50);
-        addRuneMob(EntityType.WITCH, 25);
-        addRuneMob(EntityType.SILVERFISH, 50);
+        addRuneMob(EntityTypes.SKELETON, 100);
+        addRuneMob(EntityTypes.ZOMBIE, 200);
+        addRuneMob(EntityTypes.SPIDER, 100);
+        addRuneMob(EntityTypes.CAVE_SPIDER, 100);
+        addRuneMob(EntityTypes.CREEPER, 50);
+        addRuneMob(EntityTypes.WITCH, 25);
+        addRuneMob(EntityTypes.SILVERFISH, 50);
     }
 }

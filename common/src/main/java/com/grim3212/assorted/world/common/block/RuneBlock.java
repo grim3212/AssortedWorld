@@ -1,11 +1,10 @@
 package com.grim3212.assorted.world.common.block;
 
-import com.grim3212.assorted.lib.platform.Services;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.registries.Registries;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.StringRepresentable;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -24,13 +23,13 @@ public class RuneBlock extends Block {
 
     private final RuneType runeType;
 
-    public RuneBlock(RuneType runeType) {
-        super(Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).sound(SoundType.STONE).strength(50f));
+    public RuneBlock(RuneType runeType, Properties props) {
+        super(props.mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).sound(SoundType.STONE).strength(50f));
         this.runeType = runeType;
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
+    protected InteractionResult useWithoutItem(BlockState state, Level worldIn, BlockPos pos, Player player, BlockHitResult hit) {
         player.addEffect(getPotionEffect(player.experienceLevel, 1.0F, 0.06F));
         return InteractionResult.SUCCESS;
     }
@@ -76,7 +75,7 @@ public class RuneBlock extends Block {
 
         private final String runeName;
         private final String effectName;
-        private MobEffect effectType;
+        private Holder<MobEffect> effectType;
         public static final RuneType values[] = values();
 
         private RuneType(String runeName, String effectName) {
@@ -95,7 +94,7 @@ public class RuneBlock extends Block {
             return names;
         }
 
-        public MobEffect getEffect() {
+        public Holder<MobEffect> getEffect() {
             if (effectType != null) {
                 return effectType;
             } else {
@@ -104,8 +103,11 @@ public class RuneBlock extends Block {
             }
         }
 
-        public static MobEffect get(String loc) {
-            return Services.PLATFORM.getRegistry(Registries.MOB_EFFECT).getValue(Identifier.parse(loc)).orElse(null);
+        // MobEffectInstance takes a Holder now, so the lookup has to come back as one. The library
+        // registry wrapper only hands out bare values, so this goes straight at the vanilla
+        // registry - it is the same registry on both loaders.
+        public static Holder<MobEffect> get(String loc) {
+            return BuiltInRegistries.MOB_EFFECT.get(Identifier.parse(loc)).orElse(null);
         }
 
         @Override

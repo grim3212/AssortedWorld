@@ -36,8 +36,8 @@ public class SnowballPiece extends ScatteredFeaturePiece {
 
     public SnowballPiece(StructurePieceSerializationContext context, CompoundTag tagCompound) {
         super(WorldStructures.SNOWBALL_STRUCTURE_PIECE.get(), tagCompound);
-        this.radius = tagCompound.getInt("radius");
-        this.numCenterPoints = tagCompound.getInt("numCenterPoints");
+        this.radius = tagCompound.getIntOr("radius", 0);
+        this.numCenterPoints = tagCompound.getIntOr("numCenterPoints", 0);
     }
 
     @Override
@@ -60,7 +60,7 @@ public class SnowballPiece extends ScatteredFeaturePiece {
                 int off = newY + rad;
                 rad -= 3;
                 newY = off;
-                if (rad < 3 || pos.getY() + newY + rad >= reader.getMaxBuildHeight()) {
+                if (rad < 3 || pos.getY() + newY + rad > reader.getMaxY()) {
                     break;
                 }
 
@@ -79,7 +79,7 @@ public class SnowballPiece extends ScatteredFeaturePiece {
                         for (int y = -radi; y <= radi; y++) {
                             BlockPos newPoint = new BlockPos(x, y + point.getY(), z);
 
-                            if (pos.getY() + (int) newPoint.getY() >= reader.getMaxBuildHeight()) {
+                            if (pos.getY() + (int) newPoint.getY() > reader.getMaxY()) {
                                 break;
                             }
                             Block block = blockToPlace(rand, pos, newPoint, point);

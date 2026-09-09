@@ -4,6 +4,7 @@ import com.grim3212.assorted.lib.data.LibItemTagProvider;
 import com.grim3212.assorted.world.api.WorldTags;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
+import net.minecraft.data.tags.TagAppender;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -19,7 +20,7 @@ public class WorldItemTagProvider extends LibItemTagProvider {
     }
 
     @Override
-    public void addCommonTags(Function<TagKey<Item>, IntrinsicTagAppender<Item>> tagger, BiConsumer<TagKey<Block>, TagKey<Item>> copier) {
+    public void addCommonTags(Function<TagKey<Item>, TagAppender<Item>> tagger, BiConsumer<TagKey<Block>, TagKey<Item>> copier) {
         copier.accept(WorldTags.Blocks.ORES_RANDOMITE, WorldTags.Items.ORES_RANDOMITE);
         copier.accept(WorldTags.Blocks.RUNES, WorldTags.Items.RUNES);
     }

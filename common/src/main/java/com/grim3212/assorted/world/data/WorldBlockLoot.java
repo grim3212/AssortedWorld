@@ -2,7 +2,10 @@ package com.grim3212.assorted.world.data;
 
 import com.grim3212.assorted.lib.data.LibBlockLootProvider;
 import com.grim3212.assorted.world.common.block.WorldBlocks;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -26,8 +29,9 @@ public class WorldBlockLoot extends LibBlockLootProvider {
 
     private final List<Block> blocks = new ArrayList<>();
 
-    public WorldBlockLoot() {
-        super(() -> WorldBlocks.BLOCKS.getEntries().stream().map(Supplier::get).collect(Collectors.toList()));
+    // Loot sub providers are handed the registry lookup at construction now.
+    public WorldBlockLoot(HolderLookup.Provider registries) {
+        super(registries, () -> WorldBlocks.BLOCKS.getEntries().stream().map(Supplier::get).collect(Collectors.toList()));
 
         for (Block rune : WorldBlocks.runeBlocks()) {
             this.blocks.add(rune);
@@ -42,21 +46,26 @@ public class WorldBlockLoot extends LibBlockLootProvider {
 
         this.dropSelf(WorldBlocks.GUNPOWDER_REED.get());
 
-        this.add(WorldBlocks.RANDOMITE_ORE.get(), WorldBlockLoot::createRandomiteTable);
-        this.add(WorldBlocks.DEEPSLATE_RANDOMITE_ORE.get(), WorldBlockLoot::createRandomiteTable);
+        this.add(WorldBlocks.RANDOMITE_ORE.get(), this::createRandomiteTable);
+        this.add(WorldBlocks.DEEPSLATE_RANDOMITE_ORE.get(), this::createRandomiteTable);
     }
 
-    private static LootTable.Builder createRandomiteTable(Block block) {
+    private LootTable.Builder createRandomiteTable(Block block) {
+        // Enchantments are data driven now: the constants are ResourceKeys and the loot functions
+        // want the Holder, which comes off the registry lookup this provider was built with.
+        HolderLookup.RegistryLookup<Enchantment> enchantments = this.registries.lookupOrThrow(Registries.ENCHANTMENT);
+        var fortune = enchantments.getOrThrow(Enchantments.FORTUNE);
+
         LootPoolEntryContainer.Builder<?> eggOption = LootItem.lootTableItem(Items.EGG).setWeight(40);
-        LootPoolEntryContainer.Builder<?> coalOption = LootItem.lootTableItem(Items.COAL).setWeight(30).apply(ApplyBonusCount.addOreBonusCount(Enchantments.BLOCK_FORTUNE)).apply(ApplyExplosionDecay.explosionDecay());
-        LootPoolEntryContainer.Builder<?> slimeOption = LootItem.lootTableItem(Items.SLIME_BALL).setWeight(30).apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0F, 3.0F))).apply(ApplyBonusCount.addOreBonusCount(Enchantments.BLOCK_FORTUNE)).apply(ApplyExplosionDecay.explosionDecay());
-        LootPoolEntryContainer.Builder<?> quartzOption = LootItem.lootTableItem(Items.QUARTZ).setWeight(20).apply(ApplyBonusCount.addOreBonusCount(Enchantments.BLOCK_FORTUNE)).apply(ApplyExplosionDecay.explosionDecay());
+        LootPoolEntryContainer.Builder<?> coalOption = LootItem.lootTableItem(Items.COAL).setWeight(30).apply(ApplyBonusCount.addOreBonusCount(fortune)).apply(ApplyExplosionDecay.explosionDecay());
+        LootPoolEntryContainer.Builder<?> slimeOption = LootItem.lootTableItem(Items.SLIME_BALL).setWeight(30).apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0F, 3.0F))).apply(ApplyBonusCount.addOreBonusCount(fortune)).apply(ApplyExplosionDecay.explosionDecay());
+        LootPoolEntryContainer.Builder<?> quartzOption = LootItem.lootTableItem(Items.QUARTZ).setWeight(20).apply(ApplyBonusCount.addOreBonusCount(fortune)).apply(ApplyExplosionDecay.explosionDecay());
         LootPoolEntryContainer.Builder<?> ironOption = LootItem.lootTableItem(Blocks.IRON_ORE).setWeight(20);
         LootPoolEntryContainer.Builder<?> goldOption = LootItem.lootTableItem(Blocks.GOLD_ORE).setWeight(18);
-        LootPoolEntryContainer.Builder<?> emeraldOption = LootItem.lootTableItem(Items.EMERALD).setWeight(18).apply(ApplyBonusCount.addOreBonusCount(Enchantments.BLOCK_FORTUNE)).apply(ApplyExplosionDecay.explosionDecay());
-        LootPoolEntryContainer.Builder<?> redstoneOption = LootItem.lootTableItem(Items.REDSTONE).setWeight(16).apply(SetItemCountFunction.setCount(UniformGenerator.between(4.0F, 5.0F))).apply(ApplyBonusCount.addUniformBonusCount(Enchantments.BLOCK_FORTUNE)).apply(ApplyExplosionDecay.explosionDecay());
-        LootPoolEntryContainer.Builder<?> lapisOption = LootItem.lootTableItem(Items.LAPIS_LAZULI).setWeight(15).apply(SetItemCountFunction.setCount(UniformGenerator.between(4.0F, 9.0F))).apply(ApplyBonusCount.addOreBonusCount(Enchantments.BLOCK_FORTUNE)).apply(ApplyExplosionDecay.explosionDecay());
-        LootPoolEntryContainer.Builder<?> diamondOption = LootItem.lootTableItem(Items.DIAMOND).setWeight(10).apply(ApplyBonusCount.addOreBonusCount(Enchantments.BLOCK_FORTUNE));
+        LootPoolEntryContainer.Builder<?> emeraldOption = LootItem.lootTableItem(Items.EMERALD).setWeight(18).apply(ApplyBonusCount.addOreBonusCount(fortune)).apply(ApplyExplosionDecay.explosionDecay());
+        LootPoolEntryContainer.Builder<?> redstoneOption = LootItem.lootTableItem(Items.REDSTONE).setWeight(16).apply(SetItemCountFunction.setCount(UniformGenerator.between(4.0F, 5.0F))).apply(ApplyBonusCount.addUniformBonusCount(fortune)).apply(ApplyExplosionDecay.explosionDecay());
+        LootPoolEntryContainer.Builder<?> lapisOption = LootItem.lootTableItem(Items.LAPIS_LAZULI).setWeight(15).apply(SetItemCountFunction.setCount(UniformGenerator.between(4.0F, 9.0F))).apply(ApplyBonusCount.addOreBonusCount(fortune)).apply(ApplyExplosionDecay.explosionDecay());
+        LootPoolEntryContainer.Builder<?> diamondOption = LootItem.lootTableItem(Items.DIAMOND).setWeight(10).apply(ApplyBonusCount.addOreBonusCount(fortune));
         LootPoolEntryContainer.Builder<?> netherDebrisOption = LootItem.lootTableItem(Blocks.ANCIENT_DEBRIS).setWeight(1);
         LootPool.Builder pool = LootPool.lootPool().setRolls(ConstantValue.exactly(3)).add(coalOption).add(ironOption).add(goldOption).add(diamondOption).add(redstoneOption).add(lapisOption).add(slimeOption).add(emeraldOption).add(quartzOption).add(netherDebrisOption).add(eggOption).when(ExplosionCondition.survivesExplosion());
         return LootTable.lootTable().withPool(pool);

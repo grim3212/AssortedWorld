@@ -8,6 +8,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.ChestBlock;
@@ -279,7 +280,7 @@ public class RuinFeature extends Feature<NoneFeatureConfiguration> {
             SpawnerBlockEntity tileentitymobspawner = (SpawnerBlockEntity) level.getBlockEntity(pos);
             EntityType<?> type = RuinUtil.getRandomRuneMob(random);
             if (type == null) {
-                type = EntityType.ZOMBIE;
+                type = EntityTypes.ZOMBIE;
             }
 
             tileentitymobspawner.setEntityId(type, random);
