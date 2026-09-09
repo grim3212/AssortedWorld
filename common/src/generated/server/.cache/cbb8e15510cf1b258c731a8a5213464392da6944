@@ -1,7 +1,0 @@
-// 26.2	2026-09-09T08:26:50.5862123	Tags for minecraft:block mod id assortedworld
-b4014ecb8d7cd508dcd56c6aecd3032d047a247c data/assortedworld/tags/block/runes.json
-6d639eb955911b530ea2f84fa86713e4776486fe data/c/tags/block/ores.json
-f8fd6a86cd35e8b2d13bb437f6654ed108f2858a data/c/tags/block/ores/randomite.json
-b081543be368b195b03bf6a6dfc54d6cecf9fdcf data/minecraft/tags/block/mineable/axe.json
-a0cf5f8493530847ae8346775a1e5eb75741ae1a data/minecraft/tags/block/mineable/pickaxe.json
-f8fd6a86cd35e8b2d13bb437f6654ed108f2858a data/minecraft/tags/block/needs_stone_tool.json
