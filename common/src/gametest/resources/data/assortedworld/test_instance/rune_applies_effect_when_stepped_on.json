@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:function",
+  "environment": "minecraft:default",
+  "function": "assortedworld:rune_applies_effect_when_stepped_on",
+  "structure": "assortedworld:test_box",
+  "max_ticks": 60,
+  "setup_ticks": 0,
+  "required": true
+}
