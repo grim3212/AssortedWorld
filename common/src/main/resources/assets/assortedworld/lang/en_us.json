@@ -19,5 +19,7 @@
 	"block.assortedworld.nyd_rune": "§dNYD§r Rune",
 	"block.assortedworld.thorn_rune": "§dTHORN§r Rune",
 	"block.assortedworld.os_rune": "§dOS§r Rune",
-	"block.assortedworld.gunpowder_reed": "Gunpowder Reed"
+	"block.assortedworld.gunpowder_reed": "Gunpowder Reed",
+	"tag.item.assortedworld.runes": "Runes",
+	"tag.item.c.ores.randomite": "Randomite Ores"
 }
