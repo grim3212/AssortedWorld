@@ -3,7 +3,7 @@ package com.grim3212.assorted.world;
 import com.grim3212.assorted.lib.data.ForgeBiomeTagProvider;
 import com.grim3212.assorted.lib.data.ForgeBlockTagProvider;
 import com.grim3212.assorted.lib.data.ForgeItemTagProvider;
-import com.grim3212.assorted.lib.data.ForgeWorldGenProvider;
+import com.grim3212.assorted.lib.data.ForgeDatapackRegistryProvider;
 import com.grim3212.assorted.world.client.data.WorldBlockstateProvider;
 import com.grim3212.assorted.world.client.data.WorldItemModelProvider;
 import com.grim3212.assorted.world.data.WorldBiomeTagProvider;
@@ -56,7 +56,7 @@ public class AssortedWorldNeoForge {
         // Recipe providers are not data providers any more - the Runner owns the output.
         event.addProvider(new WorldRecipes.Runner(packOutput, lookupProvider));
         event.addProvider(new LootTableProvider(packOutput, Collections.emptySet(), List.of(new LootTableProvider.SubProviderEntry(WorldBlockLoot::new, LootContextParamSets.BLOCK), new LootTableProvider.SubProviderEntry(WorldChestLoot::new, LootContextParamSets.CHEST)), lookupProvider));
-        event.addProvider(new ForgeWorldGenProvider(Constants.MOD_ID, new WorldGenData()).datpackEntriesProvider(packOutput, lookupProvider));
+        event.addProvider(new ForgeDatapackRegistryProvider(Constants.MOD_ID, new WorldGenData()).datpackEntriesProvider(packOutput, lookupProvider));
     }
 
     private void gatherClientData(final GatherDataEvent.Client event) {

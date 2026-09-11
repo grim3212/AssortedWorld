@@ -1,7 +1,7 @@
 package com.grim3212.assorted.world.data;
 
 import com.google.common.collect.Lists;
-import com.grim3212.assorted.lib.data.LibWorldGenProvider;
+import com.grim3212.assorted.lib.data.LibDatapackRegistryProvider;
 import com.grim3212.assorted.world.Constants;
 import com.grim3212.assorted.world.api.WorldTags;
 import com.grim3212.assorted.world.common.block.WorldBlocks;
@@ -43,7 +43,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class WorldGenData extends LibWorldGenProvider {
+public class WorldGenData extends LibDatapackRegistryProvider {
 
     private static final Identifier SNOWBALL_KEY = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "snowball");
     private static final Identifier PYRAMID_KEY = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "pyramid");
@@ -122,7 +122,7 @@ public class WorldGenData extends LibWorldGenProvider {
     }
 
     @Override
-    public void addToWorldGem(RegistrySetBuilder builder) {
+    public void addEntries(RegistrySetBuilder builder) {
         builder.add(Registries.STRUCTURE, context -> {
             WorldGenData.getStructures(context).forEach((r, f) -> {
                 context.register(r, f);

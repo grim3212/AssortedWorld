@@ -1,9 +1,10 @@
 package com.grim3212.assorted.world;
 
+import com.grim3212.assorted.lib.data.FabricConditionalRecipeProvider;
 import com.grim3212.assorted.lib.data.FabricBiomeTagProvider;
 import com.grim3212.assorted.lib.data.FabricBlockTagProvider;
 import com.grim3212.assorted.lib.data.FabricItemTagProvider;
-import com.grim3212.assorted.lib.data.FabricWorldGenProvider;
+import com.grim3212.assorted.lib.data.FabricDatapackRegistryProvider;
 import com.grim3212.assorted.world.data.*;
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
@@ -24,15 +25,15 @@ public class AssortedWorldFabricDatagen implements DataGeneratorEntrypoint {
         pack.addProvider((output, registriesFuture) -> new FabricBiomeTagProvider(output, registriesFuture, new WorldBiomeTagProvider(output, registriesFuture)));
 
         // Recipe providers are not data providers any more - the Runner owns the output.
-        pack.addProvider((output, registriesFuture) -> new WorldRecipes.Runner(output, registriesFuture));
+        pack.addProvider((output, registriesFuture) -> new FabricConditionalRecipeProvider(output, registriesFuture, new WorldRecipes.Runner(output, registriesFuture)));
         pack.addProvider((output, registriesFuture) -> new LootTableProvider(output, Collections.emptySet(), List.of(new LootTableProvider.SubProviderEntry(WorldBlockLoot::new, LootContextParamSets.BLOCK), new LootTableProvider.SubProviderEntry(WorldChestLoot::new, LootContextParamSets.CHEST)), registriesFuture));
 
-        pack.addProvider((output, registriesFuture) -> new FabricWorldGenProvider(output, registriesFuture, Constants.MOD_ID, getWorldGenData()));
+        pack.addProvider((output, registriesFuture) -> new FabricDatapackRegistryProvider(output, registriesFuture, Constants.MOD_ID, getWorldGenData()));
     }
 
     @Override
     public void buildRegistry(RegistrySetBuilder registryBuilder) {
-        getWorldGenData().addToWorldGem(registryBuilder);
+        getWorldGenData().addEntries(registryBuilder);
     }
 
     private WorldGenData worldGenData;
