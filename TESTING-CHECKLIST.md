@@ -13,12 +13,14 @@ Run each list on **both** NeoForge and Fabric. Use `/locate structure assortedwo
 - [ ] `Detected unsafe terrain read during worldgen` does not appear in the log
 - [ ] Structure chests are actually placed (fountain, pyramid, ruin, all four water dome variants)
 - [ ] Pyramid and fountain spawners are present
+- [ ] Water dome chests and rune placement look right in a real ocean
 
 ## Features
 - [ ] Ruins generate, and more than the first one gets a chest, a spawner and a rune
 - [ ] Spires generate
 - [ ] Randomite ore and deepslate randomite ore generate
 - [ ] `runeChance` changes how often ruins carry a rune
+- [ ] Using a rune with an item in hand feels right
 
 ## Creative
 - [ ] Everything in the Assorted World tab renders
