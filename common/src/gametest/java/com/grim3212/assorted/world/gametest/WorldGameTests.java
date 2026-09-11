@@ -15,8 +15,7 @@ import java.util.function.Consumer;
  * This mod is mostly worldgen, and a 9x9x9 test volume cannot run a generation pass - no heightmap,
  * no light level, no biome placement. So what is covered here is what is reachable without one: the
  * blocks a structure leaves behind, the loot its chests draw, and the position-seeded helpers the
- * clipped-worldgen fix rests on. Whether a structure actually generates is a human's job, in
- * {@code TESTING-CHECKLIST.md}.
+ * clipped-worldgen fix rests on. Whether a structure actually generates is checked by hand.
  * <p>
  * The tests themselves are split by feature into the {@code *Tests} classes in this package,
  * with shared helpers in {@code WorldTestSupport}; this only lists them.
