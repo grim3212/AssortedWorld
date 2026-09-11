@@ -46,10 +46,8 @@ final class WorldgenTests {
     }
 
     /**
-     * Every structure chest table has to exist and roll something. The first three were addressed
-     * at {@code loot_tables/} - the plural directory 26.2 stopped reading - and
-     * {@code setLootTable} on a table that is not there is silent, so every structure chest in the
-     * world came up empty and nothing said so.
+     * Every structure chest loot table exists and rolls something. {@code setLootTable} on a
+     * missing table is silent, and the chest simply comes up empty.
      */
     private static void structureChestLootTablesRollItems(GameTestHelper helper) {
         ReloadableServerRegistries.Holder registries = helper.getLevel().getServer().reloadableRegistries();
@@ -103,14 +101,9 @@ final class WorldgenTests {
     }
 
     /**
-     * A registry-level check, not a generation one: whether the four structures and the two features
-     * are in the loaded datapack at all, and whether anything places them.
-     * <p>
-     * Worth pinning because each of these can go missing in silence. The two datagen runs each prune
-     * their own output root, so a structure json is one misrouted run away from disappearing; and
-     * every {@code has_structure/*} biome tag is a single optional reference to a {@code c:} tag -
-     * get that name wrong and the tag loads empty, leaving the structure registered, placed, and
-     * generating nowhere at all.
+     * The four structures and two features are in the loaded datapack and something places them.
+     * Each can go missing silently: a misrouted datagen run prunes its json, and a wrong {@code c:}
+     * name in a {@code has_structure/*} biome tag loads it empty.
      */
     private static void worldgenDatapackEntriesResolve(GameTestHelper helper) {
         RegistryAccess registries = helper.getLevel().registryAccess();
@@ -148,10 +141,8 @@ final class WorldgenTests {
     }
 
     /**
-     * The other half of the same question: a placed feature that exists but is attached to no biome
-     * never runs. {@code WorldBiomeModifiers} is the only thing that attaches these, and it goes
-     * through a different loader API on each side - a {@code BiomeModifier} on NeoForge,
-     * {@code BiomeModifications} on Fabric - so this is where the two can silently disagree.
+     * Every placed feature is attached to a biome. {@code WorldBiomeModifiers} does that through a
+     * different loader API on each side, so this is where the two could disagree.
      */
     private static void modFeaturesAreAttachedToBiomes(GameTestHelper helper) {
         Registry<Biome> biomes = helper.getLevel().registryAccess().lookupOrThrow(Registries.BIOME);

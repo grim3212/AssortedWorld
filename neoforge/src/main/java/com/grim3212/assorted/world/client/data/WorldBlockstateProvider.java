@@ -18,13 +18,8 @@ import net.minecraft.world.level.block.Block;
 import java.util.stream.Stream;
 
 /**
- * Forge's {@code BlockStateProvider}, {@code ConfiguredModel} and {@code ExistingFileHelper} are
- * gone. Block states and models come from vanilla's {@link ModelProvider} now, which hands a
- * {@link BlockModelGenerators} to {@link #registerModels}.
- * <p>
- * The item half is {@link WorldItemModelProvider}. Because one {@link ModelProvider} writes both,
- * the two are kept apart by narrowing what each claims to know about - this one owns every block
- * plus the block items, which {@link ModelProvider} points at the block model on its own.
+ * Block states and block models. This owns every block and block item; {@link
+ * WorldItemModelProvider} owns the rest, so the two never write the same file.
  */
 public class WorldBlockstateProvider extends ModelProvider {
 
@@ -59,16 +54,8 @@ public class WorldBlockstateProvider extends ModelProvider {
     }
 
     /**
-     * A plant drawn as two crossed quads.
-     * <p>
-     * Vanilla's own {@code createCrossBlock} is private, so the two halves it does are spelled out:
-     * bake the {@code cross} template against the block's texture, then emit a single-variant
-     * blockstate pointing at it.
-     * <p>
-     * The 1.20.1 version also called {@code .renderType("minecraft:cutout")}. That key does not
-     * exist in 26.2 - the render layer is derived from the texture's own alpha by
-     * {@code SpriteContents} and {@code ChunkSectionLayer.byTransparency} - so it is simply dropped
-     * rather than translated. The reed still draws as cutout because its texture says so.
+     * A plant drawn as two crossed quads: the {@code cross} template baked against the block
+     * texture. The texture's alpha makes it cutout.
      */
     private void cross(BlockModelGenerators blockModels, Block block) {
         MultiVariant model = BlockModelGenerators.plainVariant(ModelTemplates.CROSS.create(block, TextureMapping.cross(block), blockModels.modelOutput));

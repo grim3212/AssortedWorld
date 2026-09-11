@@ -70,10 +70,8 @@ final class RuneTests {
     }
 
     /**
-     * {@code runeBlocks()} and {@code RuneType} are two hand-written parallel lists, and the loot
-     * tables, the block tags and every structure's rune roll all index into the first one. A rune
-     * whose effect name does not resolve is silently a null holder, and two runes sharing an effect
-     * is invisible in game.
+     * {@code runeBlocks()} and {@code RuneType} are parallel hand-written lists: every rune's
+     * effect has to resolve, and no two may share one.
      */
     private static void everyRuneMapsToADistinctEffect(GameTestHelper helper) {
         Block[] runes = WorldBlocks.runeBlocks();
@@ -102,10 +100,8 @@ final class RuneTests {
     }
 
     /**
-     * All sixteen runes are separate blocks with no block state properties at all, so "a rune
-     * places" really means the registry entry, the block and its item still line up. They go in
-     * side by side rather than one after another in the same spot: a rune that quietly resolved to
-     * its neighbour would pass a single-position loop.
+     * Every rune places as its own block. They go side by side, so a rune that resolved to its
+     * neighbour would not pass.
      */
     private static void everyRunePlaces(GameTestHelper helper) {
         Block[] runes = WorldBlocks.runeBlocks();

@@ -30,10 +30,8 @@ final class OreTests {
     }
 
     /**
-     * Both randomite ores are {@code requiresCorrectToolForDrops} and sit in
-     * {@code #minecraft:needs_stone_tool}, so wood harvests neither. Nothing in the ore's own loot
-     * table says so - the gate is the block property plus the tag - which is why it is worth
-     * pinning here.
+     * Wood harvests neither randomite ore: both need the correct tool and sit in
+     * {@code #minecraft:needs_stone_tool}, a gate the loot table does not show.
      */
     private static void randomiteOreNeedsAStoneTool(GameTestHelper helper) {
         for (Block ore : List.of(WorldBlocks.RANDOMITE_ORE.get(), WorldBlocks.DEEPSLATE_RANDOMITE_ORE.get())) {
@@ -50,10 +48,8 @@ final class OreTests {
     }
 
     /**
-     * Randomite is a {@code DropExperienceBlock}, and its experience comes out of
-     * {@code spawnAfterBreak} rather than out of the loot table - a separate path that a loot
-     * table change cannot cover. Both ores, because each declares its own {@code UniformInt} and
-     * the deepslate one is the easy half of the pair to forget.
+     * Both randomite ores drop experience, which comes from {@code spawnAfterBreak}, not the loot
+     * table. Each declares its own {@code UniformInt}.
      */
     private static void randomiteOreDropsExperience(GameTestHelper helper) {
         // Measured as deltas: whatever the first break dropped is still lying in the box when the

@@ -8,13 +8,9 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.storage.loot.LootTable;
 
 /**
- * The material a dome's ribbing is built from, and the chest loot that comes with it.
- * <p>
- * The roll is the original one — a d20 where 5, 10 and 15 each pick one of the three precious
- * variants — so a plain cobblestone dome is 17 in 20 and each of the others 1 in 20. It is rolled
- * once per dome in {@link WaterDomeStructure} and serialised by the piece, because
- * {@code postProcess} runs once per chunk the piece overlaps and the loot a chest gets has to be
- * the same on every pass.
+ * The material a dome's ribbing is built from, and the chest loot that comes with it. Cobblestone
+ * is 17 in 20 and each precious variant 1 in 20. Rolled once per dome and saved with the piece, so
+ * every chunk pass agrees.
  */
 public enum WaterDomeType {
     COBBLESTONE(Blocks.COBBLESTONE, WorldLootTables.CHESTS_WATER_DOME_COBBLESTONE),

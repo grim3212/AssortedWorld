@@ -54,11 +54,8 @@ public class WaterDomePiece extends ScatteredFeaturePiece {
     private int floorY;
 
     /**
-     * @param centre where the lobe's sphere goes. The box is built around it rather than starting
-     *               at it, so {@link #getLocatorPosition()} hands the same point back and the
-     *               volume written and the volume tested are one and the same. Building the box
-     *               from a corner instead would shift every lobe by its own radius and leave the
-     *               chain's spacing varying with it — gaps where two small lobes met.
+     * @param centre where the lobe's sphere goes. The box is built around it, so {@link
+     * #getLocatorPosition()} returns the same point and the lobes stay evenly spaced.
      */
     public WaterDomePiece(RandomSource random, BlockPos centre, int radius, boolean placesRune, int runeIndex, WaterDomeType domeType, int chestCount) {
         super(WorldStructures.WATER_DOME_STRUCTURE_PIECE.get(), centre.getX() - radius, centre.getY() - radius, centre.getZ() - radius, (radius * 2) + 1, (radius * 2) + 1, (radius * 2) + 1, getRandomHorizontalDirection(random));
@@ -155,10 +152,8 @@ public class WaterDomePiece extends ScatteredFeaturePiece {
     }
 
     /**
-     * The seabed under the centre of the sphere, resolved once. Reading it per pass was safe while
-     * every pass rewrote the whole dome, but now that each pass writes only its own chunk a second
-     * answer would step the dome at the chunk border — and the shell the first pass laid down is
-     * itself motion-blocking, so the second answer would not even be the seabed.
+     * The seabed under the sphere centre, resolved once, so every chunk pass builds the dome at the
+     * same height.
      */
     private int floorY(WorldGenLevel reader, BlockPos locator) {
         if (this.floorY == UNRESOLVED_FLOOR) {
@@ -169,10 +164,8 @@ public class WaterDomePiece extends ScatteredFeaturePiece {
     }
 
     /**
-     * Stands the dome's single rune on the floor of its centre column rather than at the sphere's
-     * centre, which is as often buried in the seabed as floating in mid-water. The floor is the
-     * lowest hollow, supported block in the column: the seabed where the dome cuts into it, the
-     * dome's own shell where it stands clear of it.
+     * Stands the rune on the floor of the centre column (the seabed, or the dome's own shell)
+     * rather than at the sphere centre, which is often buried or floating.
      */
     private void placeRune(WorldGenLevel reader, BlockPos centre) {
         Block rune = RuinUtil.runeAt(this.runeIndex);

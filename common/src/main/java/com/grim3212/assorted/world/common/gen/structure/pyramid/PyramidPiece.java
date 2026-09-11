@@ -98,13 +98,9 @@ public class PyramidPiece extends ScatteredFeaturePiece {
                 }
             }
 
-            // Outside the triple for is actually saving a lot of time
-            // 38 size was generating in about ~16s
-            // Now it is generating in about ~2s
-            //
-            // Only the part inside the chunk being generated is written. Writing the rest reached
-            // into chunks the generator had not cleared us for, which is what the "unsafe terrain
-            // read during worldgen" error was reporting.
+            // Written outside the triple loop (a size 38 pyramid went from ~16s to ~2s), and only
+            // inside the
+            // chunk being generated: writing further is an unsafe terrain read.
             blockCache.forEach((p, b) -> {
                 if (bb.isInside(p)) {
                     setBlockState(reader, p, b.defaultBlockState(), rand);

@@ -106,12 +106,9 @@ public class WaterDomeStructure extends Structure {
         // dome's pieces disagreed with each other. One roll per dome, and it decides the loot too.
         WaterDomeType domeType = WaterDomeType.random(rand);
 
-        // A dome either has loot or it does not; the ones that do get one or two chests. The first
-        // always goes in the rune piece. A dome is a chain of lobes marching in one direction that
-        // averages 50 blocks end to end, so a chest dropped in a uniformly chosen lobe sits a
-        // median 25 blocks from the rune and reads as belonging to some other structure entirely.
-        // Anchoring one to the rune lobe makes that lobe the dome's treasure chamber; the second,
-        // when there is one, is scattered down the chain as a reason to follow it.
+        // A dome with loot gets one or two chests. The first always goes in the rune lobe, so the
+        // treasure
+        // sits with the rune; a second is scattered down the chain.
         int[] chestsPerPiece = new int[pieceCount];
         if (rand.nextDouble() < WorldCommonMod.COMMON_CONFIG.waterDomeChestChance.get()) {
             chestsPerPiece[0]++;

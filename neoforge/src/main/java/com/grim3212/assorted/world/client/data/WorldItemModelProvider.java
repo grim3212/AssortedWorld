@@ -15,14 +15,8 @@ import net.minecraft.world.level.block.Block;
 import java.util.stream.Stream;
 
 /**
- * Forge's {@code ItemModelProvider} and {@code ItemModelBuilder} are gone, and so is the idea that
- * an item model is a single json: an item points at a data-driven {@code ItemModel} in
- * {@code assets/<ns>/items/}, which names the model to draw. {@link ItemModelGenerators} writes both
- * halves.
- * <p>
- * Block items are not listed here at all - they belong to {@link WorldBlockstateProvider}, which
- * points each one at its block model. The only item this provider owns is the gunpowder reed, whose
- * item is a flat sprite rather than its cross-shaped block model.
+ * Item models for everything but block items, which {@link WorldBlockstateProvider} models. That is
+ * just the gunpowder reed, whose item is a flat sprite.
  */
 public class WorldItemModelProvider extends ModelProvider {
 

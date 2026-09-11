@@ -17,25 +17,18 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
- * Straight from net.minecraftforge.common.DungeonHooks
- * <p>
- * I wanted to keep the two separate so that the extra mobs added don't change
- * regular dungeons.
+ * The rune spawner's mob list, adapted from Forge's {@code DungeonHooks} and kept separate so the
+ * extra mobs do not change regular dungeons.
  */
 public class RuinUtil {
     private static ArrayList<RuneMob> runeMobs = new ArrayList<RuneMob>();
 
     /**
-     * Adds a mob to the possible list of creatures the spawner will create. If the
-     * mob is already in the spawn list, the rarity will be added to the existing
-     * one, causing the mob to be more common.
+     * Adds a mob to the spawner list, or adds to its rarity if it is already there.
      *
-     * @param type   The entity type of the monster
-     * @param rarity The rarity of selecting this mob over others. Must be greater
-     *               then 0. Vanilla Minecraft has the following mobs: Spider 100
-     *               Skeleton 100 Zombie 200 Meaning, Zombies are twice as common as
-     *               spiders or skeletons.
-     * @return The new rarity of the monster,
+     * @param type   The entity type
+     * @param rarity Its weight against the others (vanilla: spider and skeleton 100, zombie 200)
+     * @return The mob's new rarity
      */
     public static float addRuneMob(EntityType<?> type, int rarity) {
         if (rarity <= 0) {
@@ -57,10 +50,10 @@ public class RuinUtil {
     }
 
     /**
-     * Will completely remove a Mob from the dungeon spawn list.
+     * Removes a mob from the spawner list.
      *
-     * @param name The name of the mob to remove
-     * @return The rarity of the removed mob, prior to being removed.
+     * @param name The mob to remove
+     * @return Its rarity before removal
      */
     public static int removeRuneMob(EntityType<?> name) {
         for (RuneMob mob : runeMobs) {
@@ -72,12 +65,7 @@ public class RuinUtil {
         return 0;
     }
 
-    /**
-     * Gets a random mob name from the list.
-     *
-     * @param rand World generation random number generator
-     * @return The mob name
-     */
+    /** A random mob from the list, weighted by rarity. */
     public static EntityType<?> getRandomRuneMob(RandomSource rand) {
         if (rand.nextInt(3) > 0) {
             RuneMob mob = WeightedRandom.getRandomItem(rand, runeMobs, RuneMob::weight).orElseThrow();
@@ -112,14 +100,9 @@ public class RuinUtil {
     }
 
     /**
-     * A random source that depends only on where a structure piece is, never on which chunk is
-     * being generated.
-     * <p>
-     * {@code postProcess} runs once per chunk a piece overlaps and is handed a fresh
-     * {@link RandomSource} each time, so anything decided from that one differs between passes.
-     * That was invisible while every pass rewrote the whole structure and the last one simply won.
-     * Now that each pass writes only its own chunk, two passes that disagree leave a seam along the
-     * chunk border, so every block decision has to come from here instead.
+     * A random source that depends only on where a piece is. {@code postProcess} runs once per
+     * chunk with a fresh random each time, so a block decision taken from that one leaves a seam at
+     * the chunk border.
      */
     public static RandomSource pieceRandom(WorldGenLevel reader, BoundingBox boundingBox) {
         // setLargeFeatureWithSalt is vanilla's own "same answer for this spot in this world" seeding
@@ -131,17 +114,9 @@ public class RuinUtil {
     }
 
     /**
-     * The origin a scattered-feature piece should build from: the centre of its own bounding box in
-     * x and z, at the box floor in y.
-     * <p>
-     * This is what {@code StructureStart.placeInChunk} passes as {@code postProcess}'s {@code pos}
-     * argument — but it reads the box <em>before</em> calling {@code postProcess}, and
-     * {@code ScatteredFeaturePiece.updateAverageGroundHeight} <em>moves the box vertically</em> the
-     * first time it runs. So that argument is the pre-move height on the first pass and the
-     * post-move height on every later one. It never showed while each pass rewrote the whole
-     * structure and the last one won; now that a pass writes only its own chunk, the chunks land at
-     * two different heights and the structure comes out in slabs. Call this after
-     * {@code updateAverageGroundHeight} instead and every pass agrees.
+     * The origin a scattered-feature piece builds from: the centre of its box in x and z, at the
+     * box floor. Call it after {@code updateAverageGroundHeight}, which moves the box on the first
+     * pass, so every chunk pass agrees on the height.
      */
     public static BlockPos pieceOrigin(BoundingBox boundingBox) {
         return new BlockPos(boundingBox.getCenter().getX(), boundingBox.minY(), boundingBox.getCenter().getZ());

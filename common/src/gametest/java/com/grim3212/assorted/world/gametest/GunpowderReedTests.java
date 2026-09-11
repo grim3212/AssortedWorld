@@ -49,10 +49,8 @@ final class GunpowderReedTests {
     }
 
     /**
-     * Both gunpowder recipes, and the tag the shaped one is keyed on. {@code #c:gunpowders} is
-     * filled by AssortedLib, not by this mod, and a shaped recipe whose key resolves to an empty
-     * tag matches nothing and reports nothing - which is exactly how this recipe stayed dead
-     * through most of the port.
+     * Both gunpowder recipes resolve, including the {@code #c:gunpowders} tag the shaped one is
+     * keyed on, which AssortedLib fills. A key on an empty tag matches nothing and reports nothing.
      */
     private static void gunpowderRecipesResolve(GameTestHelper helper) {
         helper.assertTrue(new ItemStack(Items.GUNPOWDER).is(LibCommonTags.Items.GUNPOWDER),

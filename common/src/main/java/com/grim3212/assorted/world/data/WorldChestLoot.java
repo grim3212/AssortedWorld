@@ -41,10 +41,8 @@ public class WorldChestLoot implements LootTableSubProvider {
     }
 
     /**
-     * The four water dome chests, one per ribbing material. A dome is cobblestone 17 times in 20
-     * and glowstone, iron or obsidian once each, so the three rare domes are what carry the payout;
-     * they climb in that order. Every tier shares the same seabed junk pool, and the odds of the
-     * dome's runes turning up in a chest climb with it as well.
+     * The four water dome chests, one per ribbing material. The three rare domes carry the payout
+     * and the rune odds climb with the tier; all share one seabed junk pool.
      */
     private void waterDomeChests(BiConsumer<ResourceKey<LootTable>, LootTable.Builder> output) {
         output.accept(WorldLootTables.CHESTS_WATER_DOME_COBBLESTONE, LootTable.lootTable()

@@ -76,15 +76,12 @@ public class FountainPiece extends ScatteredFeaturePiece {
             int halfWidth = halfWidth(height);
             int colHeight = 0;
 
-            // Both of these exist because postProcess runs once per chunk the piece overlaps. The
-            // counters are instance fields that were never reset, so the first pass spent the whole
-            // fountain's spawner and chest budget and every later pass placed none — harmless only
-            // while every pass also rewrote the whole fountain. Now that a pass writes just its own
-            // chunk, the budget has to be spent from scratch each time, and the block decisions have
-            // to come from a source that does not change between passes or the chunks disagree.
-            // Both of these must come from the box, and only after updateAverageGroundHeight above
-            // has moved it: the pos argument is read before postProcess runs, so it carries the
-            // pre-move height on the first pass and the post-move height on every later one.
+            // postProcess runs once per chunk the piece overlaps and each pass writes only its own
+            // chunk, so the
+            // spawner and chest budget restarts every pass, and every decision comes from the box
+            // rather than the
+            // pass. The box is read after updateAverageGroundHeight, which moves it on the first
+            // pass.
             BlockPos origin = RuinUtil.pieceOrigin(this.getBoundingBox());
             RandomSource pieceRandom = RuinUtil.pieceRandom(reader, this.getBoundingBox());
             this.placedSpawners = 0;

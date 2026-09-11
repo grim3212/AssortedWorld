@@ -24,10 +24,8 @@ import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConf
 public class RuinFeature extends Feature<NoneFeatureConfiguration> {
 
     /**
-     * Features are registry singletons shared across worldgen threads, so every per-ruin flag lives
-     * here and is created fresh in {@link #place}. These used to be fields on the feature itself,
-     * which meant the first ruin to place a chest or a rune stopped every later ruin from getting
-     * one.
+     * Per-ruin state, created fresh in {@link #place}: a feature is a singleton shared across
+     * worldgen threads, so it cannot hold this itself.
      */
     private static final class Ruin {
         private final int radius;

@@ -166,10 +166,8 @@ public class WorldGenData extends LibDatapackRegistryProvider {
     }
 
     /**
-     * What {@code RandomPatchConfiguration(20, 4, 0, ...)} used to do, spelt with placement
-     * modifiers: twenty attempts, spread over a 4 block horizontal radius with no vertical spread,
-     * each one keeping only positions that can actually hold a reed next to water. This is the
-     * shape vanilla's own sugar cane patch moved to.
+     * Twenty attempts over a 4 block horizontal radius, keeping only spots that can hold a reed
+     * beside water, like vanilla's sugar cane patch.
      */
     private static List<PlacementModifier> reedPatchPlacement(int rarity) {
         return List.of(RarityFilter.onAverageOnceEvery(rarity), InSquarePlacement.spread(), PlacementUtils.HEIGHTMAP, BiomeFilter.biome(), CountPlacement.of(20), RandomOffsetPlacement.ofTriangle(4, 0),

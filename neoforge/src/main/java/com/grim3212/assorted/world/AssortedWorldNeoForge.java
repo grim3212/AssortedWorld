@@ -42,10 +42,8 @@ public class AssortedWorldNeoForge {
     }
 
     /**
-     * {@code ExistingFileHelper} was removed from datagen, the event owns the provider list now
-     * ({@code addProvider}), and the include flags are gone because the server and client halves are
-     * separate events. Getting this split wrong is quiet: the wrong event runs and reports
-     * "All providers took: 0 ms" with a successful build.
+     * Server datagen. The server and client halves are separate events; if the wrong one runs, the
+     * build still succeeds, with "All providers took: 0 ms".
      */
     private void gatherServerData(final GatherDataEvent.Server event) {
         PackOutput packOutput = event.getGenerator().getPackOutput();
