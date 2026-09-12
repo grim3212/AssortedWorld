@@ -12,11 +12,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingInput;
-import net.minecraft.world.item.crafting.CraftingRecipe;
-import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
@@ -26,10 +21,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Optional;
 
 /**
- * Helpers and constants shared by AssortedWorld's gametest classes, which import them statically.
+ * Helpers and constants shared by AssortedWorld's gametest classes, which import them statically,
+ * alongside AssortedLib's {@code TestSupport}.
  */
 final class WorldTestSupport {
 
@@ -57,14 +52,6 @@ final class WorldTestSupport {
 
     static BlockPos runePos(int index) {
         return new BlockPos(index % 8, 1, index / 8);
-    }
-
-    static ItemStack craft(GameTestHelper helper, CraftingInput input, String what) {
-        // recipeAccess() is the full RecipeManager server side, so a headless test sees every
-        // loaded recipe without needing a crafting menu.
-        Optional<RecipeHolder<CraftingRecipe>> found = helper.getLevel().recipeAccess().getRecipeFor(RecipeType.CRAFTING, input, helper.getLevel());
-        helper.assertTrue(found.isPresent(), "no crafting recipe matches " + what);
-        return found.get().value().assemble(input);
     }
 
     /** The mod's own assets are on the classpath even on a headless server, jar or source root. */
