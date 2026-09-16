@@ -3,18 +3,30 @@ package com.grim3212.assorted.world.common.gen.feature;
 import com.grim3212.assorted.world.WorldCommonMod;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.DoublePlantBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 
+import java.util.List;
+
 /**
- * An island hanging in the air above the surface. Each one rolls its own {@link FloatingIslandType},
- * so what is floating over a forest may be desert, snow or mycelium.
+ * An island hanging in the air. Its shape comes from {@link FloatingIslandShape}, and what it is
+ * made of and what grows on it from a {@link FloatingIslandType} that fits the biome underneath, so
+ * a snowy biome gets spruce and snow while a jungle gets jungle trees.
  * <p>
  * GrimPack made these by lifting a bowl of terrain into the sky and leaving the crater behind. This
  * builds a new island instead and leaves the ground alone: a feature may only write to the chunk it
@@ -23,15 +35,14 @@ import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConf
  */
 public class FloatingIslandFeature extends Feature<NoneFeatureConfiguration> {
 
-    /** Every island is at least this wide; the config adds the variation on top. */
-    private static final int BASE_RADIUS = 7;
+    /** The air an island keeps under it when the build limit will not fit the configured minimum. */
+    private static final int SQUEEZED_GAP = 4;
 
-    /** How far above the surface an island floats. */
-    private static final int MIN_CLEARANCE = 20;
-    private static final int CLEARANCE_VARIANCE = 25;
-
-    /** One in this many surface blocks grows something. */
-    private static final int DECORATION_RATE = 5;
+    /**
+     * How far from the centre a tree may be planted. A feature may write at least 16 blocks from its
+     * origin, and the widest vanilla trees - fancy oak branches, mangrove roots - spread about 9.
+     */
+    private static final int TREE_REACH = 7;
 
     public FloatingIslandFeature(Codec<NoneFeatureConfiguration> codec) {
         super(codec);
@@ -41,86 +52,153 @@ public class FloatingIslandFeature extends Feature<NoneFeatureConfiguration> {
     public boolean place(FeaturePlaceContext<NoneFeatureConfiguration> context) {
         WorldGenLevel level = context.level();
         RandomSource random = context.random();
+        BlockPos origin = context.origin();
 
-        int radius = BASE_RADIUS + random.nextInt(WorldCommonMod.COMMON_CONFIG.floatingIslandSizeVariance.get());
-        BlockPos top = context.origin().above(MIN_CLEARANCE + random.nextInt(CLEARANCE_VARIANCE));
+        FloatingIslandShape shape = FloatingIslandShape.roll(random, rollSize(random));
+        Holder<Biome> biome = level.getBiome(origin);
+        FloatingIslandType type = FloatingIslandTypes.pick(random, biome);
 
-        // Room for what grows on top as well as for the island, and clear air where it goes.
-        if (top.getY() + 2 >= level.getMaxY() || !isClear(level, top, radius)) {
+        // Measured from the highest ground anywhere under the island, so an island over a mountain
+        // clears the peak instead of being turned away by it.
+        int ground = highestGround(level, origin, shape);
+        int gap = rollGap(random);
+        int treeHeadroom = type.treeHeadroom();
+
+        // Near the build limit, sink towards the ground first and then leave the trees off: an
+        // island over the tallest peaks still generates, just lower and bare.
+        int spare = spare(level, ground, gap, shape, treeHeadroom);
+        if (spare < 0) {
+            gap = Math.max(Math.min(gap, SQUEEZED_GAP), gap + spare);
+            spare = spare(level, ground, gap, shape, treeHeadroom);
+        }
+        if (spare < 0 && treeHeadroom > 0) {
+            treeHeadroom = 0;
+            spare = spare(level, ground, gap, shape, treeHeadroom);
+        }
+        if (spare < 0) {
             return false;
         }
 
-        FloatingIslandType type = FloatingIslandType.random(random);
+        // The base level is where a column with no rise has its surface. The deepest column's lowest
+        // block then sits exactly gap blocks above the ground.
+        BlockPos base = new BlockPos(origin.getX(), ground + gap + shape.deepest() - 1, origin.getZ());
 
-        for (int x = -radius; x <= radius; x++) {
-            for (int z = -radius; z <= radius; z++) {
-                double distance = Math.sqrt((x * x) + (z * z));
-                if (distance > radius) {
-                    continue;
-                }
+        for (FloatingIslandShape.Column column : shape.columns()) {
+            int fillerDepth = 1 + random.nextInt(3);
+            BlockPos surface = surface(base, column);
 
-                // A lens: full depth under the middle, tapering to the rim, with the rim itself
-                // roughed up so the underside is not a smooth cone.
-                int depth = (int) Math.round((1.0D - (distance / radius)) * radius);
-                if (depth < 1) {
-                    depth = random.nextInt(2);
-                }
+            for (int down = 0; down < column.height(); down++) {
+                BlockPos at = surface.below(down);
+                level.setBlock(at, layer(random, type, down, fillerDepth, at.getY()), Block.UPDATE_CLIENTS);
+            }
+        }
 
-                for (int y = 0; y < depth; y++) {
-                    level.setBlock(top.offset(x, -y, z), layer(y, depth, type), Block.UPDATE_CLIENTS);
-                }
+        // Trees before plants, so a trunk is never refused a spot a flower took; plants and snow
+        // after the island is whole, so canSurvive sees the finished surface.
+        if (treeHeadroom > 0) {
+            growTrees(level, context.chunkGenerator(), random, type, base, shape);
+        }
 
-                if (depth > 0) {
-                    decorate(level, random, top.offset(x, 1, z), type);
-                }
+        for (FloatingIslandShape.Column column : shape.columns()) {
+            BlockPos above = surface(base, column).above();
+            type.plant(random).ifPresent(plant -> placePlant(level, above, plant));
+
+            if (type.snowCover()) {
+                placePlant(level, above, Blocks.SNOW.defaultBlockState());
             }
         }
 
         return true;
     }
 
-    /** Cover on top, a little filler under it, then the island's core the rest of the way down. */
-    private static BlockState layer(int y, int depth, FloatingIslandType type) {
-        if (y == 0) {
-            return type.cover();
-        }
-        return y <= Math.min(3, depth / 2) ? type.filler() : type.core();
+    private static BlockPos surface(BlockPos base, FloatingIslandShape.Column column) {
+        return base.offset(column.x(), column.rise(), column.z());
     }
 
-    private static void decorate(WorldGenLevel level, RandomSource random, BlockPos pos, FloatingIslandType type) {
-        if (random.nextInt(DECORATION_RATE) != 0) {
-            return;
+    /** Cover on top, a little filler under it, then the kind's core the rest of the way down. */
+    private static BlockState layer(RandomSource random, FloatingIslandType type, int down, int fillerDepth, int y) {
+        if (down == 0) {
+            return type.cover(random);
         }
-
-        BlockState decoration = type.decoration(random);
-
-        // canSurvive keeps a cactus off sand it would break on and a sapling off snow, without this
-        // needing to know which pairings those are.
-        if (decoration != null && decoration.canSurvive(level, pos)) {
-            level.setBlock(pos, decoration, Block.UPDATE_CLIENTS);
-        }
+        return down <= fillerDepth ? type.filler() : type.core(random, y);
     }
 
     /**
-     * Nothing already in the island's box, and nothing under it reaching up into where it goes.
-     * Checked before any block is placed so a rejected island leaves no half of itself behind.
+     * Grows the kind's trees on soil near the middle. The configured features are vanilla's own, so
+     * each checks its own room and simply does nothing where a tree will not fit.
      */
-    private static boolean isClear(WorldGenLevel level, BlockPos top, int radius) {
-        for (int x = -radius; x <= radius; x++) {
-            for (int z = -radius; z <= radius; z++) {
-                if ((x * x) + (z * z) > radius * radius) {
-                    continue;
-                }
-
-                // The heightmap rather than a block walk: a column whose surface reaches into the
-                // island's box is a mountainside, and an island buried in one is the crater bug in
-                // another form.
-                if (level.getHeight(Heightmap.Types.WORLD_SURFACE_WG, top.getX() + x, top.getZ() + z) > top.getY() - radius) {
-                    return false;
-                }
-            }
+    private static void growTrees(WorldGenLevel level, ChunkGenerator generator, RandomSource random, FloatingIslandType type, BlockPos base, FloatingIslandShape shape) {
+        List<FloatingIslandShape.Column> spots = shape.columns().stream()
+                .filter(column -> Math.max(Math.abs(column.x()), Math.abs(column.z())) <= TREE_REACH)
+                .toList();
+        if (spots.isEmpty()) {
+            return;
         }
 
-        return true;
+        Registry<ConfiguredFeature<?, ?>> features = level.registryAccess().lookupOrThrow(Registries.CONFIGURED_FEATURE);
+        int count = type.treeCount(random, shape.columns().size());
+
+        for (int i = 0; i < count; i++) {
+            BlockPos ground = surface(base, spots.get(random.nextInt(spots.size())));
+            // Vanilla trees leave checking the ground to their placement rules, which this skips.
+            // Not #dirt: since 26.2 that is only dirt, coarse dirt and rooted dirt.
+            if (!level.getBlockState(ground).is(BlockTags.SUBSTRATE_OVERWORLD) || !level.isEmptyBlock(ground.above())) {
+                continue;
+            }
+
+            features.get(type.tree(random)).ifPresent(tree -> tree.value().place(level, generator, random, ground.above()));
+        }
+    }
+
+    /** A plant or snow layer in an empty spot it can survive in. Tall plants need the block above as well. */
+    private static void placePlant(WorldGenLevel level, BlockPos pos, BlockState plant) {
+        if (!level.isEmptyBlock(pos) || !plant.canSurvive(level, pos)) {
+            return;
+        }
+
+        if (plant.getBlock() instanceof DoublePlantBlock) {
+            if (level.isEmptyBlock(pos.above())) {
+                DoublePlantBlock.placeAt(level, plant, pos, Block.UPDATE_CLIENTS);
+            }
+            return;
+        }
+
+        level.setBlock(pos, plant, Block.UPDATE_CLIENTS);
+    }
+
+    /** The first free height above the tallest column under any part of the island. */
+    private static int highestGround(WorldGenLevel level, BlockPos origin, FloatingIslandShape shape) {
+        int highest = level.getMinY();
+        for (FloatingIslandShape.Column column : shape.columns()) {
+            highest = Math.max(highest, level.getHeight(Heightmap.Types.WORLD_SURFACE_WG, origin.getX() + column.x(), origin.getZ() + column.z()));
+        }
+        return highest;
+    }
+
+    /**
+     * Blocks left under the build limit once the island, a plant on top and its tallest tree are in.
+     * Negative means it does not fit.
+     */
+    private static int spare(WorldGenLevel level, int ground, int gap, FloatingIslandShape shape, int treeHeadroom) {
+        int base = ground + gap + shape.deepest() - 1;
+        int top = base + shape.highest() + 1 + treeHeadroom;
+        return level.getMaxY() - top;
+    }
+
+    /**
+     * An even roll between the configured bounds. They are clamped here as well as in the config,
+     * because the upper bound is what keeps the island inside the chunks it may write to.
+     */
+    private static int rollSize(RandomSource random) {
+        int min = Math.clamp(WorldCommonMod.COMMON_CONFIG.floatingIslandMinSize.get(), FloatingIslandShape.MIN_SIZE, FloatingIslandShape.MAX_REACH);
+        int max = Math.clamp(WorldCommonMod.COMMON_CONFIG.floatingIslandMaxSize.get(), FloatingIslandShape.MIN_SIZE, FloatingIslandShape.MAX_REACH);
+        return Math.min(min, max) + random.nextInt(Math.abs(max - min) + 1);
+    }
+
+    /** The air between the ground and the island's lowest point, evenly between the configured bounds. */
+    private static int rollGap(RandomSource random) {
+        int min = WorldCommonMod.COMMON_CONFIG.floatingIslandMinHeight.get();
+        int max = WorldCommonMod.COMMON_CONFIG.floatingIslandMaxHeight.get();
+        return Math.min(min, max) + random.nextInt(Math.abs(max - min) + 1);
     }
 }

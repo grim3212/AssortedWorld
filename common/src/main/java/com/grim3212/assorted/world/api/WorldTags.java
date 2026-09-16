@@ -57,6 +57,11 @@ public class WorldTags {
         public static final TagKey<Biome> HAS_SAND_PIT = create("has_feature/sand_pit");
         public static final TagKey<Biome> HAS_MELONS = create("has_feature/melons");
 
+        /** Where one kind of floating island hangs; see {@code FloatingIslandTypes}. */
+        public static TagKey<Biome> floatingIsland(String type) {
+            return create("floating_island/" + type);
+        }
+
         private static TagKey<Biome> create(String n) {
             return TagKey.create(Registries.BIOME, Identifier.fromNamespaceAndPath(Constants.MOD_ID, n));
         }

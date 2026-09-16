@@ -21,6 +21,9 @@ public final class WorldGameTests {
         OreTests.register(out);
         GunpowderReedTests.register(out);
         GlowstoneSeedTests.register(out);
+        FloatingIslandTests.register(out);
+        PyramidTests.register(out);
+        DesertWellTests.register(out);
         AssetTests.register(out);
     }
 }

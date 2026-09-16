@@ -1,0 +1,9 @@
+{
+  "values": [
+    {
+      "id": "#c:is_mushroom",
+      "required": false
+    },
+    "minecraft:dark_forest"
+  ]
+}

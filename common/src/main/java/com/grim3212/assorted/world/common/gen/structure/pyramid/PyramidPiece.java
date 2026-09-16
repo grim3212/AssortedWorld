@@ -29,17 +29,28 @@ import java.util.Map;
 
 public class PyramidPiece extends ScatteredFeaturePiece {
 
+    /** {@link #baseY} of a piece saved before the height was chosen when the structure is planned. */
+    private static final int LEGACY_BASE = Integer.MIN_VALUE;
+
     private final int maxHeight;
     private final int type;
     private final int runeIndex;
 
+    /** The height of the base course, chosen by {@link PyramidStructure#placement}. */
+    private final int baseY;
+
     private List<BlockPos> placedSpawners;
     private List<BlockPos> placedChests;
 
-    public PyramidPiece(RandomSource random, BlockPos pos, int maxHeight, int type) {
-        super(WorldStructures.PYRAMID_STRUCTURE_PIECE.get(), pos.getX(), pos.getY() - 1 - maxHeight, pos.getZ(), maxHeight * 2, maxHeight * 2 + 1, maxHeight * 2, getRandomHorizontalDirection(random));
+    /**
+     * @param corner the box's low corner in x and z
+     * @param baseY  the base course's height; the box runs from the floor below it to the tip
+     */
+    public PyramidPiece(RandomSource random, BlockPos corner, int baseY, int maxHeight, int type) {
+        super(WorldStructures.PYRAMID_STRUCTURE_PIECE.get(), corner.getX(), baseY - 1, corner.getZ(), maxHeight * 2, maxHeight + 2, maxHeight * 2, getRandomHorizontalDirection(random));
         this.maxHeight = maxHeight;
         this.type = type;
+        this.baseY = baseY;
         this.runeIndex = RuinUtil.randomRuneIndex(random);
         this.placedSpawners = Lists.newArrayList();
         this.placedChests = Lists.newArrayList();
@@ -50,6 +61,7 @@ public class PyramidPiece extends ScatteredFeaturePiece {
         this.maxHeight = tagCompound.getIntOr("maxHeight", 0);
         this.type = tagCompound.getIntOr("type", 0);
         this.runeIndex = tagCompound.getIntOr("runeIndex", 0);
+        this.baseY = tagCompound.getIntOr("baseY", LEGACY_BASE);
 
         // Not read back any more: postProcess regenerates them from a position-seeded source, so
         // they are working state for one pass rather than something that has to survive a reload.
@@ -63,50 +75,82 @@ public class PyramidPiece extends ScatteredFeaturePiece {
         tagCompound.putInt("maxHeight", this.maxHeight);
         tagCompound.putInt("type", this.type);
         tagCompound.putInt("runeIndex", this.runeIndex);
+        if (this.baseY != LEGACY_BASE) {
+            tagCompound.putInt("baseY", this.baseY);
+        }
     }
 
     @Override
     public void postProcess(WorldGenLevel reader, StructureManager structureManager, ChunkGenerator generator, RandomSource rand, BoundingBox bb, ChunkPos chunkPos, BlockPos pos) {
-        if (this.updateAverageGroundHeight(reader, bb, 0)) {
-            Map<BlockPos, Block> blockCache = new HashMap<>();
-
+        BlockPos offSetPos;
+        if (this.baseY != LEGACY_BASE) {
+            BlockPos centre = this.getBoundingBox().getCenter();
+            offSetPos = new BlockPos(centre.getX(), this.baseY, centre.getZ());
+        } else {
+            // A pyramid saved before its height was chosen up front finishes the way it started,
+            // from the average ground of the first chunk it generated in, so the halves agree.
+            if (!this.updateAverageGroundHeight(reader, bb, 0)) {
+                return;
+            }
             // From the box, and only after updateAverageGroundHeight above has moved it: the pos
             // argument is read before postProcess runs, so it carries the pre-move height on the
             // first pass and the post-move height on every later one.
-            BlockPos offSetPos = RuinUtil.pieceOrigin(this.getBoundingBox()).below(maxHeight / 2);
+            offSetPos = RuinUtil.pieceOrigin(this.getBoundingBox()).below(maxHeight / 2);
+        }
 
-            int halfWidth = halfWidth(maxHeight);
-            int colHeight = 0;
+        Map<BlockPos, Block> blockCache = new HashMap<>();
 
-            // Every pass works the whole pyramid out again, from a source that depends only on
-            // where it stands. The spawner and chest positions used to be generated once and
-            // carried in NBT precisely because a second pass would have re-rolled them differently;
-            // making the passes agree is what lets each of them write only its own chunk.
-            RandomSource pieceRandom = RuinUtil.pieceRandom(reader, this.getBoundingBox());
-            this.placedSpawners.clear();
-            this.placedChests.clear();
+        int halfWidth = halfWidth(maxHeight);
+        int colHeight = 0;
 
-            BlockPos newPos;
-            for (int x = -halfWidth; x <= halfWidth; x++) {
-                for (int z = -halfWidth; z <= halfWidth; z++) {
-                    colHeight = getColumnHeight(x, z);
-                    for (int y = -1; y <= colHeight; y++) {
-                        newPos = new BlockPos(x, y, z);
+        // Every pass works the whole pyramid out again, from a source that depends only on
+        // where it stands. The spawner and chest positions used to be generated once and
+        // carried in NBT precisely because a second pass would have re-rolled them differently;
+        // making the passes agree is what lets each of them write only its own chunk.
+        RandomSource pieceRandom = RuinUtil.pieceRandom(reader, this.getBoundingBox());
+        this.placedSpawners.clear();
+        this.placedChests.clear();
 
-                        blockCache.put(offSetPos.offset(newPos), blockToPlace(pieceRandom, newPos, colHeight));
-                    }
+        BlockPos newPos;
+        for (int x = -halfWidth; x <= halfWidth; x++) {
+            for (int z = -halfWidth; z <= halfWidth; z++) {
+                colHeight = getColumnHeight(x, z);
+                for (int y = -1; y <= colHeight; y++) {
+                    newPos = new BlockPos(x, y, z);
+
+                    blockCache.put(offSetPos.offset(newPos), blockToPlace(pieceRandom, newPos, colHeight));
                 }
             }
-
-            // Written outside the triple loop (a size 38 pyramid went from ~16s to ~2s), and only
-            // inside the
-            // chunk being generated: writing further is an unsafe terrain read.
-            blockCache.forEach((p, b) -> {
-                if (bb.isInside(p)) {
-                    setBlockState(reader, p, b.defaultBlockState(), rand);
-                }
-            });
         }
+
+        // Written outside the triple loop (a size 38 pyramid went from ~16s to ~2s), and only
+        // inside the chunk being generated: writing further is an unsafe terrain read.
+        blockCache.forEach((p, b) -> {
+            if (bb.isInside(p)) {
+                setBlockState(reader, p, b.defaultBlockState(), rand);
+            }
+        });
+
+        // Like vanilla's desert pyramid, fill down under the floor until it meets ground. The
+        // height is chosen from the terrain before caves and ravines are carved, and one cut under
+        // the footprint afterwards would otherwise leave the pyramid hanging over a hole.
+        for (int x = -halfWidth; x <= halfWidth; x++) {
+            for (int z = -halfWidth; z <= halfWidth; z++) {
+                BlockPos below = offSetPos.offset(x, -2, z);
+                if (!bb.isInside(below)) {
+                    continue;
+                }
+                while (below.getY() > reader.getMinY() && isHollow(reader.getBlockState(below))) {
+                    reader.setBlock(below, Blocks.SANDSTONE.defaultBlockState(), 2);
+                    below = below.below();
+                }
+            }
+        }
+    }
+
+    /** Air, fluid, or a plant or snow layer a solid block may take the place of. */
+    private static boolean isHollow(BlockState state) {
+        return state.isAir() || !state.getFluidState().isEmpty() || state.canBeReplaced();
     }
 
     private void setBlockState(WorldGenLevel world, BlockPos p, BlockState s, RandomSource rand) {

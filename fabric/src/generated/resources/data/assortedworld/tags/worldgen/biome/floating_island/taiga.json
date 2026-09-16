@@ -1,0 +1,10 @@
+{
+  "values": [
+    {
+      "id": "#minecraft:is_taiga",
+      "required": false
+    },
+    "minecraft:windswept_forest",
+    "minecraft:grove"
+  ]
+}

@@ -10,11 +10,13 @@ import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.ChestBlock;
+import net.minecraft.world.level.block.entity.BlockEntityTypes;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
+import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 import net.minecraft.world.level.storage.loot.LootTable;
 
 import java.util.List;
@@ -24,7 +26,7 @@ import java.util.List;
  * or 30 blocks deep and the loot climbs with the depth, so how far down you are willing to swim is
  * what decides the payout.
  * <p>
- * Vanilla's own desert well is left alone; these generate alongside it.
+ * Where these generate, vanilla's own desert well is taken out unless the config keeps it.
  */
 public class DesertWellFeature extends Feature<NoneFeatureConfiguration> {
 
@@ -32,6 +34,10 @@ public class DesertWellFeature extends Feature<NoneFeatureConfiguration> {
     private static final List<Integer> DEPTHS = List.of(10, 15, 20, 25, 30);
 
     private static final List<ResourceKey<LootTable>> LOOT = List.of(WorldLootTables.CHESTS_DESERT_WELL_10, WorldLootTables.CHESTS_DESERT_WELL_15, WorldLootTables.CHESTS_DESERT_WELL_20, WorldLootTables.CHESTS_DESERT_WELL_25, WorldLootTables.CHESTS_DESERT_WELL_30);
+
+    /** Casing blocks that face the water, as offsets from the shaft's centre column. */
+    private static final List<BlockPos> SHAFT_WALL = List.of(new BlockPos(1, 0, 1), new BlockPos(1, 0, -1), new BlockPos(-1, 0, 1), new BlockPos(-1, 0, -1),
+            new BlockPos(2, 0, 0), new BlockPos(-2, 0, 0), new BlockPos(0, 0, 2), new BlockPos(0, 0, -2));
 
     public DesertWellFeature(Codec<NoneFeatureConfiguration> codec) {
         super(codec);
@@ -48,7 +54,7 @@ public class DesertWellFeature extends Feature<NoneFeatureConfiguration> {
 
         // Sand all the way around the rim, so a well never ends up half over a cliff, and room for
         // the shaft plus the chest chamber under it.
-        if (origin.getY() - depth - 2 <= level.getMinY() || !onSand(level, origin)) {
+        if (origin.getY() - depth - 2 <= level.getMinY() || !onSand(level, origin) || !isOpen(level, origin)) {
             return false;
         }
 
@@ -92,6 +98,13 @@ public class DesertWellFeature extends Feature<NoneFeatureConfiguration> {
 
         placeChest(level, random, base.below(depth), sandstone, LOOT.get(tier));
 
+        // Vanilla's well is the only source of some pottery sherds, so these carry its suspicious
+        // sand too: two in the shaft wall just under the water, where vanilla puts them.
+        for (int i = 0; i < 2; i++) {
+            BlockPos wall = SHAFT_WALL.get(random.nextInt(SHAFT_WALL.size()));
+            placeSuspiciousSand(level, base.offset(wall.getX(), -1 - i, wall.getZ()));
+        }
+
         // The rim above ground, with a slab in the middle of each side to step over.
         for (int x = -2; x <= 2; x++) {
             for (int z = -2; z <= 2; z++) {
@@ -121,6 +134,11 @@ public class DesertWellFeature extends Feature<NoneFeatureConfiguration> {
         return true;
     }
 
+    private static void placeSuspiciousSand(WorldGenLevel level, BlockPos pos) {
+        level.setBlock(pos, Blocks.SUSPICIOUS_SAND.defaultBlockState(), Block.UPDATE_ALL);
+        level.getBlockEntity(pos, BlockEntityTypes.BRUSHABLE_BLOCK).ifPresent(sand -> sand.setLootTable(BuiltInLootTables.DESERT_WELL_ARCHAEOLOGY, pos.asLong()));
+    }
+
     /** A chest at the bottom of the shaft, walled in so the water above does not pour past it. */
     private static void placeChest(WorldGenLevel level, RandomSource random, BlockPos pos, BlockState sandstone, ResourceKey<LootTable> loot) {
         level.setBlock(pos.below(), sandstone, Block.UPDATE_CLIENTS);
@@ -132,6 +150,25 @@ public class DesertWellFeature extends Feature<NoneFeatureConfiguration> {
         if (level.getBlockEntity(pos) instanceof ChestBlockEntity chest) {
             chest.setLootTable(loot, random.nextLong());
         }
+    }
+
+    /**
+     * Nothing but air, plants or dune sand where the rim, pillars and roof go, so a well never
+     * builds into a pillar, a temple or another well.
+     */
+    private static boolean isOpen(WorldGenLevel level, BlockPos origin) {
+        for (int x = -2; x <= 2; x++) {
+            for (int z = -2; z <= 2; z++) {
+                for (int y = 0; y <= 4; y++) {
+                    BlockState state = level.getBlockState(origin.offset(x, y, z));
+                    if (!state.isAir() && !state.canBeReplaced() && !state.is(Blocks.SAND)) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
     }
 
     /** Sand under the whole 5x5 the well sits on. */

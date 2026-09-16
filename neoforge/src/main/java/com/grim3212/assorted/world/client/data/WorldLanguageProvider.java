@@ -132,11 +132,13 @@ public class WorldLanguageProvider extends LibLanguageProvider {
 
         this.add("manual.assortedworld.chapter.world_gen.floating_islands.title", "Floating Islands");
         this.add("manual.assortedworld.chapter.world_gen.floating_islands",
-                "Islands hang twenty to forty five blocks over the ground. Getting up to one is the whole problem. Nothing grows a bridge for you.");
+                "Islands hang high over the ground and take after the land below them."
+                        + BREAK
+                        + "Getting up to one is the whole problem. Nothing grows a bridge for you.");
 
         this.add("manual.assortedworld.chapter.world_gen.desert_wells.title", "Desert Wells");
         this.add("manual.assortedworld.chapter.world_gen.desert_wells",
-                "Some desert wells are not just a well. The shaft under them runs ten to thirty "
+                "Desert wells are not just a well. The shaft under them runs ten to thirty "
                         + "blocks down through the sandstone to a chest, and the deeper the swim the "
                         + "better what is waiting at the bottom.");
 

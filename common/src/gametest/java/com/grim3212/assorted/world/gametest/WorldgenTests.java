@@ -1,10 +1,13 @@
 package com.grim3212.assorted.world.gametest;
 
 import com.grim3212.assorted.world.Constants;
+import com.grim3212.assorted.world.WorldCommonMod;
 import com.grim3212.assorted.world.api.WorldLootTables;
+import com.grim3212.assorted.world.common.gen.WorldBiomeModifiers;
 import com.grim3212.assorted.world.common.gen.placement.ConfigRarityFilter;
 import com.grim3212.assorted.world.common.gen.placement.WorldPlacements;
 import com.grim3212.assorted.world.common.util.RuinUtil;
+import com.grim3212.assorted.world.data.WorldGenData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -16,6 +19,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.ReloadableServerRegistries;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
@@ -47,6 +51,7 @@ final class WorldgenTests {
         out.accept("worldgen_datapack_entries_resolve", WorldgenTests::worldgenDatapackEntriesResolve);
         out.accept("mod_features_are_attached_to_biomes", WorldgenTests::modFeaturesAreAttachedToBiomes);
         out.accept("config_rarity_gates_the_new_features", WorldgenTests::configRarityGatesTheNewFeatures);
+        out.accept("vanilla_desert_well_is_replaced", WorldgenTests::vanillaDesertWellIsReplaced);
     }
 
     /**
@@ -182,6 +187,19 @@ final class WorldgenTests {
         }
 
         helper.assertTrue(problems.isEmpty(), "config gated features: " + String.join("; ", problems));
+        helper.succeed();
+    }
+
+    /**
+     * With the config at its default, the desert has this mod's well and not vanilla's. The removal
+     * goes through a different loader API on each side, like the additions.
+     */
+    private static void vanillaDesertWellIsReplaced(GameTestHelper helper) {
+        helper.assertTrue(WorldCommonMod.COMMON_CONFIG.desertWellReplaceVanilla.get(), "desertWells.replaceVanilla is off in the test config");
+
+        Biome desert = helper.getLevel().registryAccess().lookupOrThrow(Registries.BIOME).getValueOrThrow(Biomes.DESERT);
+        helper.assertFalse(hasFeature(desert, WorldBiomeModifiers.VANILLA_DESERT_WELL), "the desert still has vanilla's desert well");
+        helper.assertTrue(hasFeature(desert, WorldGenData.DESERT_WELL_KEY), "the desert lost this mod's desert well as well");
         helper.succeed();
     }
 

@@ -20,9 +20,13 @@ public class WorldCommonConfig {
     public final Supplier<Integer> glowstoneSeedPlantHeight;
 
     public final Supplier<Integer> floatingIslandRarity;
-    public final Supplier<Integer> floatingIslandSizeVariance;
+    public final Supplier<Integer> floatingIslandMinSize;
+    public final Supplier<Integer> floatingIslandMaxSize;
+    public final Supplier<Integer> floatingIslandMinHeight;
+    public final Supplier<Integer> floatingIslandMaxHeight;
 
     public final Supplier<Integer> desertWellRarity;
+    public final Supplier<Boolean> desertWellReplaceVanilla;
 
     public final Supplier<Integer> wheatFieldRarity;
     public final Supplier<Integer> wheatFieldSize;
@@ -52,16 +56,20 @@ public class WorldCommonConfig {
         glowstoneSeedsEnabled = builder.defineBoolean("parts.glowstoneSeedsEnabled", true, "Set this to true if you would like glowstone seeds to be craftable and found in the creative tab.");
         glowstoneSeedPlantHeight = builder.defineInteger("glowstoneSeeds.plantHeight", 15, -64, 320, "Outside the Nether, glowstone seeds only take on a netherrack ceiling at or below this height. In the Nether they take at any height.");
 
-        floatingIslandRarity = builder.defineInteger("floatingIslands.rarity", 500, 0, 10000, RARITY);
-        floatingIslandSizeVariance = builder.defineInteger("floatingIslands.sizeVariance", 5, 1, 8, "How much an island's radius varies above the base of 7. Capped at 8 because an island has to stay inside the chunks the generator lets a feature write to.");
+        floatingIslandRarity = builder.defineInteger("floatingIslands.rarity", 1000, 0, 10000, RARITY);
+        floatingIslandMinSize = builder.defineInteger("floatingIslands.minSize", 6, 3, 15, "The smallest an island can be, as how many blocks it reaches from its middle. Sizes are rolled evenly between this and maxSize, so setting the two equal makes every island the same size.");
+        floatingIslandMaxSize = builder.defineInteger("floatingIslands.maxSize", 14, 3, 15, "The largest an island can be, as how many blocks it reaches from its middle. Capped at 15 because an island has to stay inside the chunks the generator lets a feature write to.");
+        floatingIslandMinHeight = builder.defineInteger("floatingIslands.minHeight", 16, 1, 256, "The least open air between an island's lowest point and the highest ground anywhere under it. Over the tallest mountains an island sinks below this, and then drops its trees, rather than not generating.");
+        floatingIslandMaxHeight = builder.defineInteger("floatingIslands.maxHeight", 64, 1, 256, "The most open air between an island's lowest point and the highest ground anywhere under it. Heights are rolled evenly between this and minHeight.");
 
-        desertWellRarity = builder.defineInteger("desertWells.rarity", 1000, 0, 10000, RARITY + " These are the deep wells with a chest at the bottom; vanilla's own desert wells are untouched.");
+        desertWellRarity = builder.defineInteger("desertWells.rarity", 900, 0, 10000, RARITY + " These are the deep wells with a chest at the bottom.");
+        desertWellReplaceVanilla = builder.defineBoolean("desertWells.replaceVanilla", true, "Set this to true to take vanilla's desert well out of every biome these wells generate in, so the two do not generate side by side. Needs a world reload. This is separate from rarity, which is all that decides whether these wells generate: off and rarity 0 leaves a desert with vanilla's wells only, on and rarity 0 leaves it with no wells at all, and off with any other rarity generates both.");
 
         wheatFieldRarity = builder.defineInteger("worldGenExpanded.wheatFieldRarity", 150, 0, 10000, RARITY);
         wheatFieldSize = builder.defineInteger("worldGenExpanded.wheatFieldSize", 6, 1, 11, "The radius in blocks of a wheat field.");
         saplingRarity = builder.defineInteger("worldGenExpanded.saplingRarity", 200, 0, 10000, RARITY);
         treeStumpRarity = builder.defineInteger("worldGenExpanded.treeStumpRarity", 200, 0, 10000, RARITY);
-        cactusFieldRarity = builder.defineInteger("worldGenExpanded.cactusFieldRarity", 150, 0, 10000, RARITY);
+        cactusFieldRarity = builder.defineInteger("worldGenExpanded.cactusFieldRarity", 250, 0, 10000, RARITY);
         cactusFieldSize = builder.defineInteger("worldGenExpanded.cactusFieldSize", 8, 1, 11, "The radius in blocks of a cactus field.");
         sandstonePillarRarity = builder.defineInteger("worldGenExpanded.sandstonePillarRarity", 250, 0, 10000, RARITY);
         sandPitRarity = builder.defineInteger("worldGenExpanded.sandPitRarity", 250, 0, 10000, RARITY);
