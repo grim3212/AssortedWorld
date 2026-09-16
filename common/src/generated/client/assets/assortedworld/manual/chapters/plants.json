@@ -20,6 +20,12 @@
     },
     {
       "type": "assortedlib:recipe",
+      "conditions": [
+        {
+          "type": "assortedlib:part_enabled",
+          "part": "glowstone_seeds"
+        }
+      ],
       "id": "glowstone_seeds",
       "recipes": [
         "assortedworld:glowstone_seeds"

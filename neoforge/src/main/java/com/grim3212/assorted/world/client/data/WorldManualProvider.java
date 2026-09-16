@@ -3,6 +3,7 @@ package com.grim3212.assorted.world.client.data;
 import com.grim3212.assorted.lib.data.LibManualProvider;
 import com.grim3212.assorted.world.Constants;
 import com.grim3212.assorted.world.common.block.WorldBlocks;
+import com.grim3212.assorted.world.common.crafting.WorldConditions;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
@@ -42,7 +43,7 @@ public class WorldManualProvider extends LibManualProvider {
         ChapterBuilder plants = this.chapter("plants");
         plants.recipes("gunpowder_reed", WorldBlocks.GUNPOWDER_REED.get()).opens(WorldBlocks.GUNPOWDER_REED.get());
         plants.recipesById("gunpowder", recipeId("gunpowder"));
-        plants.recipes("glowstone_seeds", WorldBlocks.GLOWSTONE_SEEDS.get()).opens(WorldBlocks.GLOWSTONE_SEEDS.get());
+        plants.recipes("glowstone_seeds", WorldBlocks.GLOWSTONE_SEEDS.get()).whenPartEnabled(WorldConditions.Parts.GLOWSTONE_SEEDS).opens(WorldBlocks.GLOWSTONE_SEEDS.get());
 
         ChapterBuilder worldGen = this.chapter("world_gen");
         worldGen.image("floating_islands", picture("floating_islands"), 119, 104);
