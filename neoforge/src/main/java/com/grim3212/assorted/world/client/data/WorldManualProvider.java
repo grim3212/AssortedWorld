@@ -20,7 +20,7 @@ public class WorldManualProvider extends LibManualProvider {
 
     @Override
     protected void addChapters() {
-        this.section(40, WorldBlocks.RANDOMITE_ORE.get());
+        this.section(140, WorldBlocks.RANDOMITE_ORE.get());
 
         ChapterBuilder randomite = this.chapter("randomite");
         randomite.items("ore", WorldBlocks.RANDOMITE_ORE.get(), WorldBlocks.DEEPSLATE_RANDOMITE_ORE.get())
