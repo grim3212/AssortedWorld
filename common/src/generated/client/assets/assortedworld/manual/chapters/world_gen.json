@@ -1,0 +1,32 @@
+{
+  "pages": [
+    {
+      "type": "assortedlib:image",
+      "height": 104,
+      "id": "floating_islands",
+      "image": "assortedworld:textures/gui/manual/floating_islands.png",
+      "text": "manual.assortedworld.chapter.world_gen.floating_islands",
+      "title": "manual.assortedworld.chapter.world_gen.floating_islands.title",
+      "width": 119
+    },
+    {
+      "type": "assortedlib:image",
+      "height": 104,
+      "id": "desert_wells",
+      "image": "assortedworld:textures/gui/manual/desert_wells.png",
+      "text": "manual.assortedworld.chapter.world_gen.desert_wells",
+      "title": "manual.assortedworld.chapter.world_gen.desert_wells.title",
+      "width": 126
+    },
+    {
+      "type": "assortedlib:image",
+      "height": 101,
+      "id": "world_gen_expanded",
+      "image": "assortedworld:textures/gui/manual/world_gen_expanded.png",
+      "text": "manual.assortedworld.chapter.world_gen.world_gen_expanded",
+      "title": "manual.assortedworld.chapter.world_gen.world_gen_expanded.title",
+      "width": 128
+    }
+  ],
+  "sort_order": 40
+}

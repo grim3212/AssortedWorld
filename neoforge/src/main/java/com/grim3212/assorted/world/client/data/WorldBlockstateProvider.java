@@ -51,6 +51,8 @@ public class WorldBlockstateProvider extends ModelProvider {
         }
 
         cross(blockModels, WorldBlocks.GUNPOWDER_REED.get());
+        // Every growth step looks the same, as it did in GrimPack
+        cross(blockModels, WorldBlocks.GLOWSTONE_SEEDS.get());
     }
 
     /**

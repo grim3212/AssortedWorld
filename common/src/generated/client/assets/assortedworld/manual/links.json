@@ -33,6 +33,12 @@
         "assortedworld:gunpowder_reed"
       ],
       "page": "assortedworld:plants/gunpowder_reed"
+    },
+    {
+      "blocks": [
+        "assortedworld:glowstone_seeds"
+      ],
+      "page": "assortedworld:plants/glowstone_seeds"
     }
   ]
 }

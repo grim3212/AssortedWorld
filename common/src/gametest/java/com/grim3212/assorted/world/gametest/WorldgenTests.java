@@ -2,11 +2,14 @@ package com.grim3212.assorted.world.gametest;
 
 import com.grim3212.assorted.world.Constants;
 import com.grim3212.assorted.world.api.WorldLootTables;
+import com.grim3212.assorted.world.common.gen.placement.ConfigRarityFilter;
+import com.grim3212.assorted.world.common.gen.placement.WorldPlacements;
 import com.grim3212.assorted.world.common.util.RuinUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.Identifier;
@@ -43,6 +46,7 @@ final class WorldgenTests {
         out.accept("piece_random_depends_only_on_position", WorldgenTests::pieceRandomDependsOnlyOnPosition);
         out.accept("worldgen_datapack_entries_resolve", WorldgenTests::worldgenDatapackEntriesResolve);
         out.accept("mod_features_are_attached_to_biomes", WorldgenTests::modFeaturesAreAttachedToBiomes);
+        out.accept("config_rarity_gates_the_new_features", WorldgenTests::configRarityGatesTheNewFeatures);
     }
 
     /**
@@ -63,7 +67,12 @@ final class WorldgenTests {
                 WorldLootTables.CHESTS_WATER_DOME_COBBLESTONE,
                 WorldLootTables.CHESTS_WATER_DOME_GLOWSTONE,
                 WorldLootTables.CHESTS_WATER_DOME_IRON,
-                WorldLootTables.CHESTS_WATER_DOME_OBSIDIAN);
+                WorldLootTables.CHESTS_WATER_DOME_OBSIDIAN,
+                WorldLootTables.CHESTS_DESERT_WELL_10,
+                WorldLootTables.CHESTS_DESERT_WELL_15,
+                WorldLootTables.CHESTS_DESERT_WELL_20,
+                WorldLootTables.CHESTS_DESERT_WELL_25,
+                WorldLootTables.CHESTS_DESERT_WELL_30);
 
         for (ResourceKey<LootTable> key : tables) {
             LootTable table = registries.getLootTable(key);
@@ -126,7 +135,7 @@ final class WorldgenTests {
 
         Registry<ConfiguredFeature<?, ?>> configured = registries.lookupOrThrow(Registries.CONFIGURED_FEATURE);
         Registry<PlacedFeature> placed = registries.lookupOrThrow(Registries.PLACED_FEATURE);
-        for (String name : List.of("ruin", "spire", "ore_randomite", "patch_gunpowder_reed")) {
+        for (String name : List.of("ruin", "spire", "ore_randomite", "patch_gunpowder_reed", "floating_island", "desert_well", "wheat_field", "cactus_field", "sand_pillar", "sand_pit", "patch_saplings", "tree_stumps", "patch_melons")) {
             Identifier id = Identifier.fromNamespaceAndPath(Constants.MOD_ID, name);
             if (configured.getValue(id) == null) {
                 problems.add("configured feature " + id + " is not in the registry");
@@ -141,6 +150,42 @@ final class WorldgenTests {
     }
 
     /**
+     * The config rarity modifier is registered, every part name it knows reads back a rarity, and the
+     * placed features that are meant to be config gated carry it. A placed feature that lost the
+     * modifier would silently generate in every chunk, and one naming a part nothing registered
+     * would silently generate in none.
+     */
+    private static void configRarityGatesTheNewFeatures(GameTestHelper helper) {
+        List<String> problems = new ArrayList<>();
+
+        Identifier rarityType = BuiltInRegistries.PLACEMENT_MODIFIER_TYPE.getKey(WorldPlacements.CONFIG_RARITY.get());
+        if (rarityType == null) {
+            problems.add("the config_rarity placement modifier type is not registered, so its placed features cannot load");
+        }
+
+        for (String part : List.of(WorldPlacements.Parts.FLOATING_ISLAND, WorldPlacements.Parts.DESERT_WELL, WorldPlacements.Parts.WHEAT_FIELD, WorldPlacements.Parts.SAPLING,
+                WorldPlacements.Parts.TREE_STUMP, WorldPlacements.Parts.CACTUS_FIELD, WorldPlacements.Parts.SANDSTONE_PILLAR, WorldPlacements.Parts.SAND_PIT, WorldPlacements.Parts.MELON)) {
+            if (WorldPlacements.rarity(part) <= 0) {
+                problems.add("part " + part + " reads back no rarity, so it can never generate");
+            }
+        }
+
+        Registry<PlacedFeature> placed = helper.getLevel().registryAccess().lookupOrThrow(Registries.PLACED_FEATURE);
+        for (String name : List.of("floating_island", "desert_well", "wheat_field", "cactus_field", "sand_pillar", "sand_pit", "patch_saplings", "tree_stumps", "patch_melons")) {
+            Identifier id = Identifier.fromNamespaceAndPath(Constants.MOD_ID, name);
+            PlacedFeature feature = placed.getValue(id);
+            if (feature == null) {
+                problems.add("placed feature " + id + " is not in the registry");
+            } else if (feature.placement().stream().noneMatch(modifier -> modifier instanceof ConfigRarityFilter)) {
+                problems.add("placed feature " + id + " has no config rarity filter, so the config cannot turn it off");
+            }
+        }
+
+        helper.assertTrue(problems.isEmpty(), "config gated features: " + String.join("; ", problems));
+        helper.succeed();
+    }
+
+    /**
      * Every placed feature is attached to a biome. {@code WorldBiomeModifiers} does that through a
      * different loader API on each side, so this is where the two could disagree.
      */
@@ -148,7 +193,7 @@ final class WorldgenTests {
         Registry<Biome> biomes = helper.getLevel().registryAccess().lookupOrThrow(Registries.BIOME);
         List<String> problems = new ArrayList<>();
 
-        for (String name : List.of("ore_randomite", "patch_gunpowder_reed", "ruin", "spire")) {
+        for (String name : List.of("ore_randomite", "patch_gunpowder_reed", "ruin", "spire", "floating_island", "desert_well", "wheat_field", "cactus_field", "sand_pillar", "sand_pit", "patch_saplings", "tree_stumps", "patch_melons")) {
             Identifier id = Identifier.fromNamespaceAndPath(Constants.MOD_ID, name);
             int biomeCount = 0;
             for (Biome biome : biomes) {

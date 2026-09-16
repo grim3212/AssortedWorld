@@ -55,6 +55,7 @@ public class WorldLanguageProvider extends LibLanguageProvider {
         this.addRunesChapter();
         this.addStructuresChapter();
         this.addPlantsChapter();
+        this.addWorldGenChapter();
     }
 
     private void addRandomiteChapter() {
@@ -110,7 +111,7 @@ public class WorldLanguageProvider extends LibLanguageProvider {
     }
 
     private void addPlantsChapter() {
-        this.add("manual.assortedworld.chapter.plants", "Gunpowder Reed");
+        this.add("manual.assortedworld.chapter.plants", "Plants");
 
         this.add("manual.assortedworld.chapter.plants.gunpowder_reed.title", "Gunpowder Reed");
         this.add("manual.assortedworld.chapter.plants.gunpowder_reed",
@@ -120,5 +121,31 @@ public class WorldLanguageProvider extends LibLanguageProvider {
         this.add("manual.assortedworld.chapter.plants.gunpowder.title", "Back to Gunpowder");
         this.add("manual.assortedworld.chapter.plants.gunpowder",
                 "A reed breaks back down into gunpowder one for one.");
+
+        this.add("manual.assortedworld.chapter.plants.glowstone_seeds.title", "Glowstone Seeds");
+        this.add("manual.assortedworld.chapter.plants.glowstone_seeds",
+                "A glowstone seed takes on the underside of a netherrack ceiling and ripens before bursting into a blob of glowstone.");
+    }
+
+    private void addWorldGenChapter() {
+        this.add("manual.assortedworld.chapter.world_gen", "Out in the World");
+
+        this.add("manual.assortedworld.chapter.world_gen.floating_islands.title", "Floating Islands");
+        this.add("manual.assortedworld.chapter.world_gen.floating_islands",
+                "Islands hang twenty to forty five blocks over the ground. Getting up to one is the whole problem. Nothing grows a bridge for you.");
+
+        this.add("manual.assortedworld.chapter.world_gen.desert_wells.title", "Desert Wells");
+        this.add("manual.assortedworld.chapter.world_gen.desert_wells",
+                "Some desert wells are not just a well. The shaft under them runs ten to thirty "
+                        + "blocks down through the sandstone to a chest, and the deeper the swim the "
+                        + "better what is waiting at the bottom.");
+
+        this.add("manual.assortedworld.chapter.world_gen.world_gen_expanded.title", "A Fuller World");
+        this.add("manual.assortedworld.chapter.world_gen.world_gen_expanded",
+                "Wild wheat grows in patches on the plains and melons turn up along the water. Stray "
+                        + "saplings and the stumps of felled trees are scattered through the woods."
+                        + BREAK
+                        + "The desert has more variety with fields of cactus, sandstone pillars standing out of "
+                        + "the dunes, and pits sunk into the sand in terraces.");
     }
 }

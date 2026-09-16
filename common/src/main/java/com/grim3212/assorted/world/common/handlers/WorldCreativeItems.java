@@ -5,6 +5,7 @@ import com.grim3212.assorted.lib.platform.Services;
 import com.grim3212.assorted.lib.registry.IRegistryObject;
 import com.grim3212.assorted.lib.registry.RegistryProvider;
 import com.grim3212.assorted.world.Constants;
+import com.grim3212.assorted.world.WorldCommonMod;
 import com.grim3212.assorted.world.common.block.WorldBlocks;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -37,6 +38,11 @@ public class WorldCreativeItems {
         items.add(WorldBlocks.RANDOMITE_ORE.get());
         items.add(WorldBlocks.DEEPSLATE_RANDOMITE_ORE.get());
         items.add(WorldBlocks.GUNPOWDER_REED.get());
+
+        if (WorldCommonMod.COMMON_CONFIG.glowstoneSeedsEnabled.get()) {
+            items.add(WorldBlocks.GLOWSTONE_SEEDS.get());
+        }
+
         for (Block rune : WorldBlocks.runeBlocks()) {
             items.add(rune);
         }

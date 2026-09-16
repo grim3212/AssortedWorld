@@ -1,0 +1,12 @@
+{
+  "values": [
+    {
+      "id": "#c:is_dense_vegetation/overworld",
+      "required": false
+    },
+    {
+      "id": "#c:is_tree/coniferous",
+      "required": false
+    }
+  ]
+}

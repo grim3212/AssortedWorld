@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:function",
+  "environment": "minecraft:default",
+  "function": "assortedworld:config_rarity_gates_the_new_features",
+  "structure": "assortedworld:test_box",
+  "max_ticks": 1,
+  "setup_ticks": 0,
+  "required": true
+}

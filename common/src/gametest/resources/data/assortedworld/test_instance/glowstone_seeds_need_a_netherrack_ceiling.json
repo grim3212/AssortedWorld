@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:function",
+  "environment": "minecraft:default",
+  "function": "assortedworld:glowstone_seeds_need_a_netherrack_ceiling",
+  "structure": "assortedworld:test_box",
+  "max_ticks": 1,
+  "setup_ticks": 0,
+  "required": true
+}

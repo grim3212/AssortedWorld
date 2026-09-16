@@ -20,6 +20,7 @@ public final class WorldGameTests {
         WorldgenTests.register(out);
         OreTests.register(out);
         GunpowderReedTests.register(out);
+        GlowstoneSeedTests.register(out);
         AssetTests.register(out);
     }
 }

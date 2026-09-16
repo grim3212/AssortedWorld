@@ -7,6 +7,8 @@ import com.grim3212.assorted.world.api.WorldTags;
 import com.grim3212.assorted.world.common.block.WorldBlocks;
 import com.grim3212.assorted.world.common.gen.feature.WorldFeatures;
 import com.grim3212.assorted.world.common.gen.feature.WorldTargets;
+import com.grim3212.assorted.world.common.gen.placement.ConfigRarityFilter;
+import com.grim3212.assorted.world.common.gen.placement.WorldPlacements;
 import com.grim3212.assorted.world.common.gen.structure.fountain.FountainStructure;
 import com.grim3212.assorted.world.common.gen.structure.pyramid.PyramidStructure;
 import com.grim3212.assorted.world.common.gen.structure.snowball.SnowballStructure;
@@ -20,8 +22,11 @@ import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.data.worldgen.placement.PlacementUtils;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.random.WeightedList;
 import net.minecraft.util.valueproviders.BiasedToBottomInt;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.VerticalAnchor;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
@@ -30,7 +35,9 @@ import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.BlockColumnConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration;
+import net.minecraft.world.level.levelgen.feature.configurations.SimpleBlockConfiguration;
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
+import net.minecraft.world.level.levelgen.feature.stateproviders.WeightedStateProvider;
 import net.minecraft.world.level.levelgen.placement.*;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
@@ -59,6 +66,16 @@ public class WorldGenData extends LibDatapackRegistryProvider {
     public static final Identifier SPIRE_KEY = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "spire");
     public static final Identifier RANDOMITE_KEY = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "ore_randomite");
     public static final Identifier GUNPOWDER_REED_KEY = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "patch_gunpowder_reed");
+
+    public static final Identifier FLOATING_ISLAND_KEY = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "floating_island");
+    public static final Identifier DESERT_WELL_KEY = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "desert_well");
+    public static final Identifier WHEAT_FIELD_KEY = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "wheat_field");
+    public static final Identifier CACTUS_FIELD_KEY = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "cactus_field");
+    public static final Identifier SAND_PILLAR_KEY = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "sand_pillar");
+    public static final Identifier SAND_PIT_KEY = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "sand_pit");
+    public static final Identifier SAPLING_KEY = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "patch_saplings");
+    public static final Identifier TREE_STUMP_KEY = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "tree_stumps");
+    public static final Identifier MELON_KEY = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "patch_melons");
 
     private static ResourceKey<Structure> structureResourceKey(Identifier key) {
         return ResourceKey.create(Registries.STRUCTURE, key);
@@ -105,6 +122,19 @@ public class WorldGenData extends LibDatapackRegistryProvider {
         // so the configured feature is just the block column that used to be wrapped by the patch.
         map.put(GUNPOWDER_REED_KEY, new ConfiguredFeature<>(Feature.BLOCK_COLUMN, BlockColumnConfiguration.simple(BiasedToBottomInt.of(2, 4), BlockStateProvider.simple(WorldBlocks.GUNPOWDER_REED.get()))));
 
+        map.put(FLOATING_ISLAND_KEY, new ConfiguredFeature<>(WorldFeatures.FLOATING_ISLAND_FEATURE.get(), NoneFeatureConfiguration.INSTANCE));
+        map.put(DESERT_WELL_KEY, new ConfiguredFeature<>(WorldFeatures.DESERT_WELL_FEATURE.get(), NoneFeatureConfiguration.INSTANCE));
+        map.put(WHEAT_FIELD_KEY, new ConfiguredFeature<>(WorldFeatures.WHEAT_FIELD_FEATURE.get(), NoneFeatureConfiguration.INSTANCE));
+        map.put(CACTUS_FIELD_KEY, new ConfiguredFeature<>(WorldFeatures.CACTUS_FIELD_FEATURE.get(), NoneFeatureConfiguration.INSTANCE));
+        map.put(SAND_PILLAR_KEY, new ConfiguredFeature<>(WorldFeatures.SAND_PILLAR_FEATURE.get(), NoneFeatureConfiguration.INSTANCE));
+        map.put(SAND_PIT_KEY, new ConfiguredFeature<>(WorldFeatures.SAND_PIT_FEATURE.get(), NoneFeatureConfiguration.INSTANCE));
+
+        // Saplings, stumps and melons are single blocks - vanilla's SIMPLE_BLOCK places them and the
+        // placement below is what makes each a scattered patch.
+        map.put(SAPLING_KEY, new ConfiguredFeature<>(Feature.SIMPLE_BLOCK, new SimpleBlockConfiguration(new WeightedStateProvider(saplings()))));
+        map.put(TREE_STUMP_KEY, new ConfiguredFeature<>(Feature.SIMPLE_BLOCK, new SimpleBlockConfiguration(new WeightedStateProvider(stumps()))));
+        map.put(MELON_KEY, new ConfiguredFeature<>(Feature.SIMPLE_BLOCK, new SimpleBlockConfiguration(BlockStateProvider.simple(Blocks.MELON))));
+
         return map;
     }
 
@@ -117,6 +147,17 @@ public class WorldGenData extends LibDatapackRegistryProvider {
         map.put(SPIRE_KEY, new PlacedFeature(holderGetter.getOrThrow(configuredFeatureResourceKey(SPIRE_KEY)), heightmapPlacement(350)));
         map.put(RANDOMITE_KEY, new PlacedFeature(holderGetter.getOrThrow(configuredFeatureResourceKey(RANDOMITE_KEY)), commonOrePlacement(12, HeightRangePlacement.triangle(VerticalAnchor.BOTTOM, VerticalAnchor.TOP))));
         map.put(GUNPOWDER_REED_KEY, new PlacedFeature(holderGetter.getOrThrow(configuredFeatureResourceKey(GUNPOWDER_REED_KEY)), reedPatchPlacement(8)));
+
+        map.put(FLOATING_ISLAND_KEY, new PlacedFeature(holderGetter.getOrThrow(configuredFeatureResourceKey(FLOATING_ISLAND_KEY)), surfacePlacement(WorldPlacements.Parts.FLOATING_ISLAND)));
+        map.put(DESERT_WELL_KEY, new PlacedFeature(holderGetter.getOrThrow(configuredFeatureResourceKey(DESERT_WELL_KEY)), surfacePlacement(WorldPlacements.Parts.DESERT_WELL)));
+        map.put(WHEAT_FIELD_KEY, new PlacedFeature(holderGetter.getOrThrow(configuredFeatureResourceKey(WHEAT_FIELD_KEY)), surfacePlacement(WorldPlacements.Parts.WHEAT_FIELD)));
+        map.put(CACTUS_FIELD_KEY, new PlacedFeature(holderGetter.getOrThrow(configuredFeatureResourceKey(CACTUS_FIELD_KEY)), surfacePlacement(WorldPlacements.Parts.CACTUS_FIELD)));
+        map.put(SAND_PILLAR_KEY, new PlacedFeature(holderGetter.getOrThrow(configuredFeatureResourceKey(SAND_PILLAR_KEY)), surfacePlacement(WorldPlacements.Parts.SANDSTONE_PILLAR)));
+        map.put(SAND_PIT_KEY, new PlacedFeature(holderGetter.getOrThrow(configuredFeatureResourceKey(SAND_PIT_KEY)), surfacePlacement(WorldPlacements.Parts.SAND_PIT)));
+
+        map.put(SAPLING_KEY, new PlacedFeature(holderGetter.getOrThrow(configuredFeatureResourceKey(SAPLING_KEY)), scatteredOnGrass(WorldPlacements.Parts.SAPLING, 16)));
+        map.put(TREE_STUMP_KEY, new PlacedFeature(holderGetter.getOrThrow(configuredFeatureResourceKey(TREE_STUMP_KEY)), scatteredOnGrass(WorldPlacements.Parts.TREE_STUMP, 12)));
+        map.put(MELON_KEY, new PlacedFeature(holderGetter.getOrThrow(configuredFeatureResourceKey(MELON_KEY)), scatteredOnGrass(WorldPlacements.Parts.MELON, 8)));
 
         return map;
     }
@@ -159,6 +200,44 @@ public class WorldGenData extends LibDatapackRegistryProvider {
 
     private static List<PlacementModifier> commonOrePlacement(int count, PlacementModifier modifier) {
         return orePlacement(CountPlacement.of(count), modifier);
+    }
+
+    /**
+     * One attempt on the surface of a chunk the config's rarity picked out. The feature itself
+     * decides whether the spot will do, since each of these shapes its own footprint.
+     */
+    private static List<PlacementModifier> surfacePlacement(String part) {
+        return List.of(ConfigRarityFilter.onAverageOnceEvery(part), InSquarePlacement.spread(), PlacementUtils.HEIGHTMAP, BiomeFilter.biome());
+    }
+
+    /**
+     * A scatter of single blocks over grass. The offset comes before the heightmap so every attempt
+     * gets its own ground height, which is what lets a patch follow a slope.
+     */
+    private static List<PlacementModifier> scatteredOnGrass(String part, int count) {
+        return List.of(ConfigRarityFilter.onAverageOnceEvery(part), InSquarePlacement.spread(), CountPlacement.of(count), RandomOffsetPlacement.ofTriangle(6, 0), PlacementUtils.HEIGHTMAP,
+                BlockPredicateFilter.forPredicate(BlockPredicate.allOf(BlockPredicate.ONLY_IN_AIR_PREDICATE, BlockPredicate.matchesBlocks(new BlockPos(0, -1, 0), Blocks.GRASS_BLOCK))), BiomeFilter.biome());
+    }
+
+    /** The saplings a stray one can be, weighted towards the common woods. */
+    private static WeightedList<BlockState> saplings() {
+        return WeightedList.<BlockState>builder()
+                .add(Blocks.OAK_SAPLING.defaultBlockState(), 6)
+                .add(Blocks.BIRCH_SAPLING.defaultBlockState(), 4)
+                .add(Blocks.SPRUCE_SAPLING.defaultBlockState(), 4)
+                .add(Blocks.JUNGLE_SAPLING.defaultBlockState(), 2)
+                .add(Blocks.ACACIA_SAPLING.defaultBlockState(), 2)
+                .add(Blocks.DARK_OAK_SAPLING.defaultBlockState(), 2)
+                .build();
+    }
+
+    /** A stump is one log left standing where a tree was. */
+    private static WeightedList<BlockState> stumps() {
+        return WeightedList.<BlockState>builder()
+                .add(Blocks.OAK_LOG.defaultBlockState(), 6)
+                .add(Blocks.BIRCH_LOG.defaultBlockState(), 4)
+                .add(Blocks.SPRUCE_LOG.defaultBlockState(), 4)
+                .build();
     }
 
     private static List<PlacementModifier> heightmapPlacement(int rarity) {

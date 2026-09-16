@@ -1,0 +1,19 @@
+{
+  "feature": "assortedworld:sand_pit",
+  "placement": [
+    {
+      "type": "assortedworld:config_rarity",
+      "part": "sand_pit"
+    },
+    {
+      "type": "minecraft:in_square"
+    },
+    {
+      "type": "minecraft:heightmap",
+      "heightmap": "MOTION_BLOCKING"
+    },
+    {
+      "type": "minecraft:biome"
+    }
+  ]
+}

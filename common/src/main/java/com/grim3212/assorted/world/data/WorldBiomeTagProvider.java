@@ -27,5 +27,21 @@ public class WorldBiomeTagProvider extends LibBiomeTagProvider {
         tagger.apply(WorldTags.Biomes.HAS_PYRAMID).addOptionalTag(BiomeTags.HAS_DESERT_PYRAMID);
         tagger.apply(WorldTags.Biomes.HAS_SNOWBALL).addOptionalTag(LibCommonTags.Biomes.IS_SNOWY);
         tagger.apply(WorldTags.Biomes.HAS_WATER_DOME).addOptionalTag(BiomeTags.IS_OCEAN);
+
+        // Islands hang over any overworld surface; what they are made of is rolled per island and
+        // has nothing to do with the biome underneath.
+        tagger.apply(WorldTags.Biomes.HAS_FLOATING_ISLAND).addOptionalTag(BiomeTags.IS_OVERWORLD);
+
+        tagger.apply(WorldTags.Biomes.HAS_DESERT_WELL).addOptionalTag(LibCommonTags.Biomes.IS_DESERT);
+        tagger.apply(WorldTags.Biomes.HAS_SAND_PILLAR).addOptionalTag(LibCommonTags.Biomes.IS_DESERT);
+        tagger.apply(WorldTags.Biomes.HAS_CACTUS_FIELD).addOptionalTag(LibCommonTags.Biomes.IS_SANDY);
+        tagger.apply(WorldTags.Biomes.HAS_SAND_PIT).addOptionalTag(LibCommonTags.Biomes.IS_SANDY);
+
+        tagger.apply(WorldTags.Biomes.HAS_WHEAT_FIELD).addOptionalTag(LibCommonTags.Biomes.IS_PLAINS);
+        tagger.apply(WorldTags.Biomes.HAS_MELONS).addOptionalTag(LibCommonTags.Biomes.IS_PLAINS).addOptionalTag(LibCommonTags.Biomes.IS_WET_OVERWORLD);
+
+        // Where trees already grow, so a stray sapling or stump reads as part of the wood.
+        tagger.apply(WorldTags.Biomes.HAS_SAPLINGS).addOptionalTag(LibCommonTags.Biomes.IS_DENSE_OVERWORLD).addOptionalTag(LibCommonTags.Biomes.IS_CONIFEROUS);
+        tagger.apply(WorldTags.Biomes.HAS_TREE_STUMPS).addOptionalTag(LibCommonTags.Biomes.IS_DENSE_OVERWORLD).addOptionalTag(LibCommonTags.Biomes.IS_CONIFEROUS);
     }
 }

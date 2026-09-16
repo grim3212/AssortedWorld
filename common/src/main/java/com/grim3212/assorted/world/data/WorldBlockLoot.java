@@ -46,6 +46,11 @@ public class WorldBlockLoot extends LibBlockLootProvider {
 
         this.dropSelf(WorldBlocks.GUNPOWDER_REED.get());
 
+        // A seed breaks back into the dust it was made from, 1 or 2 of it, like GrimPack's did.
+        this.add(WorldBlocks.GLOWSTONE_SEEDS.get(), block -> LootTable.lootTable().withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1))
+                .add(LootItem.lootTableItem(Items.GLOWSTONE_DUST).apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0F, 2.0F))))
+                .when(ExplosionCondition.survivesExplosion())));
+
         this.add(WorldBlocks.RANDOMITE_ORE.get(), this::createRandomiteTable);
         this.add(WorldBlocks.DEEPSLATE_RANDOMITE_ORE.get(), this::createRandomiteTable);
     }

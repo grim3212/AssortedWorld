@@ -21,6 +21,13 @@ public class WorldLootTables {
     public static final ResourceKey<LootTable> CHESTS_WATER_DOME_IRON = create("chests/water_dome/iron");
     public static final ResourceKey<LootTable> CHESTS_WATER_DOME_OBSIDIAN = create("chests/water_dome/obsidian");
 
+    // One table per desert well depth tier. Deeper is a longer swim and a better chest.
+    public static final ResourceKey<LootTable> CHESTS_DESERT_WELL_10 = create("chests/desert_well/level_10");
+    public static final ResourceKey<LootTable> CHESTS_DESERT_WELL_15 = create("chests/desert_well/level_15");
+    public static final ResourceKey<LootTable> CHESTS_DESERT_WELL_20 = create("chests/desert_well/level_20");
+    public static final ResourceKey<LootTable> CHESTS_DESERT_WELL_25 = create("chests/desert_well/level_25");
+    public static final ResourceKey<LootTable> CHESTS_DESERT_WELL_30 = create("chests/desert_well/level_30");
+
     private static ResourceKey<LootTable> create(String name) {
         return ResourceKey.create(Registries.LOOT_TABLE, Identifier.fromNamespaceAndPath(Constants.MOD_ID, name));
     }

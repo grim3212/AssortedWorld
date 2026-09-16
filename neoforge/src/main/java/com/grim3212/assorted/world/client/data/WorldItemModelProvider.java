@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 
 /**
  * Item models for everything but block items, which {@link WorldBlockstateProvider} models. That is
- * just the gunpowder reed, whose item is a flat sprite.
+ * the two plants, whose items are flat sprites rather than their block models.
  */
 public class WorldItemModelProvider extends ModelProvider {
 
@@ -44,5 +44,6 @@ public class WorldItemModelProvider extends ModelProvider {
         // The reed's item is a flat sprite, not its block model. generateFlatItem derives the
         // texture from the item id, which is what the old `item/<name>` layer0 resolved to anyway.
         itemModels.generateFlatItem(WorldBlocks.GUNPOWDER_REED.get().asItem(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(WorldBlocks.GLOWSTONE_SEEDS.get().asItem(), ModelTemplates.FLAT_ITEM);
     }
 }

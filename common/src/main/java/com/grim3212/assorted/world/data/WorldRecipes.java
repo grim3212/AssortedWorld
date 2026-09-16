@@ -4,6 +4,7 @@ import com.grim3212.assorted.lib.core.conditions.ConditionalRecipeProvider;
 import com.grim3212.assorted.lib.util.LibCommonTags;
 import com.grim3212.assorted.world.Constants;
 import com.grim3212.assorted.world.common.block.WorldBlocks;
+import com.grim3212.assorted.world.common.crafting.WorldConditions;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
@@ -32,6 +33,7 @@ public class WorldRecipes extends ConditionalRecipeProvider {
 
     @Override
     public void registerConditions() {
+        this.addConditions(partEnabled(WorldConditions.Parts.GLOWSTONE_SEEDS), WorldBlocks.GLOWSTONE_SEEDS.getId());
     }
 
     @Override
@@ -40,6 +42,9 @@ public class WorldRecipes extends ConditionalRecipeProvider {
 
         ShapelessRecipeBuilder.shapeless(this.items, RecipeCategory.MISC, Items.GUNPOWDER, 1).requires(WorldBlocks.GUNPOWDER_REED.get()).unlockedBy("has_gunpowder_reeds", has(WorldBlocks.GUNPOWDER_REED.get())).save(this.output, key("gunpowder"));
         ShapedRecipeBuilder.shaped(this.items, RecipeCategory.MISC, WorldBlocks.GUNPOWDER_REED.get(), 1).define('X', LibCommonTags.Items.GUNPOWDER).define('R', Items.SUGAR_CANE).pattern("XXX").pattern("XRX").pattern("XXX").unlockedBy("has_gunpowder", has(LibCommonTags.Items.GUNPOWDER)).save(this.output, key(name(WorldBlocks.GUNPOWDER_REED.get())));
+
+        // Three glowstone dust around a soul sand, as GrimPack had it
+        ShapedRecipeBuilder.shaped(this.items, RecipeCategory.MISC, WorldBlocks.GLOWSTONE_SEEDS.get(), 1).define('G', LibCommonTags.Items.DUSTS_GLOWSTONE).define('S', Items.SOUL_SAND).pattern("GSG").pattern(" G ").unlockedBy("has_glowstone_dust", has(LibCommonTags.Items.DUSTS_GLOWSTONE)).save(this.output, key(name(WorldBlocks.GLOWSTONE_SEEDS.get())));
     }
 
     /**

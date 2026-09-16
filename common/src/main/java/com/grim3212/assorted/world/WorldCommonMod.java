@@ -1,8 +1,10 @@
 package com.grim3212.assorted.world;
 
 import com.grim3212.assorted.world.common.block.WorldBlocks;
+import com.grim3212.assorted.world.common.crafting.WorldConditions;
 import com.grim3212.assorted.world.common.gen.WorldBiomeModifiers;
 import com.grim3212.assorted.world.common.gen.feature.WorldFeatures;
+import com.grim3212.assorted.world.common.gen.placement.WorldPlacements;
 import com.grim3212.assorted.world.common.gen.structure.WorldStructures;
 import com.grim3212.assorted.world.common.handlers.WorldCreativeItems;
 import com.grim3212.assorted.world.config.WorldCommonConfig;
@@ -17,7 +19,9 @@ public class WorldCommonMod {
         WorldBlocks.init();
         WorldStructures.init();
         WorldFeatures.init();
+        WorldPlacements.init();
         WorldBiomeModifiers.init();
+        WorldConditions.init();
         WorldCreativeItems.init();
     }
 }

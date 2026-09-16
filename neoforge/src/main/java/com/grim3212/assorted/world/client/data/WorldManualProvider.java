@@ -40,8 +40,14 @@ public class WorldManualProvider extends LibManualProvider {
         structures.image("water_domes", picture("water_domes"), 128, 95);
 
         ChapterBuilder plants = this.chapter("plants");
-        plants.recipes("gunpowder_reed", "gunpowder_reed").opens(WorldBlocks.GUNPOWDER_REED.get());
-        plants.recipes("gunpowder", "gunpowder");
+        plants.recipes("gunpowder_reed", WorldBlocks.GUNPOWDER_REED.get()).opens(WorldBlocks.GUNPOWDER_REED.get());
+        plants.recipesById("gunpowder", recipeId("gunpowder"));
+        plants.recipes("glowstone_seeds", WorldBlocks.GLOWSTONE_SEEDS.get()).opens(WorldBlocks.GLOWSTONE_SEEDS.get());
+
+        ChapterBuilder worldGen = this.chapter("world_gen");
+        worldGen.image("floating_islands", picture("floating_islands"), 119, 104);
+        worldGen.image("desert_wells", picture("desert_wells"), 126, 104);
+        worldGen.image("world_gen_expanded", picture("world_gen_expanded"), 128, 101);
     }
 
     /** The screenshots under {@code textures/gui/manual}, sized to leave room for the text below. */

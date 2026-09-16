@@ -1,0 +1,37 @@
+{
+  "type": "minecraft:simple_block",
+  "config": {
+    "to_place": {
+      "type": "minecraft:weighted_state_provider",
+      "entries": [
+        {
+          "data": {
+            "Name": "minecraft:oak_log",
+            "Properties": {
+              "axis": "y"
+            }
+          },
+          "weight": 6
+        },
+        {
+          "data": {
+            "Name": "minecraft:birch_log",
+            "Properties": {
+              "axis": "y"
+            }
+          },
+          "weight": 4
+        },
+        {
+          "data": {
+            "Name": "minecraft:spruce_log",
+            "Properties": {
+              "axis": "y"
+            }
+          },
+          "weight": 4
+        }
+      ]
+    }
+  }
+}

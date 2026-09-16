@@ -38,6 +38,66 @@ public class WorldChestLoot implements LootTableSubProvider {
         output.accept(WorldLootTables.CHESTS_RUIN, LootTable.lootTable().withPool(treasurePool()).withPool(junkPool()));
 
         waterDomeChests(output);
+        desertWellChests(output);
+    }
+
+    /**
+     * The five desert well chests, one per depth tier. The shallow wells are the rubbish someone
+     * threw down them and the deep ones are what was worth hiding at the bottom of a 30 block shaft.
+     * <p>
+     * Ported from GrimPack's tables, which rolled counts from 0 and so could hand out a chest full
+     * of nothing; these start at 1.
+     */
+    private void desertWellChests(BiConsumer<ResourceKey<LootTable>, LootTable.Builder> output) {
+        output.accept(WorldLootTables.CHESTS_DESERT_WELL_10, LootTable.lootTable()
+                .withPool(LootPool.lootPool().setRolls(UniformGenerator.between(2.0F, 8.0F))
+                        .add(LootItem.lootTableItem(Items.BONE).setWeight(20).apply(count(1.0F, 3.0F)))
+                        .add(LootItem.lootTableItem(Items.STRING).setWeight(20).apply(count(1.0F, 2.0F)))
+                        .add(LootItem.lootTableItem(Items.COBBLESTONE).setWeight(20).apply(count(1.0F, 6.0F)))
+                        .add(LootItem.lootTableItem(Items.DIRT).setWeight(20).apply(count(1.0F, 6.0F)))
+                        .add(LootItem.lootTableItem(Items.COBWEB).setWeight(10).apply(count(1.0F, 2.0F)))));
+
+        output.accept(WorldLootTables.CHESTS_DESERT_WELL_15, LootTable.lootTable()
+                .withPool(LootPool.lootPool().setRolls(UniformGenerator.between(2.0F, 8.0F))
+                        .add(LootItem.lootTableItem(Items.LEATHER).setWeight(20).apply(count(1.0F, 4.0F)))
+                        .add(LootItem.lootTableItem(Items.IRON_INGOT).setWeight(15).apply(count(1.0F, 3.0F)))
+                        .add(LootItem.lootTableItem(Items.SLIME_BALL).setWeight(20).apply(count(1.0F, 4.0F)))
+                        .add(LootItem.lootTableItem(Items.WHEAT_SEEDS).setWeight(20).apply(count(1.0F, 4.0F)))));
+
+        output.accept(WorldLootTables.CHESTS_DESERT_WELL_20, LootTable.lootTable()
+                .withPool(LootPool.lootPool().setRolls(UniformGenerator.between(3.0F, 9.0F))
+                        .add(LootItem.lootTableItem(Items.MELON_SEEDS).setWeight(20).apply(count(1.0F, 3.0F)))
+                        .add(LootItem.lootTableItem(Items.PUMPKIN_SEEDS).setWeight(20).apply(count(1.0F, 3.0F)))
+                        .add(LootItem.lootTableItem(Items.IRON_INGOT).setWeight(15).apply(count(1.0F, 4.0F)))
+                        .add(LootItem.lootTableItem(Items.SLIME_BALL).setWeight(15).apply(count(1.0F, 5.0F)))
+                        .add(LootItem.lootTableItem(Items.QUARTZ).setWeight(15).apply(count(1.0F, 3.0F)))
+                        .add(LootItem.lootTableItem(Items.FISHING_ROD).setWeight(8))));
+
+        output.accept(WorldLootTables.CHESTS_DESERT_WELL_25, LootTable.lootTable()
+                .withPool(LootPool.lootPool().setRolls(UniformGenerator.between(3.0F, 10.0F))
+                        .add(LootItem.lootTableItem(Items.GOLD_INGOT).setWeight(15).apply(count(1.0F, 4.0F)))
+                        .add(LootItem.lootTableItem(Items.REDSTONE).setWeight(15).apply(count(1.0F, 6.0F)))
+                        .add(LootItem.lootTableItem(Items.MELON_SEEDS).setWeight(20).apply(count(1.0F, 5.0F)))
+                        .add(LootItem.lootTableItem(Items.IRON_INGOT).setWeight(15).apply(count(1.0F, 5.0F)))
+                        .add(LootItem.lootTableItem(Items.QUARTZ).setWeight(15).apply(count(1.0F, 4.0F)))
+                        .add(LootItem.lootTableItem(Items.BLAZE_ROD).setWeight(10).apply(count(1.0F, 5.0F)))
+                        .add(LootItem.lootTableItem(Items.GHAST_TEAR).setWeight(5).apply(count(1.0F, 3.0F)))
+                        .add(LootItem.lootTableItem(Items.EXPERIENCE_BOTTLE).setWeight(5).apply(count(1.0F, 3.0F)))
+                        .add(LootItem.lootTableItem(Items.BOOK).setWeight(8).apply(EnchantRandomlyFunction.randomApplicableEnchantment(this.registries)))));
+
+        output.accept(WorldLootTables.CHESTS_DESERT_WELL_30, LootTable.lootTable()
+                .withPool(LootPool.lootPool().setRolls(UniformGenerator.between(4.0F, 12.0F))
+                        .add(LootItem.lootTableItem(Items.REDSTONE).setWeight(20).apply(count(1.0F, 7.0F)))
+                        .add(LootItem.lootTableItem(Items.BLAZE_ROD).setWeight(15).apply(count(1.0F, 6.0F)))
+                        .add(LootItem.lootTableItem(Items.NETHER_WART).setWeight(15).apply(count(1.0F, 5.0F)))
+                        .add(LootItem.lootTableItem(Items.QUARTZ).setWeight(15).apply(count(1.0F, 5.0F)))
+                        .add(LootItem.lootTableItem(Items.ENDER_PEARL).setWeight(10).apply(count(1.0F, 4.0F)))
+                        .add(LootItem.lootTableItem(Items.DIAMOND).setWeight(8).apply(count(1.0F, 4.0F)))
+                        .add(LootItem.lootTableItem(Items.EMERALD).setWeight(8).apply(count(1.0F, 4.0F)))
+                        .add(LootItem.lootTableItem(Items.EXPERIENCE_BOTTLE).setWeight(8).apply(count(1.0F, 4.0F)))
+                        .add(LootItem.lootTableItem(Items.BOOK).setWeight(8).apply(EnchantRandomlyFunction.randomApplicableEnchantment(this.registries)))
+                        .add(LootItem.lootTableItem(Items.DIAMOND_PICKAXE).setWeight(5).apply(EnchantWithLevelsFunction.enchantWithLevels(this.registries, UniformGenerator.between(20.0F, 30.0F))))
+                        .add(LootItem.lootTableItem(Items.NETHER_STAR).setWeight(1))));
     }
 
     /**

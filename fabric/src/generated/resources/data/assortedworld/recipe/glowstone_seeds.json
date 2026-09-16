@@ -1,0 +1,20 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "assortedlib:part_enabled",
+      "part": "glowstone_seeds"
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "G": "#c:dusts/glowstone",
+    "S": "minecraft:soul_sand"
+  },
+  "pattern": [
+    "GSG",
+    " G "
+  ],
+  "result": {
+    "id": "assortedworld:glowstone_seeds"
+  }
+}

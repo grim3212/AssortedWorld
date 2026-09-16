@@ -17,6 +17,15 @@
       ],
       "text": "manual.assortedworld.chapter.plants.gunpowder",
       "title": "manual.assortedworld.chapter.plants.gunpowder.title"
+    },
+    {
+      "type": "assortedlib:recipe",
+      "id": "glowstone_seeds",
+      "recipes": [
+        "assortedworld:glowstone_seeds"
+      ],
+      "text": "manual.assortedworld.chapter.plants.glowstone_seeds",
+      "title": "manual.assortedworld.chapter.plants.glowstone_seeds.title"
     }
   ],
   "sort_order": 30
