@@ -1,0 +1,24 @@
+{
+  "pages": [
+    {
+      "type": "assortedlib:item",
+      "id": "ore",
+      "interval": 50,
+      "items": [
+        "assortedworld:randomite_ore",
+        "assortedworld:deepslate_randomite_ore"
+      ],
+      "text": "manual.assortedworld.chapter.randomite.ore",
+      "title": "manual.assortedworld.chapter.randomite.ore.title"
+    },
+    {
+      "type": "assortedlib:image",
+      "height": 104,
+      "id": "finding",
+      "image": "assortedworld:textures/gui/manual/randomite.png",
+      "text": "manual.assortedworld.chapter.randomite.finding",
+      "title": "manual.assortedworld.chapter.randomite.finding.title",
+      "width": 94
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "pages": [
+    {
+      "type": "assortedlib:recipe",
+      "id": "gunpowder_reed",
+      "recipes": [
+        "assortedworld:gunpowder_reed"
+      ],
+      "text": "manual.assortedworld.chapter.plants.gunpowder_reed",
+      "title": "manual.assortedworld.chapter.plants.gunpowder_reed.title"
+    },
+    {
+      "type": "assortedlib:recipe",
+      "id": "gunpowder",
+      "recipes": [
+        "assortedworld:gunpowder"
+      ],
+      "text": "manual.assortedworld.chapter.plants.gunpowder",
+      "title": "manual.assortedworld.chapter.plants.gunpowder.title"
+    }
+  ],
+  "sort_order": 30
+}

@@ -1,0 +1,59 @@
+{
+  "pages": [
+    {
+      "type": "assortedlib:image",
+      "height": 104,
+      "id": "ruins",
+      "image": "assortedworld:textures/gui/manual/ruins.png",
+      "text": "manual.assortedworld.chapter.structures.ruins",
+      "title": "manual.assortedworld.chapter.structures.ruins.title",
+      "width": 113
+    },
+    {
+      "type": "assortedlib:image",
+      "height": 104,
+      "id": "spires",
+      "image": "assortedworld:textures/gui/manual/spires.png",
+      "text": "manual.assortedworld.chapter.structures.spires",
+      "title": "manual.assortedworld.chapter.structures.spires.title",
+      "width": 79
+    },
+    {
+      "type": "assortedlib:image",
+      "height": 104,
+      "id": "fountains",
+      "image": "assortedworld:textures/gui/manual/fountains.png",
+      "text": "manual.assortedworld.chapter.structures.fountains",
+      "title": "manual.assortedworld.chapter.structures.fountains.title",
+      "width": 98
+    },
+    {
+      "type": "assortedlib:image",
+      "height": 104,
+      "id": "pyramids",
+      "image": "assortedworld:textures/gui/manual/pyramids.png",
+      "text": "manual.assortedworld.chapter.structures.pyramids",
+      "title": "manual.assortedworld.chapter.structures.pyramids.title",
+      "width": 113
+    },
+    {
+      "type": "assortedlib:image",
+      "height": 104,
+      "id": "snowballs",
+      "image": "assortedworld:textures/gui/manual/snowballs.png",
+      "text": "manual.assortedworld.chapter.structures.snowballs",
+      "title": "manual.assortedworld.chapter.structures.snowballs.title",
+      "width": 58
+    },
+    {
+      "type": "assortedlib:image",
+      "height": 95,
+      "id": "water_domes",
+      "image": "assortedworld:textures/gui/manual/water_domes.png",
+      "text": "manual.assortedworld.chapter.structures.water_domes",
+      "title": "manual.assortedworld.chapter.structures.water_domes.title",
+      "width": 128
+    }
+  ],
+  "sort_order": 20
+}

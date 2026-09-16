@@ -1,6 +1,7 @@
 package com.grim3212.assorted.world;
 
 import com.grim3212.assorted.world.client.data.WorldLanguageProvider;
+import com.grim3212.assorted.world.client.data.WorldManualProvider;
 import com.grim3212.assorted.lib.data.ForgeBiomeTagProvider;
 import com.grim3212.assorted.lib.data.ForgeBlockTagProvider;
 import com.grim3212.assorted.lib.data.ForgeItemTagProvider;
@@ -64,5 +65,6 @@ public class AssortedWorldNeoForge {
         event.addProvider(new WorldBlockstateProvider(packOutput));
         event.addProvider(new WorldItemModelProvider(packOutput));
         event.addProvider(new WorldLanguageProvider(packOutput));
+        event.addProvider(new WorldManualProvider(packOutput));
     }
 }
