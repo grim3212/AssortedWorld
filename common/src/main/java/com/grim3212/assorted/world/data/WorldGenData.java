@@ -18,11 +18,11 @@ import net.minecraft.core.HolderGetter;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.data.worldgen.placement.PlacementUtils;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.random.WeightedList;
 import net.minecraft.util.valueproviders.BiasedToBottomInt;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Blocks;
@@ -37,7 +37,6 @@ import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConf
 import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.SimpleBlockConfiguration;
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
-import net.minecraft.world.level.levelgen.feature.stateproviders.WeightedStateProvider;
 import net.minecraft.world.level.levelgen.placement.*;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
@@ -69,7 +68,7 @@ public class WorldGenData extends LibDatapackRegistryProvider {
 
     public static final Identifier FLOATING_ISLAND_KEY = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "floating_island");
     public static final Identifier DESERT_WELL_KEY = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "desert_well");
-    public static final Identifier WHEAT_FIELD_KEY = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "wheat_field");
+    public static final Identifier CROP_FIELD_KEY = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "crop_field");
     public static final Identifier CACTUS_FIELD_KEY = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "cactus_field");
     public static final Identifier SAND_PILLAR_KEY = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "sand_pillar");
     public static final Identifier SAND_PIT_KEY = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "sand_pit");
@@ -124,15 +123,15 @@ public class WorldGenData extends LibDatapackRegistryProvider {
 
         map.put(FLOATING_ISLAND_KEY, new ConfiguredFeature<>(WorldFeatures.FLOATING_ISLAND_FEATURE.get(), NoneFeatureConfiguration.INSTANCE));
         map.put(DESERT_WELL_KEY, new ConfiguredFeature<>(WorldFeatures.DESERT_WELL_FEATURE.get(), NoneFeatureConfiguration.INSTANCE));
-        map.put(WHEAT_FIELD_KEY, new ConfiguredFeature<>(WorldFeatures.WHEAT_FIELD_FEATURE.get(), NoneFeatureConfiguration.INSTANCE));
+        map.put(CROP_FIELD_KEY, new ConfiguredFeature<>(WorldFeatures.CROP_FIELD_FEATURE.get(), NoneFeatureConfiguration.INSTANCE));
         map.put(CACTUS_FIELD_KEY, new ConfiguredFeature<>(WorldFeatures.CACTUS_FIELD_FEATURE.get(), NoneFeatureConfiguration.INSTANCE));
         map.put(SAND_PILLAR_KEY, new ConfiguredFeature<>(WorldFeatures.SAND_PILLAR_FEATURE.get(), NoneFeatureConfiguration.INSTANCE));
         map.put(SAND_PIT_KEY, new ConfiguredFeature<>(WorldFeatures.SAND_PIT_FEATURE.get(), NoneFeatureConfiguration.INSTANCE));
 
-        // Saplings, stumps and melons are single blocks - vanilla's SIMPLE_BLOCK places them and the
-        // placement below is what makes each a scattered patch.
-        map.put(SAPLING_KEY, new ConfiguredFeature<>(Feature.SIMPLE_BLOCK, new SimpleBlockConfiguration(new WeightedStateProvider(saplings()))));
-        map.put(TREE_STUMP_KEY, new ConfiguredFeature<>(Feature.SIMPLE_BLOCK, new SimpleBlockConfiguration(new WeightedStateProvider(stumps()))));
+        // Saplings and stumps pick their wood from the biome they land in, which a state provider
+        // cannot do, so each is its own feature; the placement below is what makes it a patch.
+        map.put(SAPLING_KEY, new ConfiguredFeature<>(WorldFeatures.SAPLING_FEATURE.get(), NoneFeatureConfiguration.INSTANCE));
+        map.put(TREE_STUMP_KEY, new ConfiguredFeature<>(WorldFeatures.TREE_STUMP_FEATURE.get(), NoneFeatureConfiguration.INSTANCE));
         map.put(MELON_KEY, new ConfiguredFeature<>(Feature.SIMPLE_BLOCK, new SimpleBlockConfiguration(BlockStateProvider.simple(Blocks.MELON))));
 
         return map;
@@ -150,14 +149,14 @@ public class WorldGenData extends LibDatapackRegistryProvider {
 
         map.put(FLOATING_ISLAND_KEY, new PlacedFeature(holderGetter.getOrThrow(configuredFeatureResourceKey(FLOATING_ISLAND_KEY)), surfacePlacement(WorldPlacements.Parts.FLOATING_ISLAND)));
         map.put(DESERT_WELL_KEY, new PlacedFeature(holderGetter.getOrThrow(configuredFeatureResourceKey(DESERT_WELL_KEY)), surfacePlacement(WorldPlacements.Parts.DESERT_WELL)));
-        map.put(WHEAT_FIELD_KEY, new PlacedFeature(holderGetter.getOrThrow(configuredFeatureResourceKey(WHEAT_FIELD_KEY)), surfacePlacement(WorldPlacements.Parts.WHEAT_FIELD)));
+        map.put(CROP_FIELD_KEY, new PlacedFeature(holderGetter.getOrThrow(configuredFeatureResourceKey(CROP_FIELD_KEY)), surfacePlacement(WorldPlacements.Parts.CROP_FIELD)));
         map.put(CACTUS_FIELD_KEY, new PlacedFeature(holderGetter.getOrThrow(configuredFeatureResourceKey(CACTUS_FIELD_KEY)), surfacePlacement(WorldPlacements.Parts.CACTUS_FIELD)));
         map.put(SAND_PILLAR_KEY, new PlacedFeature(holderGetter.getOrThrow(configuredFeatureResourceKey(SAND_PILLAR_KEY)), surfacePlacement(WorldPlacements.Parts.SANDSTONE_PILLAR)));
         map.put(SAND_PIT_KEY, new PlacedFeature(holderGetter.getOrThrow(configuredFeatureResourceKey(SAND_PIT_KEY)), surfacePlacement(WorldPlacements.Parts.SAND_PIT)));
 
         map.put(SAPLING_KEY, new PlacedFeature(holderGetter.getOrThrow(configuredFeatureResourceKey(SAPLING_KEY)), scatteredOnGrass(WorldPlacements.Parts.SAPLING, 16)));
         map.put(TREE_STUMP_KEY, new PlacedFeature(holderGetter.getOrThrow(configuredFeatureResourceKey(TREE_STUMP_KEY)), scatteredOnGrass(WorldPlacements.Parts.TREE_STUMP, 12)));
-        map.put(MELON_KEY, new PlacedFeature(holderGetter.getOrThrow(configuredFeatureResourceKey(MELON_KEY)), scatteredOnGrass(WorldPlacements.Parts.MELON, 8)));
+        map.put(MELON_KEY, new PlacedFeature(holderGetter.getOrThrow(configuredFeatureResourceKey(MELON_KEY)), pumpkinStylePatch(WorldPlacements.Parts.MELON, 24)));
 
         return map;
     }
@@ -211,33 +210,25 @@ public class WorldGenData extends LibDatapackRegistryProvider {
     }
 
     /**
-     * A scatter of single blocks over grass. The offset comes before the heightmap so every attempt
-     * gets its own ground height, which is what lets a patch follow a slope.
+     * A scatter of single blocks over the forest floor. The offset comes before the heightmap so
+     * every attempt gets its own ground height, which is what lets a patch follow a slope.
      */
     private static List<PlacementModifier> scatteredOnGrass(String part, int count) {
-        return List.of(ConfigRarityFilter.onAverageOnceEvery(part), InSquarePlacement.spread(), CountPlacement.of(count), RandomOffsetPlacement.ofTriangle(6, 0), PlacementUtils.HEIGHTMAP,
-                BlockPredicateFilter.forPredicate(BlockPredicate.allOf(BlockPredicate.ONLY_IN_AIR_PREDICATE, BlockPredicate.matchesBlocks(new BlockPos(0, -1, 0), Blocks.GRASS_BLOCK))), BiomeFilter.biome());
+        return List.of(ConfigRarityFilter.onAverageOnceEvery(part), InSquarePlacement.spread(), CountPlacement.of(count), RandomOffsetPlacement.ofTriangle(6, 0), PlacementUtils.HEIGHTMAP_NO_LEAVES,
+                BlockPredicateFilter.forPredicate(BlockPredicate.allOf(BlockPredicate.replaceable(), BlockPredicate.matchesFluids(Fluids.EMPTY),
+                        BlockPredicate.matchesTag(new BlockPos(0, -1, 0), BlockTags.SUPPORTS_VEGETATION))), BiomeFilter.biome());
     }
 
-    /** The saplings a stray one can be, weighted towards the common woods. */
-    private static WeightedList<BlockState> saplings() {
-        return WeightedList.<BlockState>builder()
-                .add(Blocks.OAK_SAPLING.defaultBlockState(), 6)
-                .add(Blocks.BIRCH_SAPLING.defaultBlockState(), 4)
-                .add(Blocks.SPRUCE_SAPLING.defaultBlockState(), 4)
-                .add(Blocks.JUNGLE_SAPLING.defaultBlockState(), 2)
-                .add(Blocks.ACACIA_SAPLING.defaultBlockState(), 2)
-                .add(Blocks.DARK_OAK_SAPLING.defaultBlockState(), 2)
-                .build();
-    }
-
-    /** A stump is one log left standing where a tree was. */
-    private static WeightedList<BlockState> stumps() {
-        return WeightedList.<BlockState>builder()
-                .add(Blocks.OAK_LOG.defaultBlockState(), 6)
-                .add(Blocks.BIRCH_LOG.defaultBlockState(), 4)
-                .add(Blocks.SPRUCE_LOG.defaultBlockState(), 4)
-                .build();
+    /**
+     * Vanilla's pumpkin patch shape with the config's rarity in place of the baked in one: tries
+     * spread over a wide trapezoid, so the melons come up in a loose clump rather than an even
+     * dusting. The count is well under vanilla's 96 - a patch of melons is worth more than a patch
+     * of pumpkins, so a smaller one goes further.
+     */
+    private static List<PlacementModifier> pumpkinStylePatch(String part, int count) {
+        return List.of(ConfigRarityFilter.onAverageOnceEvery(part), InSquarePlacement.spread(), PlacementUtils.HEIGHTMAP, BiomeFilter.biome(), CountPlacement.of(count),
+                RandomOffsetPlacement.ofTriangle(7, 3),
+                BlockPredicateFilter.forPredicate(BlockPredicate.allOf(BlockPredicate.ONLY_IN_AIR_PREDICATE, BlockPredicate.matchesBlocks(new BlockPos(0, -1, 0), Blocks.GRASS_BLOCK))));
     }
 
     private static List<PlacementModifier> heightmapPlacement(int rarity) {

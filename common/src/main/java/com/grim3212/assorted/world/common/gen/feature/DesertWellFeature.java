@@ -36,7 +36,7 @@ public class DesertWellFeature extends Feature<NoneFeatureConfiguration> {
     private static final List<ResourceKey<LootTable>> LOOT = List.of(WorldLootTables.CHESTS_DESERT_WELL_10, WorldLootTables.CHESTS_DESERT_WELL_15, WorldLootTables.CHESTS_DESERT_WELL_20, WorldLootTables.CHESTS_DESERT_WELL_25, WorldLootTables.CHESTS_DESERT_WELL_30);
 
     /** Casing blocks that face the water, as offsets from the shaft's centre column. */
-    private static final List<BlockPos> SHAFT_WALL = List.of(new BlockPos(1, 0, 1), new BlockPos(1, 0, -1), new BlockPos(-1, 0, 1), new BlockPos(-1, 0, -1),
+    public static final List<BlockPos> SHAFT_WALL = List.of(new BlockPos(1, 0, 1), new BlockPos(1, 0, -1), new BlockPos(-1, 0, 1), new BlockPos(-1, 0, -1),
             new BlockPos(2, 0, 0), new BlockPos(-2, 0, 0), new BlockPos(0, 0, 2), new BlockPos(0, 0, -2));
 
     public DesertWellFeature(Codec<NoneFeatureConfiguration> codec) {
@@ -100,10 +100,10 @@ public class DesertWellFeature extends Feature<NoneFeatureConfiguration> {
 
         // Vanilla's well is the only source of some pottery sherds, so these carry its suspicious
         // sand too: two in the shaft wall just under the water, where vanilla puts them.
-        for (int i = 0; i < 2; i++) {
-            BlockPos wall = SHAFT_WALL.get(random.nextInt(SHAFT_WALL.size()));
-            placeSuspiciousSand(level, base.offset(wall.getX(), -1 - i, wall.getZ()));
-        }
+        BlockPos first = SHAFT_WALL.get(random.nextInt(SHAFT_WALL.size()));
+        BlockPos second = SHAFT_WALL.get(oppositeWall(random, SHAFT_WALL.indexOf(first)));
+        placeSuspiciousSand(level, base.offset(first.getX(), -1, first.getZ()));
+        placeSuspiciousSand(level, base.offset(second.getX(), -2, second.getZ()));
 
         // The rim above ground, with a slab in the middle of each side to step over.
         for (int x = -2; x <= 2; x++) {
@@ -134,7 +134,16 @@ public class DesertWellFeature extends Feature<NoneFeatureConfiguration> {
         return true;
     }
 
-    private static void placeSuspiciousSand(WorldGenLevel level, BlockPos pos) {
+    /**
+     * A wall two to six steps round the ring from {@code from}, so the well's two suspicious sands
+     * are never the same spot and never side by side - one is always in view from the other.
+     */
+    public static int oppositeWall(RandomSource random, int from) {
+        return (from + 2 + random.nextInt(SHAFT_WALL.size() - 3)) % SHAFT_WALL.size();
+    }
+
+    /** Public so the gametests can check the block entity actually took the loot table. */
+    public static void placeSuspiciousSand(WorldGenLevel level, BlockPos pos) {
         level.setBlock(pos, Blocks.SUSPICIOUS_SAND.defaultBlockState(), Block.UPDATE_ALL);
         level.getBlockEntity(pos, BlockEntityTypes.BRUSHABLE_BLOCK).ifPresent(sand -> sand.setLootTable(BuiltInLootTables.DESERT_WELL_ARCHAEOLOGY, pos.asLong()));
     }

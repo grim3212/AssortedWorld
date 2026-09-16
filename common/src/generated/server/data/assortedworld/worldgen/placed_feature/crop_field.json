@@ -1,9 +1,9 @@
 {
-  "feature": "assortedworld:wheat_field",
+  "feature": "assortedworld:crop_field",
   "placement": [
     {
       "type": "assortedworld:config_rarity",
-      "part": "wheat_field"
+      "part": "crop_field"
     },
     {
       "type": "minecraft:in_square"

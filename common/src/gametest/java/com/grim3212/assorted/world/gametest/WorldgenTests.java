@@ -140,7 +140,7 @@ final class WorldgenTests {
 
         Registry<ConfiguredFeature<?, ?>> configured = registries.lookupOrThrow(Registries.CONFIGURED_FEATURE);
         Registry<PlacedFeature> placed = registries.lookupOrThrow(Registries.PLACED_FEATURE);
-        for (String name : List.of("ruin", "spire", "ore_randomite", "patch_gunpowder_reed", "floating_island", "desert_well", "wheat_field", "cactus_field", "sand_pillar", "sand_pit", "patch_saplings", "tree_stumps", "patch_melons")) {
+        for (String name : List.of("ruin", "spire", "ore_randomite", "patch_gunpowder_reed", "floating_island", "desert_well", "crop_field", "cactus_field", "sand_pillar", "sand_pit", "patch_saplings", "tree_stumps", "patch_melons")) {
             Identifier id = Identifier.fromNamespaceAndPath(Constants.MOD_ID, name);
             if (configured.getValue(id) == null) {
                 problems.add("configured feature " + id + " is not in the registry");
@@ -168,7 +168,7 @@ final class WorldgenTests {
             problems.add("the config_rarity placement modifier type is not registered, so its placed features cannot load");
         }
 
-        for (String part : List.of(WorldPlacements.Parts.FLOATING_ISLAND, WorldPlacements.Parts.DESERT_WELL, WorldPlacements.Parts.WHEAT_FIELD, WorldPlacements.Parts.SAPLING,
+        for (String part : List.of(WorldPlacements.Parts.FLOATING_ISLAND, WorldPlacements.Parts.DESERT_WELL, WorldPlacements.Parts.CROP_FIELD, WorldPlacements.Parts.SAPLING,
                 WorldPlacements.Parts.TREE_STUMP, WorldPlacements.Parts.CACTUS_FIELD, WorldPlacements.Parts.SANDSTONE_PILLAR, WorldPlacements.Parts.SAND_PIT, WorldPlacements.Parts.MELON)) {
             if (WorldPlacements.rarity(part) <= 0) {
                 problems.add("part " + part + " reads back no rarity, so it can never generate");
@@ -176,7 +176,7 @@ final class WorldgenTests {
         }
 
         Registry<PlacedFeature> placed = helper.getLevel().registryAccess().lookupOrThrow(Registries.PLACED_FEATURE);
-        for (String name : List.of("floating_island", "desert_well", "wheat_field", "cactus_field", "sand_pillar", "sand_pit", "patch_saplings", "tree_stumps", "patch_melons")) {
+        for (String name : List.of("floating_island", "desert_well", "crop_field", "cactus_field", "sand_pillar", "sand_pit", "patch_saplings", "tree_stumps", "patch_melons")) {
             Identifier id = Identifier.fromNamespaceAndPath(Constants.MOD_ID, name);
             PlacedFeature feature = placed.getValue(id);
             if (feature == null) {
@@ -211,7 +211,7 @@ final class WorldgenTests {
         Registry<Biome> biomes = helper.getLevel().registryAccess().lookupOrThrow(Registries.BIOME);
         List<String> problems = new ArrayList<>();
 
-        for (String name : List.of("ore_randomite", "patch_gunpowder_reed", "ruin", "spire", "floating_island", "desert_well", "wheat_field", "cactus_field", "sand_pillar", "sand_pit", "patch_saplings", "tree_stumps", "patch_melons")) {
+        for (String name : List.of("ore_randomite", "patch_gunpowder_reed", "ruin", "spire", "floating_island", "desert_well", "crop_field", "cactus_field", "sand_pillar", "sand_pit", "patch_saplings", "tree_stumps", "patch_melons")) {
             Identifier id = Identifier.fromNamespaceAndPath(Constants.MOD_ID, name);
             int biomeCount = 0;
             for (Biome biome : biomes) {

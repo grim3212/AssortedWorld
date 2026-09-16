@@ -144,8 +144,9 @@ public class WorldLanguageProvider extends LibLanguageProvider {
 
         this.add("manual.assortedworld.chapter.world_gen.world_gen_expanded.title", "A Fuller World");
         this.add("manual.assortedworld.chapter.world_gen.world_gen_expanded",
-                "Wild wheat grows in patches on the plains and melons turn up along the water. Stray "
-                        + "saplings and the stumps of felled trees are scattered through the woods."
+                "Wild fields of wheat, carrots, potatoes or beetroot grow on the plains, watered by "
+                        + "holes dug in among the rows. Melons come up in loose patches around as well. "
+                        + "Stray saplings and the stumps of felled trees are scattered through the woods."
                         + BREAK
                         + "The desert has more variety with fields of cactus, sandstone pillars standing out of "
                         + "the dunes, and pits sunk into the sand in terraces.");

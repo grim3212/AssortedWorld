@@ -24,6 +24,8 @@ public final class WorldGameTests {
         FloatingIslandTests.register(out);
         PyramidTests.register(out);
         DesertWellTests.register(out);
+        BiomeWoodsTests.register(out);
+        WaterDomeTests.register(out);
         AssetTests.register(out);
     }
 }

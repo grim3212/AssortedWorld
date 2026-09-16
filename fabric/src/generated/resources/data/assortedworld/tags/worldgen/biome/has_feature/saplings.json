@@ -7,6 +7,23 @@
     {
       "id": "#c:is_tree/coniferous",
       "required": false
-    }
+    },
+    {
+      "id": "#minecraft:is_forest",
+      "required": false
+    },
+    {
+      "id": "#minecraft:is_taiga",
+      "required": false
+    },
+    {
+      "id": "#minecraft:is_jungle",
+      "required": false
+    },
+    "minecraft:cherry_grove",
+    "minecraft:pale_garden",
+    "minecraft:windswept_forest",
+    "minecraft:mangrove_swamp",
+    "minecraft:swamp"
   ]
 }

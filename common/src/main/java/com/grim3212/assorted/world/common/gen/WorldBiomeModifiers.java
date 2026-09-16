@@ -36,7 +36,7 @@ public class WorldBiomeModifiers {
                 GenerationStep.Decoration.SURFACE_STRUCTURES, VANILLA_DESERT_WELL);
 
         // The planted ones go in with the vegetation, after the trees they grow among are standing.
-        Services.WORLD_GEN.addFeatureToBiomes(matchesTag(WorldTags.Biomes.HAS_WHEAT_FIELD), GenerationStep.Decoration.VEGETAL_DECORATION, WorldGenData.WHEAT_FIELD_KEY);
+        Services.WORLD_GEN.addFeatureToBiomes(matchesTag(WorldTags.Biomes.HAS_CROP_FIELD), GenerationStep.Decoration.VEGETAL_DECORATION, WorldGenData.CROP_FIELD_KEY);
         Services.WORLD_GEN.addFeatureToBiomes(matchesTag(WorldTags.Biomes.HAS_CACTUS_FIELD), GenerationStep.Decoration.VEGETAL_DECORATION, WorldGenData.CACTUS_FIELD_KEY);
         Services.WORLD_GEN.addFeatureToBiomes(matchesTag(WorldTags.Biomes.HAS_SAPLINGS), GenerationStep.Decoration.VEGETAL_DECORATION, WorldGenData.SAPLING_KEY);
         Services.WORLD_GEN.addFeatureToBiomes(matchesTag(WorldTags.Biomes.HAS_TREE_STUMPS), GenerationStep.Decoration.VEGETAL_DECORATION, WorldGenData.TREE_STUMP_KEY);

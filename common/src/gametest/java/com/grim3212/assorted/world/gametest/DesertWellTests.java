@@ -1,11 +1,17 @@
 package com.grim3212.assorted.world.gametest;
 
 import com.grim3212.assorted.world.api.WorldLootTables;
+import com.grim3212.assorted.world.common.gen.feature.DesertWellFeature;
+import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.ReloadableServerRegistries;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BrushableBlockEntity;
+import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
@@ -38,6 +44,7 @@ final class DesertWellTests {
 
     static void register(BiConsumer<String, Consumer<GameTestHelper>> out) {
         out.accept("desert_well_sherd_odds_climb_with_depth", DesertWellTests::desertWellSherdOddsClimbWithDepth);
+        out.accept("desert_well_places_two_suspicious_sands", DesertWellTests::desertWellPlacesTwoSuspiciousSands);
     }
 
     /**
@@ -70,6 +77,41 @@ final class DesertWellTests {
             helper.assertTrue(withSherd > previous,
                     "the " + tier.depth() + " block well is no likelier to give a sherd than the tier above it");
             previous = withSherd;
+        }
+
+        helper.succeed();
+    }
+
+    /**
+     * Both suspicious sands carry the archaeology table. A well places two, one block apart down the
+     * shaft, and {@code setLootTable} on a block entity that never got created is silent - so a sand
+     * with no table looks exactly like sand nobody has brushed yet.
+     * <p>
+     * The two also have to be different walls: stacked in one column they read as a single find.
+     */
+    private static void desertWellPlacesTwoSuspiciousSands(GameTestHelper helper) {
+        for (int i = 0; i < 2; i++) {
+            BlockPos at = CENTRE.offset(i * 2, 0, 0);
+            helper.setBlock(at.below(), Blocks.SANDSTONE);
+            DesertWellFeature.placeSuspiciousSand(helper.getLevel(), helper.absolutePos(at));
+
+            helper.assertBlockPresent(Blocks.SUSPICIOUS_SAND, at);
+
+            BrushableBlockEntity sand = helper.getBlockEntity(at, BrushableBlockEntity.class);
+            String saved = sand.saveWithoutMetadata(helper.getLevel().registryAccess()).toString();
+            helper.assertTrue(saved.contains(BuiltInLootTables.DESERT_WELL_ARCHAEOLOGY.identifier().toString()),
+                    "the suspicious sand did not take the desert well archaeology table: " + saved);
+        }
+
+        RandomSource random = helper.getLevel().getRandom();
+        for (int from = 0; from < DesertWellFeature.SHAFT_WALL.size(); from++) {
+            for (int roll = 0; roll < 64; roll++) {
+                int other = DesertWellFeature.oppositeWall(random, from);
+                helper.assertFalse(other == from, "a well put both of its suspicious sands in the same wall");
+                int steps = Math.floorMod(other - from, DesertWellFeature.SHAFT_WALL.size());
+                helper.assertTrue(steps >= 2 && steps <= DesertWellFeature.SHAFT_WALL.size() - 2,
+                        "a well put its two suspicious sands side by side, " + steps + " steps apart");
+            }
         }
 
         helper.succeed();

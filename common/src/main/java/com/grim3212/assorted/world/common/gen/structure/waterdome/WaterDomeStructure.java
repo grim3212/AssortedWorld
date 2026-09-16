@@ -19,6 +19,10 @@ public class WaterDomeStructure extends Structure {
 
     public static final MapCodec<WaterDomeStructure> CODEC = simpleCodec(WaterDomeStructure::new);
 
+    /** How much suspicious gravel a dome that has any gets, across all its lobes. */
+    public static final int MIN_GRAVEL = 2;
+    public static final int MAX_GRAVEL = 5;
+
     public WaterDomeStructure(Structure.StructureSettings settings) {
         super(settings);
     }
@@ -117,11 +121,21 @@ public class WaterDomeStructure extends Structure {
             }
         }
 
+        // Some domes have suspicious gravel on the floor, scattered over whichever lobes the rolls
+        // land in rather than heaped in one.
+        int[] gravelPerPiece = new int[pieceCount];
+        if (rand.nextDouble() < WorldCommonMod.COMMON_CONFIG.waterDomeSuspiciousGravelChance.get()) {
+            int pieces = MIN_GRAVEL + rand.nextInt(MAX_GRAVEL - MIN_GRAVEL + 1);
+            for (int idx = 0; idx < pieces; idx++) {
+                gravelPerPiece[rand.nextInt(pieceCount)]++;
+            }
+        }
+
         for (int idx = 0; idx < pieceCount; idx++) {
             // xs/zs are the lobe centres, and the piece now builds its box around that centre. The
             // spacing between consecutive lobes is therefore exactly the step rolled above, as it
             // has always been.
-            builder.addPiece(new WaterDomePiece(context.random(), blockpos.offset(xs[idx], 0, zs[idx]), rads[idx], idx == 0, runeIndex, domeType, chestsPerPiece[idx]));
+            builder.addPiece(new WaterDomePiece(context.random(), blockpos.offset(xs[idx], 0, zs[idx]), rads[idx], idx == 0, runeIndex, domeType, chestsPerPiece[idx], gravelPerPiece[idx]));
         }
     }
 }

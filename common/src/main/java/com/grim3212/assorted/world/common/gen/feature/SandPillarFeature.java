@@ -1,5 +1,7 @@
 package com.grim3212.assorted.world.common.gen.feature;
 
+import com.grim3212.assorted.world.WorldCommonMod;
+import com.grim3212.assorted.world.common.block.WorldBlocks;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
@@ -7,19 +9,25 @@ import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SlabBlock;
+import net.minecraft.world.level.block.entity.BlockEntityTypes;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.SlabType;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
+import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * A sandstone column standing in the desert: a plinth sunk into the sand, a straight shaft and a
  * capital, in one of a few {@link Style styles}. On red sand it is built from red sandstone.
  * Some have fallen, leaving a broken stump and rubble.
+ * <p>
+ * Some also have a block of suspicious sand worked into the plinth, or a single rune buried in the
+ * middle of the shaft; both are off by default odds in the config rather than guaranteed.
  */
 public class SandPillarFeature extends Feature<NoneFeatureConfiguration> {
 
@@ -125,6 +133,10 @@ public class SandPillarFeature extends Feature<NoneFeatureConfiguration> {
             }
         }
 
+        if (random.nextFloat() <= WorldCommonMod.COMMON_CONFIG.sandstonePillarSuspiciousSandChance.get()) {
+            plinthSand(level, random, plinthBottom, min, max, plinthHeight);
+        }
+
         BlockPos shaftBottom = plinthBottom.above(plinthHeight);
         int standing = style == Style.RUINED ? 2 + random.nextInt(Math.max(1, shaft - 2)) : shaft;
 
@@ -139,6 +151,12 @@ public class SandPillarFeature extends Feature<NoneFeatureConfiguration> {
                     level.setBlock(shaftBottom.offset(x, y, z), shaftBlock(style, stone, y), Block.UPDATE_CLIENTS);
                 }
             }
+        }
+
+        // Halfway up whatever is left standing, so a fallen pillar can still be hiding one.
+        if (random.nextFloat() <= WorldCommonMod.COMMON_CONFIG.sandstonePillarRuneChance.get()) {
+            Block[] runes = WorldBlocks.runeBlocks();
+            level.setBlock(shaftBottom.offset(0, standing / 2, 0), runes[random.nextInt(runes.length)].defaultBlockState(), Block.UPDATE_CLIENTS);
         }
 
         if (style == Style.RUINED) {
@@ -168,6 +186,28 @@ public class SandPillarFeature extends Feature<NoneFeatureConfiguration> {
         }
 
         return true;
+    }
+
+    /**
+     * One block of the plinth's outer ring turned over to suspicious sand, carrying what a desert
+     * pyramid's sand carries. Only the ring, so it is visible from outside, and never the top layer
+     * of a plinth that has one, so the shaft still sits on stone.
+     */
+    private static void plinthSand(WorldGenLevel level, RandomSource random, BlockPos plinthBottom, int min, int max, int plinthHeight) {
+        List<BlockPos> ring = new ArrayList<>();
+        for (int x = min - 1; x <= max + 1; x++) {
+            for (int z = min - 1; z <= max + 1; z++) {
+                if (x == min - 1 || x == max + 1 || z == min - 1 || z == max + 1) {
+                    ring.add(new BlockPos(x, 0, z));
+                }
+            }
+        }
+
+        BlockPos at = ring.get(random.nextInt(ring.size()));
+        BlockPos pos = plinthBottom.offset(at.getX(), random.nextInt(Math.max(1, plinthHeight - 1)), at.getZ());
+
+        level.setBlock(pos, Blocks.SUSPICIOUS_SAND.defaultBlockState(), Block.UPDATE_ALL);
+        level.getBlockEntity(pos, BlockEntityTypes.BRUSHABLE_BLOCK).ifPresent(sand -> sand.setLootTable(BuiltInLootTables.DESERT_PYRAMID_ARCHAEOLOGY, pos.asLong()));
     }
 
     private static BlockState plinth(Style style, Stone stone, int y) {

@@ -1,5 +1,6 @@
 package com.grim3212.assorted.world.gametest;
 
+import com.grim3212.assorted.world.common.gen.feature.FloatingIslandFeature;
 import com.grim3212.assorted.world.common.gen.feature.FloatingIslandShape;
 import com.grim3212.assorted.world.common.gen.feature.FloatingIslandType;
 import com.grim3212.assorted.world.common.gen.feature.FloatingIslandTypes;
@@ -13,6 +14,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,7 +45,7 @@ final class FloatingIslandTests {
     }
 
     /**
-     * Every tree an island kind names is a real configured feature, and a kind with trees has soil
+     * Every tree an island kind names and every ore it seeds is a real configured feature, and a kind with trees has soil
      * for them to stand on. Either going wrong is silent: the island just grows nothing.
      */
     private static void floatingIslandTreesExist(GameTestHelper helper) {
@@ -62,7 +64,14 @@ final class FloatingIslandTests {
             }
         }
 
-        helper.assertTrue(missing.isEmpty(), "island trees that do not exist: " + missing);
+        // The ore veins are vanilla features by id too, and a renamed one would just never show.
+        for (ResourceKey<ConfiguredFeature<?, ?>> ore : FloatingIslandFeature.ores()) {
+            if (features.get(ore).filter(feature -> feature.value().config() instanceof OreConfiguration).isEmpty()) {
+                missing.add("ore -> " + ore.identifier() + " (missing, or no longer an ore feature)");
+            }
+        }
+
+        helper.assertTrue(missing.isEmpty(), "island trees or ores that do not exist: " + missing);
         helper.succeed();
     }
 

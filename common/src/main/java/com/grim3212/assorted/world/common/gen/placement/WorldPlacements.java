@@ -24,7 +24,7 @@ public class WorldPlacements {
     public static class Parts {
         public static final String FLOATING_ISLAND = "floating_island";
         public static final String DESERT_WELL = "desert_well";
-        public static final String WHEAT_FIELD = "wheat_field";
+        public static final String CROP_FIELD = "crop_field";
         public static final String SAPLING = "sapling";
         public static final String TREE_STUMP = "tree_stump";
         public static final String CACTUS_FIELD = "cactus_field";
@@ -44,7 +44,7 @@ public class WorldPlacements {
     public static void init() {
         RARITIES.put(Parts.FLOATING_ISLAND, WorldCommonMod.COMMON_CONFIG.floatingIslandRarity);
         RARITIES.put(Parts.DESERT_WELL, WorldCommonMod.COMMON_CONFIG.desertWellRarity);
-        RARITIES.put(Parts.WHEAT_FIELD, WorldCommonMod.COMMON_CONFIG.wheatFieldRarity);
+        RARITIES.put(Parts.CROP_FIELD, WorldCommonMod.COMMON_CONFIG.cropFieldRarity);
         RARITIES.put(Parts.SAPLING, WorldCommonMod.COMMON_CONFIG.saplingRarity);
         RARITIES.put(Parts.TREE_STUMP, WorldCommonMod.COMMON_CONFIG.treeStumpRarity);
         RARITIES.put(Parts.CACTUS_FIELD, WorldCommonMod.COMMON_CONFIG.cactusFieldRarity);

@@ -2,6 +2,7 @@ package com.grim3212.assorted.world.gametest;
 
 import com.grim3212.assorted.world.common.gen.structure.pyramid.PyramidPiece;
 import com.grim3212.assorted.world.common.gen.structure.pyramid.PyramidStructure;
+import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.util.RandomSource;
 
@@ -13,7 +14,7 @@ import java.util.function.Consumer;
 import java.util.function.IntBinaryOperator;
 
 /**
- * Where a pyramid's base goes. Pyramids used to take their height from the average ground of
+ * Where a pyramid's base goes, and what is buried in its floor. Pyramids used to take their height from the average ground of
  * whichever chunk generated first, and on a dune that left the downhill side of the base in the air.
  */
 final class PyramidTests {
@@ -23,6 +24,55 @@ final class PyramidTests {
 
     static void register(BiConsumer<String, Consumer<GameTestHelper>> out) {
         out.accept("pyramid_base_never_overhangs", PyramidTests::pyramidBaseNeverOverhangs);
+        out.accept("pyramid_buries_suspicious_sand_by_the_rune", PyramidTests::pyramidBuriesSuspiciousSandByTheRune);
+    }
+
+    /**
+     * The sand sits in the floor course around the rune and nowhere else. A brushable block is
+     * {@code Fallable}: one placed in the open room above the floor falls and takes its sherd with
+     * it, so the course it lands in is the whole point.
+     */
+    private static void pyramidBuriesSuspiciousSandByTheRune(GameTestHelper helper) {
+        List<String> problems = new ArrayList<>();
+        RandomSource random = RandomSource.create(7L);
+
+        int total = 0;
+        int pyramids = 200;
+        for (int i = 0; i < pyramids; i++) {
+            int buried = 0;
+            // The same sweep the piece makes, so the sand can only come from where it really would.
+            for (int x = -8; x <= 8; x++) {
+                for (int z = -8; z <= 8; z++) {
+                    for (int y = -1; y <= 8; y++) {
+                        if (!PyramidPiece.suspiciousSand(random, new BlockPos(x, y, z))) {
+                            continue;
+                        }
+
+                        buried++;
+                        if (y != -1) {
+                            problems.add("sand at y " + y + ", which is not the floor course");
+                        }
+                        if (Math.max(Math.abs(x), Math.abs(z)) > 2) {
+                            problems.add("sand " + Math.max(Math.abs(x), Math.abs(z)) + " blocks out, too far from the rune");
+                        }
+                        if (x == 0 && z == 0) {
+                            problems.add("sand straight under the rune");
+                        }
+                    }
+                }
+            }
+
+            if (buried == 0) {
+                problems.add("a pyramid buried no suspicious sand at all");
+            }
+            total += buried;
+        }
+
+        // 24 floor blocks at one in four, so about six; vanilla's desert pyramid scatters 5 to 7.
+        int average = total / pyramids;
+        helper.assertTrue(average >= 4 && average <= 8, "pyramids averaged " + average + " suspicious sands, not about 6");
+        helper.assertTrue(problems.isEmpty(), "pyramid sand: " + String.join("; ", problems));
+        helper.succeed();
     }
 
     /**

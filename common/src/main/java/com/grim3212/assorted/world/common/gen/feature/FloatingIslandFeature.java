@@ -3,11 +3,16 @@ package com.grim3212.assorted.world.common.gen.feature;
 import com.grim3212.assorted.world.WorldCommonMod;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.RandomSource;
+import net.minecraft.util.random.Weighted;
+import net.minecraft.util.random.WeightedList;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
@@ -19,7 +24,9 @@ import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
+import net.minecraft.world.level.levelgen.feature.OreFeature;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
+import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration;
 
 import java.util.List;
 
@@ -93,6 +100,10 @@ public class FloatingIslandFeature extends Feature<NoneFeatureConfiguration> {
             }
         }
 
+        if (WorldCommonMod.COMMON_CONFIG.floatingIslandOres.get()) {
+            seedOres(level, random, base, shape);
+        }
+
         // Trees before plants, so a trunk is never refused a spot a flower took; plants and snow
         // after the island is whole, so canSurvive sees the finished surface.
         if (treeHeadroom > 0) {
@@ -148,6 +159,93 @@ public class FloatingIslandFeature extends Feature<NoneFeatureConfiguration> {
 
             features.get(type.tree(random)).ifPresent(tree -> tree.value().place(level, generator, random, ground.above()));
         }
+    }
+
+    /**
+     * Vanilla's own ore veins and stone pockets, grown inside the island's core. Every one of them
+     * only replaces {@code #stone_ore_replaceables}, so a stone core gets veins and a sandstone,
+     * terracotta or ice core is left as it is without this needing to know which is which.
+     */
+    private static void seedOres(WorldGenLevel level, RandomSource random, BlockPos base, FloatingIslandShape shape) {
+        // Tall enough for a vein to sit inside the core rather than break out of the surface.
+        List<FloatingIslandShape.Column> spots = shape.columns().stream()
+                .filter(column -> Math.max(Math.abs(column.x()), Math.abs(column.z())) <= ORE_REACH && column.height() >= MIN_ORE_HEIGHT)
+                .toList();
+        if (spots.isEmpty()) {
+            return;
+        }
+
+        Registry<ConfiguredFeature<?, ?>> features = level.registryAccess().lookupOrThrow(Registries.CONFIGURED_FEATURE);
+        int veins = Math.max(1, shape.columns().size() / COLUMNS_PER_VEIN);
+
+        for (int i = 0; i < veins; i++) {
+            FloatingIslandShape.Column spot = spots.get(random.nextInt(spots.size()));
+            // Somewhere below the filler, which is at most three blocks under the surface.
+            int down = 4 + random.nextInt(spot.height() - 4);
+            BlockPos at = surface(base, spot).below(down);
+            features.get(ORES.getRandomOrThrow(random))
+                    .filter(ore -> ore.value().config() instanceof OreConfiguration)
+                    .ifPresent(ore -> growVein(level, random, (OreConfiguration) ore.value().config(), at));
+        }
+    }
+
+    /**
+     * A random walk as many steps as the vein's size, placing ore wherever vanilla's rules allow.
+     * Not {@link Feature#ORE} itself: it gives up on any vein above the ground's heightmap, which
+     * is every vein in an island.
+     */
+    private static void growVein(WorldGenLevel level, RandomSource random, OreConfiguration config, BlockPos start) {
+        BlockPos.MutableBlockPos at = start.mutable();
+        for (int step = 0; step < config.size; step++) {
+            BlockState current = level.getBlockState(at);
+            for (OreConfiguration.TargetBlockState target : config.targetStates) {
+                if (OreFeature.canPlaceOre(current, level::getBlockState, random, config, target, at)) {
+                    level.setBlock(at, target.state, Block.UPDATE_CLIENTS);
+                    break;
+                }
+            }
+
+            Direction direction = Direction.getRandom(random);
+            at.move(direction);
+            if (at.distManhattan(start) > VEIN_SPREAD || Math.abs(at.get(direction.getAxis()) - start.get(direction.getAxis())) > VEIN_SPREAD / 2) {
+                at.move(direction.getOpposite());
+            }
+        }
+    }
+
+    /**
+     * How far from the centre a vein may start, and how far one may wander from its start. Together
+     * they stay inside the 15 blocks an island may reach.
+     */
+    private static final int ORE_REACH = 8;
+    private static final int VEIN_SPREAD = 6;
+    private static final int MIN_ORE_HEIGHT = 6;
+    private static final int COLUMNS_PER_VEIN = 12;
+
+    /** Weighted about as the ground has them near the surface: coal and iron common, diamond rare. */
+    private static final WeightedList<ResourceKey<ConfiguredFeature<?, ?>>> ORES = WeightedList.<ResourceKey<ConfiguredFeature<?, ?>>>builder()
+            .add(ore("ore_coal"), 10)
+            .add(ore("ore_iron_small"), 8)
+            .add(ore("ore_copper_small"), 6)
+            .add(ore("ore_redstone"), 3)
+            .add(ore("ore_gold"), 3)
+            .add(ore("ore_lapis"), 2)
+            .add(ore("ore_emerald"), 1)
+            .add(ore("ore_diamond_small"), 1)
+            .add(ore("ore_granite"), 2)
+            .add(ore("ore_diorite"), 2)
+            .add(ore("ore_andesite"), 2)
+            .add(ore("ore_gravel"), 2)
+            .add(ore("ore_dirt"), 2)
+            .build();
+
+    private static ResourceKey<ConfiguredFeature<?, ?>> ore(String id) {
+        return ResourceKey.create(Registries.CONFIGURED_FEATURE, Identifier.withDefaultNamespace(id));
+    }
+
+    /** Every ore feature islands can seed, for checking they all exist. */
+    public static List<ResourceKey<ConfiguredFeature<?, ?>>> ores() {
+        return ORES.unwrap().stream().map(Weighted::value).toList();
     }
 
     /** A plant or snow layer in an empty spot it can survive in. Tall plants need the block above as well. */

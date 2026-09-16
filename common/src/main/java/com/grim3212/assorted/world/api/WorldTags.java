@@ -49,7 +49,7 @@ public class WorldTags {
         // has_feature/* for the placed features, next to has_structure/* for the structures.
         public static final TagKey<Biome> HAS_FLOATING_ISLAND = create("has_feature/floating_island");
         public static final TagKey<Biome> HAS_DESERT_WELL = create("has_feature/desert_well");
-        public static final TagKey<Biome> HAS_WHEAT_FIELD = create("has_feature/wheat_field");
+        public static final TagKey<Biome> HAS_CROP_FIELD = create("has_feature/crop_field");
         public static final TagKey<Biome> HAS_SAPLINGS = create("has_feature/saplings");
         public static final TagKey<Biome> HAS_TREE_STUMPS = create("has_feature/tree_stumps");
         public static final TagKey<Biome> HAS_CACTUS_FIELD = create("has_feature/cactus_field");
@@ -60,6 +60,11 @@ public class WorldTags {
         /** Where one kind of floating island hangs; see {@code FloatingIslandTypes}. */
         public static TagKey<Biome> floatingIsland(String type) {
             return create("floating_island/" + type);
+        }
+
+        /** Where one wood grows, for stray saplings and stumps; see {@code BiomeWoods}. */
+        public static TagKey<Biome> woods(String wood) {
+            return create("woods/" + wood);
         }
 
         private static TagKey<Biome> create(String n) {

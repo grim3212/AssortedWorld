@@ -15,6 +15,7 @@ import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTypes;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.entity.SpawnerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -22,6 +23,7 @@ import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.ScatteredFeaturePiece;
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceSerializationContext;
+import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 
 import java.util.HashMap;
 import java.util.List;
@@ -163,6 +165,9 @@ public class PyramidPiece extends ScatteredFeaturePiece {
                 ((ChestBlockEntity) te).setLootTable(WorldLootTables.CHESTS_PYRAMID, rand.nextLong());
             }
 
+        } else if (s.getBlock() == Blocks.SUSPICIOUS_SAND) {
+            world.getBlockEntity(p, BlockEntityTypes.BRUSHABLE_BLOCK).ifPresent(sand -> sand.setLootTable(BuiltInLootTables.DESERT_PYRAMID_ARCHAEOLOGY, p.asLong()));
+
         } else if (s.getBlock() == Blocks.SPAWNER) {
             BlockEntity te = world.getBlockEntity(p);
 
@@ -180,6 +185,9 @@ public class PyramidPiece extends ScatteredFeaturePiece {
         // Exactly one rune per pyramid, at the centre of the base course regardless of size.
         if (pos.getX() == 0 && pos.getY() == 0 && pos.getZ() == 0) {
             return RuinUtil.runeAt(this.runeIndex);
+        }
+        if (suspiciousSand(random, pos)) {
+            return Blocks.SUSPICIOUS_SAND;
         }
         if (placeStone(random, pos, colHeight)) {
             if (type == 1) {
@@ -199,6 +207,22 @@ public class PyramidPiece extends ScatteredFeaturePiece {
         } else {
             return Blocks.AIR;
         }
+    }
+
+    /**
+     * Suspicious sand worked into the floor around the rune, about six of the 24 blocks in the 5x5
+     * it sits in - vanilla's desert pyramid scatters 5 to 7 of its own.
+     * <p>
+     * The floor course rather than the one the rune stands on: that one is open, and a brushable
+     * block is {@code Fallable}, so an unsupported one falls and takes its sherd with it.
+     */
+    public static boolean suspiciousSand(RandomSource random, BlockPos pos) {
+        if (pos.getY() != -1 || Math.max(Math.abs(pos.getX()), Math.abs(pos.getZ())) > 2) {
+            return false;
+        }
+
+        // Straight under the rune stays sandstone, so the rune is not sitting on something brushable.
+        return !(pos.getX() == 0 && pos.getZ() == 0) && random.nextInt(4) == 0;
     }
 
     private boolean placeStone(RandomSource random, BlockPos pos, int colHeight) {

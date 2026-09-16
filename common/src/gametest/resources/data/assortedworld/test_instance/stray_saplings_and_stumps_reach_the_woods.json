@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:function",
+  "environment": "minecraft:default",
+  "function": "assortedworld:stray_saplings_and_stumps_reach_the_woods",
+  "structure": "assortedworld:test_box",
+  "max_ticks": 1,
+  "setup_ticks": 0,
+  "required": true
+}

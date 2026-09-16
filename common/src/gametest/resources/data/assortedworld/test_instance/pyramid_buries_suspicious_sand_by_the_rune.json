@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:function",
+  "environment": "minecraft:default",
+  "function": "assortedworld:pyramid_buries_suspicious_sand_by_the_rune",
+  "structure": "assortedworld:test_box",
+  "max_ticks": 1,
+  "setup_ticks": 0,
+  "required": true
+}

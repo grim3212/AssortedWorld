@@ -8,7 +8,7 @@
     Craftable from glowstone dust and soul sand.
   - Floating islands. Rather than being a scoop of the ground below it will build the islands so the ground is left intact.
   - Desert wells. A shaft with loot that climbs with the depth. These replace vanilla's desert wells.
-  - World gen expanded: wild wheat fields, melons, stray saplings, tree stumps, cactus fields, and sandstone pillars and sand pits.
+  - World gen expanded: wild crop fields, melons, stray saplings, tree stumps, cactus fields, and sandstone pillars and sand pits.
 - Pyramids no longer generate with part of their base hanging in the air on sloped ground.
 - Requires Assorted Lib 4.1.0.
 
