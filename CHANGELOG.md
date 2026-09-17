@@ -2,7 +2,7 @@
 
 ## 9.1.0
 
-- Added a support for the Instruction Manul
+- Added instruction manual support
 - Brought four pieces of GrimPack's Grim World over:
   - Glowstone seeds. Plant them on a netherrack ceiling and they ripen into a blob of glowstone.
     Craftable from glowstone dust and soul sand.
