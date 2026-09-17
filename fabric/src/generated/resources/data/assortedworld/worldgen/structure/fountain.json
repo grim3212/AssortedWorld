@@ -1,6 +1,0 @@
-{
-  "type": "assortedworld:fountain",
-  "biomes": "#assortedworld:has_structure/fountain",
-  "spawn_overrides": {},
-  "step": "surface_structures"
-}

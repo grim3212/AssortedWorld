@@ -27,5 +27,6 @@ public final class WorldGameTests {
         BiomeWoodsTests.register(out);
         WaterDomeTests.register(out);
         AssetTests.register(out);
+        CrossLoaderDataTests.register(out);
     }
 }

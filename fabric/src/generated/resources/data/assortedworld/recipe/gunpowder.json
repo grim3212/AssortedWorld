@@ -1,9 +1,0 @@
-{
-  "type": "minecraft:crafting_shapeless",
-  "ingredients": [
-    "assortedworld:gunpowder_reed"
-  ],
-  "result": {
-    "id": "minecraft:gunpowder"
-  }
-}

@@ -19,9 +19,6 @@
     ],
     "client": [
       "com.grim3212.assorted.world.AssortedWorldFabricClient"
-    ],
-    "fabric-datagen": [
-      "com.grim3212.assorted.world.AssortedWorldFabricDatagen"
     ]
   },
   "depends": {
