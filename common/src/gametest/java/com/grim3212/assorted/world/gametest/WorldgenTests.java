@@ -10,6 +10,7 @@ import com.grim3212.assorted.world.common.util.RuinUtil;
 import com.grim3212.assorted.world.data.WorldGenData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -45,6 +46,48 @@ final class WorldgenTests {
     private WorldgenTests() {
     }
 
+    /** Namespaces whose features this pack adds through AssortedLib's world gen helper. */
+    private static final List<String> OURS = List.of("assortedworld", "assortedcore");
+
+    /**
+     * A feature's index in its generation step decides the seed it is placed from, so the same seed
+     * only gives the same world if both loaders add the features in the same order. Fabric applies
+     * its biome modifications sorted by the placed feature's id, so AssortedLib's NeoForge side sorts
+     * the same way and this asserts the result: our features run in ascending id order in every step
+     * they appear in. When this fails the two loaders still generate identical terrain and every
+     * scattered feature has moved, which is not obvious from looking at one of them.
+     */
+    private static void addedFeaturesKeepOneOrderAcrossLoaders(GameTestHelper helper) {
+        var biomes = helper.getLevel().registryAccess().lookupOrThrow(Registries.BIOME);
+        int checked = 0;
+
+        for (String biomeId : new String[]{"minecraft:plains", "minecraft:desert", "minecraft:jagged_peaks"}) {
+            var biome = biomes.getOrThrow(ResourceKey.create(Registries.BIOME, Identifier.parse(biomeId)));
+            List<HolderSet<PlacedFeature>> steps = biome.value().getGenerationSettings().features();
+
+            for (int step = 0; step < steps.size(); step++) {
+                String previous = null;
+
+                for (Holder<PlacedFeature> feature : steps.get(step)) {
+                    String id = feature.unwrapKey().map(key -> key.identifier().toString()).orElse(null);
+                    if (id == null || OURS.stream().noneMatch(namespace -> id.startsWith(namespace + ":"))) {
+                        continue;
+                    }
+
+                    checked++;
+                    if (previous != null && previous.compareTo(id) > 0) {
+                        helper.fail(biomeId + " step " + step + " has " + previous + " before " + id
+                                + "; our features must be in ascending id order or the loaders place them differently");
+                    }
+                    previous = id;
+                }
+            }
+        }
+
+        helper.assertTrue(checked > 0, "found none of our features in these biomes, so this asserted nothing");
+        helper.succeed();
+    }
+
     static void register(BiConsumer<String, Consumer<GameTestHelper>> out) {
         out.accept("structure_chest_loot_tables_roll_items", WorldgenTests::structureChestLootTablesRollItems);
         out.accept("piece_random_depends_only_on_position", WorldgenTests::pieceRandomDependsOnlyOnPosition);
@@ -52,6 +95,7 @@ final class WorldgenTests {
         out.accept("mod_features_are_attached_to_biomes", WorldgenTests::modFeaturesAreAttachedToBiomes);
         out.accept("config_rarity_gates_the_new_features", WorldgenTests::configRarityGatesTheNewFeatures);
         out.accept("vanilla_desert_well_is_replaced", WorldgenTests::vanillaDesertWellIsReplaced);
+        out.accept("added_features_keep_one_order_across_loaders", WorldgenTests::addedFeaturesKeepOneOrderAcrossLoaders);
     }
 
     /**
