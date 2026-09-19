@@ -1,5 +1,9 @@
 # Changelog
 
+## 9.1.1
+
+- Sand pit and cactus fields can only generate in deserts not any sandy biome
+
 ## 9.1.0
 
 - Added instruction manual support

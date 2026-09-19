@@ -40,8 +40,9 @@ public class WorldBiomeTagProvider extends LibBiomeTagProvider {
         tagger.apply(WorldTags.Biomes.HAS_DESERT_WELL).addOptionalTag(LibCommonTags.Biomes.IS_DESERT);
         // Red sandstone pillars stand on the badlands' red sand.
         tagger.apply(WorldTags.Biomes.HAS_SAND_PILLAR).addOptionalTag(LibCommonTags.Biomes.IS_DESERT).addOptionalTag(BiomeTags.IS_BADLANDS);
-        tagger.apply(WorldTags.Biomes.HAS_CACTUS_FIELD).addOptionalTag(LibCommonTags.Biomes.IS_SANDY);
-        tagger.apply(WorldTags.Biomes.HAS_SAND_PIT).addOptionalTag(LibCommonTags.Biomes.IS_SANDY);
+        // Desert only: c:is_sandy also holds the beach and the badlands.
+        tagger.apply(WorldTags.Biomes.HAS_CACTUS_FIELD).addOptionalTag(LibCommonTags.Biomes.IS_DESERT);
+        tagger.apply(WorldTags.Biomes.HAS_SAND_PIT).addOptionalTag(LibCommonTags.Biomes.IS_DESERT);
 
         tagger.apply(WorldTags.Biomes.HAS_CROP_FIELD).addOptionalTag(LibCommonTags.Biomes.IS_PLAINS);
         tagger.apply(WorldTags.Biomes.HAS_MELONS).addOptionalTag(LibCommonTags.Biomes.IS_PLAINS).addOptionalTag(LibCommonTags.Biomes.IS_WET_OVERWORLD);
